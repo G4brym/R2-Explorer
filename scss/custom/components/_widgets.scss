@@ -1,0 +1,164 @@
+// 
+// widgets.scss
+//
+
+// Simple tile box
+.widget-flat {
+    position: relative;
+    overflow: hidden;
+    i.widget-icon {
+        font-size: 36px;
+    }
+}
+
+// Inbox-widget(Used Profile)
+.inbox-widget {
+    .inbox-item {
+        border-bottom: 1px solid #{rgba(map-get($grays, "300"),0.5)};
+        overflow: hidden;
+        padding: 0.625rem 0;
+        position: relative;
+        &:last-of-type {
+            border-bottom: none;
+        }
+        .inbox-item-img {
+            display: block;
+            float: left;
+            margin-right: 15px;
+            width: 40px;
+            img {
+                width: 40px;
+            }
+        }
+        .inbox-item-author {
+            color: $text-color-h;
+            display: block;
+            margin-bottom: 3px;
+            font-weight: $label-font-weight;
+        }
+        .inbox-item-text {
+            color: $text-muted;
+            display: block;
+            font-size: 0.8125rem;
+            margin: 0;
+            overflow: hidden;
+        }
+        .inbox-item-date {
+            color: #{map-get($grays, "600")};
+            font-size: 0.6875rem;
+            position: absolute;
+            right: 5px;
+            top: 10px;
+        }
+    }
+}
+
+/* Chat widget */
+
+.conversation-list {
+    list-style: none;
+    padding: 0 15px;
+    li {
+        margin-bottom: 20px;
+
+        .conversation-actions {
+            float: right;
+            display: none;
+        }
+
+        &:hover {
+            .conversation-actions {
+                display: block;
+            }
+        }
+    }
+    .chat-avatar {
+        float: left;
+        text-align: center;
+        width: 42px;
+        img {
+            border-radius: 100%;
+            width: 100%;
+        }
+        i {
+            font-size: 12px;
+            font-style: normal;
+        }
+    }
+    .ctext-wrap {
+        background: $chat-secondary-user-bg;
+        border-radius: 3px;
+        display: inline-block;
+        padding: 12px;
+        position: relative;
+        i {
+            display: block;
+            font-size: 12px;
+            font-style: normal;
+            font-weight: $label-font-weight;
+            position: relative;
+        }
+        p {
+            margin: 0;
+            padding-top: 3px;
+        }
+        &:after {
+            left: -10px;
+            top: 0;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+            border-top-color: $chat-secondary-user-bg;
+            border-width: 6px;
+            margin-right: -1px;
+            border-right-color: $chat-secondary-user-bg;
+        }
+    }
+    .conversation-text {
+        float: left;
+        font-size: 12px;
+        margin-left: 12px;
+        width: 70%;
+    }
+    .odd {
+        .chat-avatar {
+            float: right !important;
+        }
+        .conversation-text {
+            float: right !important;
+            margin-right: 12px;
+            text-align: right;
+            width: 70% !important;
+        }
+        .ctext-wrap {
+            background-color: $chat-primary-user-bg;
+            &:after {
+                border-color: transparent;
+                border-left-color: $chat-primary-user-bg;
+                border-top-color: $chat-primary-user-bg;
+                right: -10px !important;
+                left: auto;
+            }
+        }
+
+        .conversation-actions {
+            float: left;
+        }
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .inbox-widget {
+        .inbox-item {
+            border-bottom: 1px solid #{rgba(map-get($dark-grays, "300"),0.5)};
+            .inbox-item-date {
+                color: #{map-get($dark-grays, "600")};
+            }
+        }
+    }
+}

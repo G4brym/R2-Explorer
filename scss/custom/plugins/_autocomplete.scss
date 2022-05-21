@@ -1,0 +1,59 @@
+//
+// autocomplete.scss
+//
+
+.autocomplete-suggestions {
+    border: $dropdown-border-width solid $dropdown-border-color;
+    background-color: $dropdown-bg;
+    cursor: default;
+    overflow: auto;
+    max-height: 200px !important;
+    box-shadow: $box-shadow;
+}
+
+.autocomplete-suggestion {
+    padding: 5px 10px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.autocomplete-no-suggestion {
+    padding: 5px;
+}
+
+.autocomplete-selected {
+    background: #{map-get($grays, "200")};
+    cursor: pointer;
+}
+
+.autocomplete-suggestions strong {
+    font-weight: bold;
+    color: #{map-get($grays, "900")};
+}
+
+.autocomplete-group {
+    padding: 5px;
+    font-weight: $font-weight-medium;
+    font-family: $font-family-secondary;
+}
+
+.autocomplete-group strong {
+    font-weight: bold;
+    font-size: 16px;
+    color: #{map-get($grays, "900")};
+    display: block;
+}
+
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .autocomplete-selected {
+        background: #{map-get($dark-grays, "200")};
+    }
+    .autocomplete-suggestions, .autocomplete-group {
+        strong {
+            color: #{map-get($dark-grays, "900")};
+        }
+    }
+}

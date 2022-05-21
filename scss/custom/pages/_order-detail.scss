@@ -1,0 +1,91 @@
+// 
+// order-detail.scss
+//
+
+.track-order-list{
+    ul{
+        li{
+            position: relative;
+            border-left: 2px solid #{map-get($grays, "300")};
+            padding: 0px 0px 14px 21px;
+            &:first-child{
+                padding-top: 0px;
+            }
+
+            &:last-child{
+                padding-bottom: 0px;
+            }
+            &:before{
+                content: "";
+                position: absolute;
+                left: -7px;
+                top: 0;
+                height: 12px;
+                width: 12px;
+                background-color: $primary;
+                border-radius: 50%;
+                border: 3px solid $card-bg;
+            }
+
+            &.completed{
+                border-color: $primary;
+            }
+            .active-dot{
+                &.dot{
+                    top: -9px;
+                    left: -16px;     
+                    border-color: $primary;           
+                }
+            }
+        }
+    }
+}
+  
+.dot {
+    border: 4px solid $primary;
+    background: 0 0;
+    border-radius: 60px;
+    height: 30px;
+    width: 30px;
+    animation: pulse 3s ease-out;
+    animation-iteration-count: infinite;
+    position: absolute;
+    top: -15px;
+    right: -2px;
+    z-index: 1;
+    opacity: 0;
+}
+  
+@keyframes pulse {
+    0% {
+        -webkit-transform: scale(0);
+        opacity: 0.0;
+    }
+    25% {
+        -webkit-transform: scale(0);
+        opacity: 0.1;
+    }
+    50% {
+        -webkit-transform: scale(0.1);
+        opacity: 0.3;
+    }
+    75% {
+        -webkit-transform: scale(0.5);
+        opacity: 0.5;
+    }
+    100% {
+        -webkit-transform: scale(1);
+        opacity: 0.0;
+    }
+}
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .track-order-list{
+        ul{
+            li{
+                border-left: 2px solid #{map-get($dark-grays, "300")};
+            }
+        }
+    }
+}

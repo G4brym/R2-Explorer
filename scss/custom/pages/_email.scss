@@ -1,0 +1,257 @@
+// 
+// email.scss
+//
+
+.inbox-leftbar {
+    width: 240px;
+    float: left;
+    padding: 0 20px 20px 10px;
+    position: relative;
+
+    &:before {
+        border-right: 5px solid $body-bg;
+        content: "";
+        position: absolute;
+        top: 0;
+        right: -15px;
+        bottom: -1.5rem;
+    }
+}
+
+.inbox-rightbar {
+    margin: -1.5rem 0 -1.5rem 250px;
+    border-left: 5px solid $body-bg;
+    padding: 1.5rem 0 1.5rem 25px;
+}
+
+.message-list {
+    display: block;
+    padding-left: 0;
+    li {
+        position: relative;
+        display: block;
+        height: 51px;
+        line-height: 50px;
+        cursor: default;
+        transition-duration: .3s;
+        a {
+            color: $dropdown-link-color;
+        }
+        &:hover {
+            background: $dropdown-link-hover-bg;
+            transition-duration: .05s;
+        }
+        .col-mail {
+            float: left;
+            position: relative;
+        }
+        .col-mail-1 {
+            width: 320px;
+            .star-toggle,
+            .checkbox-wrapper-mail,
+            .dot {
+                display: block;
+                float: left;
+            }
+            .dot {
+                border: 4px solid transparent;
+                border-radius: 100px;
+                margin: 22px 26px 0;
+                height: 0;
+                width: 0;
+                line-height: 0;
+                font-size: 0;
+            }
+            .checkbox-wrapper-mail {
+                margin: 15px 10px 0 20px;
+            }
+            .star-toggle {
+                margin-top: 18px;
+                color: #{map-get($grays, "500")};
+                margin-left: 10px;
+            }
+            .title {
+                position: absolute;
+                top: 0;
+                left: 100px;
+                right: 0;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                margin-bottom: 0;
+                line-height: 50px;
+            }
+        }
+        .col-mail-2 {
+            position: absolute;
+            top: 0;
+            left: 320px;
+            right: 0;
+            bottom: 0;
+            .subject,
+            .date {
+                position: absolute;
+                top: 0;
+            }
+            .subject {
+                left: 0;
+                right: 110px;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+            .date {
+                right: 0;
+                width: 100px;
+                padding-left: 10px;
+            }
+        }
+    }
+    li.active,
+    li.mail-selected {
+        background: #{map-get($grays, "100")};
+        transition-duration: .05s;
+    }
+    li.active,
+    li.active:hover {
+        box-shadow: inset 3px 0 0 $cyan;
+    }
+    li.unread a {
+        font-weight: $label-font-weight;
+        color: #{darken(map-get($grays, "900"), 5%)};
+    }
+    
+    .checkbox-wrapper-mail {
+        cursor: pointer;
+        height: 20px;
+        width: 20px;
+        position: relative;
+        display: inline-block;
+        box-shadow: inset 0 0 0 2px #{map-get($grays, "400")};
+        border-radius: 3px;
+        input {
+            opacity: 0;
+            cursor: pointer;
+        }
+        input:checked~label {
+            opacity: 1;
+        }
+        label {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            right: 3px;
+            bottom: 3px;
+            cursor: pointer;
+            background: #{map-get($grays, "600")};
+            opacity: 0;
+            margin-bottom: 0 !important;
+            transition-duration: .05s;
+        }
+        label:active {
+            background: #87949b;
+        }
+    }
+}
+
+.mail-list {
+    a {
+        color: $dropdown-link-color;
+        padding: 9px 10px;
+        display: block;
+        font-size: 15px;
+    }
+}
+
+.reply-box {
+    border: 2px solid #{map-get($grays, "100")};
+}
+
+@media (max-width: 648px) {
+    .inbox-leftbar {
+        width: 100%;
+        float: none;
+        padding: 0 20px;
+
+        &:before {
+            border-right: none;
+        }
+    }
+    .inbox-rightbar {
+        padding-top: 40px;
+        margin: 0;
+        border: 0;
+        padding-left: 0;
+    }
+    .message-list {
+        li .col-mail-1  {
+            .checkbox-wrapper-mail {
+                margin-left: 0;
+            }
+        }
+    }
+}
+
+@media (max-width: 520px) {
+    .inbox-rightbar {
+        > .btn-group {
+            margin-bottom: 10px;
+        }
+    }
+    .message-list li {
+        .col-mail-1 {
+            width: 150px;
+            .title {
+                left: 80px;
+            }
+        }
+        .col-mail-2 {
+            left: 160px;
+            .date {
+                text-align: right;
+                padding-right: 10px;
+                padding-left: 20px;
+            }
+        }
+    }
+}
+
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .inbox-leftbar {
+        &:before {
+            border-right: 5px solid var(--#{$variable-prefix}body-bg);
+        }
+    }
+    
+    .inbox-rightbar {
+        border-left: 5px solid var(--#{$variable-prefix}body-bg);
+    }
+    .message-list {
+        li {
+            .col-mail-1 {
+                .star-toggle {
+                    color: #{map-get($dark-grays, "500")};
+                }
+            }
+            &.active,
+            &.mail-selected {
+                background: #{map-get($dark-grays, "100")};
+            }
+            &.unread a {
+                color: #{darken(map-get($dark-grays, "900"), 5%)};
+            }
+        }
+        .checkbox-wrapper-mail {
+            box-shadow: inset 0 0 0 2px #{map-get($dark-grays, "400")};
+            label {
+                background: #{map-get($dark-grays, "600")};
+            }
+        }
+    }
+    .reply-box {
+        border: 2px solid #{map-get($dark-grays, "300")};
+    }
+}

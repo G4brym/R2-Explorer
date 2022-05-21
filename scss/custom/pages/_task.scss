@@ -1,0 +1,17 @@
+// 
+// _task.scss
+// 
+
+.task-item {
+    padding-left: 12px;
+    position: relative;
+
+    &:before {
+        content: "\F01DB";
+        font-family: "Material Design Icons";
+        position: absolute;
+        left: 0;
+        font-size: 19px;
+        top: -3px;
+    }
+}

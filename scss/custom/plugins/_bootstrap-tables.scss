@@ -1,0 +1,98 @@
+// 
+// bootstrap-tables.scss
+//
+
+.bootstrap-table {
+    .table:not(.table-sm) {
+        >tbody>tr>td,
+        >tbody>tr>th,
+        >tfoot>tr>td,
+        >tfoot>tr>th,
+        >thead>tr>td {
+            padding: $table-cell-padding-y;
+        }
+    }
+    .table {
+        border-bottom: none;
+    }
+    .table>thead>tr>th {
+        border-bottom: none;
+    }
+    table {
+        &.table-borderless {
+            tr {
+                border: none !important;
+                th, td {
+                    border: none !important;
+                }
+            }
+        }
+    }
+    table {
+        &.table-bordered {
+            tr {
+                border-color: $table-border-color !important;
+            }
+        }
+    }
+}
+
+
+.table-borderless.table-bordered {
+    border: none !important;
+}
+
+table[data-toggle="table"] {
+    display: none;
+}
+
+.fixed-table-pagination {
+    .pagination-detail,
+    div.pagination {
+        margin-top: 20px;
+        margin-bottom: 0;
+    }
+    .pagination {
+        .page-link {
+            border-radius: 30px !important;
+            margin: 0 3px;
+            border: none;
+        }
+    }
+}
+
+.fixed-table-container {
+    border: none;
+    thead {
+        th {
+            .th-inner {
+                padding: $table-cell-padding-y;
+            }
+        }
+    }
+}
+
+.fixed-table-toolbar {
+    .fa {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 400;
+
+        &.fa-sync {
+            font-weight: 900;
+        }
+    }
+    .fa-toggle-down:before {
+        content: "\f150";
+    }
+    .fa-toggle-up:before {
+        content: "\f151";
+    }
+    .fa-refresh:before {
+        content: "\f01e";
+        font-weight: 900;
+    }
+    .fa-th-list:before {
+        content: "\f0ca";
+        font-weight: 900;
+    }
+}

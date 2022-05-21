@@ -1,0 +1,87 @@
+// 
+// nestable-list.scss
+//
+
+.dd-list {
+    .dd-item {
+        .dd-handle {
+            border: none;
+            padding: 8px 16px;
+            height: auto;
+            font-weight: 600;
+            border-radius: 3px;
+            background: $dropdown-link-hover-bg;
+            color: $dropdown-link-color;
+
+            &:hover {
+                color: $primary;
+            }
+        }
+        button {
+            height: 36px;
+            font-size: 17px;
+            margin: 0;
+            color: #{map-get($grays, "600")};
+            width: 36px;
+        }
+    }
+    .dd3-item {
+        margin: 5px 0;
+
+        .dd-item button {
+            width: 36px;
+            height: 36px;
+        }
+    }
+    .dd3-handle {
+        margin: 0;
+        height: 36px !important;
+        float: left;
+    }
+    .dd3-content {
+        height: auto;
+        border: none;
+        padding: 8px 16px 8px 46px;
+        background: $dropdown-link-hover-bg;
+        color: $dropdown-link-color;
+        font-weight: 600;
+        &:hover {
+            color: $primary;
+        }
+    }
+    .dd3-handle:before {
+        content: "\F035C";
+        font-family: "Material Design Icons";
+        color: #{map-get($grays, "500")};
+    }
+}
+
+.dd-empty,
+.dd-placeholder {
+    background: #{rgba(map-get($grays, "400"),0.2)};
+}
+
+.dd-dragel {
+    .dd-handle {
+        box-shadow: $box-shadow;
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .dd-list {
+        .dd-item {
+            button {
+                color: #{map-get($dark-grays, "600")};
+            }
+        }
+        .dd3-handle:before {
+            color: #{map-get($dark-grays, "500")};
+        }
+    }
+    .dd-empty,
+    .dd-placeholder {
+        background: #{rgba(map-get($dark-grays, "400"),0.2)};
+    }
+}

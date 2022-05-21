@@ -1,0 +1,70 @@
+//
+// cropper.scss
+//
+
+.image-crop-preview {
+    .img-preview {
+        float: left;
+        margin-bottom: .5rem;
+        margin-right: .5rem;
+        overflow: hidden;
+        background-color: #{map-get($grays, "100")};
+        text-align: center;
+        width: 100%;
+    
+        >img {
+            max-width: 100%;
+        }
+    }
+
+    .preview-lg {
+        height: 9rem;
+        width: 16rem;
+    }
+    .preview-md {
+        height: 4.5rem;
+        width: 8rem;
+    }
+    .preview-sm {
+        height: 2.25rem;
+        width: 4rem;
+    }
+    .preview-xs {
+        height: 1.125rem;
+        margin-right: 0;
+        width: 2rem;
+    }
+}
+
+.img-crop-preview-btns {
+    > .btn, 
+    > .btn-group {
+        margin-bottom: 8px;
+        margin-right: 8px;
+    }
+}
+
+.docs-cropped {
+    .modal-body {
+        >img,
+        >canvas {
+            max-width: 100%;
+        }
+    }
+}
+
+.docs-drop-options {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    
+    .image-crop-preview {
+        .img-preview {
+            background-color: #{map-get($dark-grays, "100")};
+        }
+    }
+}

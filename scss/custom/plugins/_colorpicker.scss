@@ -1,0 +1,16 @@
+//
+// colorpicker.scss
+//
+
+.colorpicker {
+    background: $dropdown-bg;
+    box-shadow: $box-shadow;
+    border: 1px solid $dropdown-border-color;
+}
+
+.sp-picker-container {
+    .sp-alpha-handle {
+        right: 0;
+        left: auto;
+    }
+}

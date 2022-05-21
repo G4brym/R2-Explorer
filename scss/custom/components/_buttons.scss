@@ -1,0 +1,269 @@
+//
+// buttons.scss
+//
+
+// Button shadow
+
+@mixin button-shadow($color) {
+    box-shadow: $btn-box-shadow rgba($color, 0.5);
+}
+
+// Button Shadows
+@each $color, $value in $theme-colors {
+    .btn-#{$color} {
+        @include button-shadow($value);
+    }
+}
+
+.btn {
+    .mdi {
+        &:before {
+            margin-top: -1px;
+        }
+    }
+
+    i {
+        display: inline-block;
+    }
+}
+
+//
+// light button
+//
+.btn-light,
+.btn-white {
+    color: #{map-get($grays, "900")};
+}
+
+.btn-white {
+    border-color: #{map-get($grays, "300")};
+
+    &:hover,
+    &:focus {
+        background-color: #{map-get($grays, "100")};
+        border-color: #{map-get($grays, "100")};
+    }
+
+    &:focus,
+    &.focus {
+        box-shadow: 0 0 0 $btn-focus-width #{rgba(map-get($grays, "300"), 0.3)};
+    }
+}
+
+//
+// Link buttons
+//
+// Make a button look and behave like a link
+.btn-link {
+    font-weight: $font-weight-normal;
+    color: $link-color;
+    background-color: transparent;
+    &:hover {
+        color: $link-hover-color;
+        text-decoration: $link-hover-decoration;
+        background-color: transparent;
+        border-color: transparent;
+    }
+    &:focus,
+    &.focus {
+        text-decoration: $link-hover-decoration;
+        border-color: transparent;
+        box-shadow: none;
+    }
+    &:disabled,
+    &.disabled {
+        color: $btn-link-disabled-color;
+        pointer-events: none;
+    } // No need for an active state here
+}
+//
+// Alternate buttons
+//
+@each $color, $value in $theme-colors {
+    .btn-outline-#{$color} {
+        @include button-outline-variant($value);
+    }
+}
+
+//
+// Button labels
+//
+
+.btn-label {
+    margin: -0.55rem 0.9rem -0.55rem -0.9rem;
+    padding: 0.6rem 0.9rem;
+    background-color: #{rgba(map-get($grays, "900"), 0.1)};
+}
+
+.btn-label-right {
+    margin: (-$btn-padding-y) (-$btn-padding-x) (-$btn-padding-y) ($btn-padding-x);
+    padding: ($btn-padding-y) ($btn-padding-x);
+    background-color: #{rgba(map-get($grays, "900"), 0.1)};
+    display: inline-block;
+}
+
+//
+// Button Extra Small Size
+//
+
+.btn-xs {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    border-radius: 0.15rem;
+}
+
+//
+// Soft Buttons
+//
+
+@mixin button-variant-soft($bg) {
+    color: $bg;
+    background-color: rgba($bg, 0.18);
+    border-color: rgba($bg, 0.12);
+
+    &:hover {
+        color: $white;
+        background-color: $bg;
+    }
+
+    &:focus,
+    &.focus {
+        box-shadow: 0 0 0 $btn-focus-width rgba($bg, 0.3);
+    }
+}
+
+@each $color, $value in $theme-colors {
+    .btn-soft-#{$color} {
+        @include button-variant-soft($value);
+    }
+}
+
+
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    // Button Shadows
+    @each $color, $value in $dark-theme-colors {
+        .btn-#{$color} {
+            @include button-shadow($value);
+        }
+        .btn-outline-#{$color} {
+            @include button-outline-variant($value);
+        }
+        .btn-soft-#{$color} {
+            @include button-variant-soft($value);
+        }
+    }
+    .btn-label {
+        background-color: #{rgba(map-get($dark-grays, "900"), 0.1)};
+    }
+    
+    .btn-label-right {
+        background-color: #{rgba(map-get($dark-grays, "900"), 0.1)};
+    }
+    .btn-white {
+        border-color: #{map-get($dark-grays, "300")};
+        color: $white;
+        &:hover,
+        &:focus {
+            background-color: #{map-get($dark-grays, "100")};
+            border-color: #{map-get($dark-grays, "100")};
+        }
+
+        &:focus,
+        &.focus {
+            box-shadow: 0 0 0 $btn-focus-width #{rgba(map-get($dark-grays, "300"), 0.3)};
+        }
+    }
+
+    .btn-light {
+        background-color: #{map-get($dark-grays, "300")};
+        border-color: #{map-get($dark-grays, "300")};
+        color: #{map-get($dark-grays, "900")};
+    }
+    .btn-dark {
+        background-color: #{map-get($dark-grays, "900")};
+        border-color: #{map-get($dark-grays, "900")};
+        color: #{map-get($dark-grays, "100")};
+    }
+    .btn-secondary {
+        background-color: #{map-get($dark-grays, "600")};
+        border-color: #{map-get($dark-grays, "600")};
+        color: #{map-get($dark-grays, "300")};
+    }
+
+    .btn-outline-light {
+        border-color: #{map-get($dark-grays, "300")};
+        color: #{map-get($dark-grays, "300")};
+        &:hover,
+        &.active,
+        &:active,
+        &:focus {
+                color: #{map-get($dark-grays, "900")} !important;
+                background-color: #{map-get($dark-grays, "300")};
+        }
+    }
+    .btn-outline-dark {
+        border-color: #{map-get($dark-grays, "900")};
+        color: #{map-get($dark-grays, "900")};
+        &:hover,
+        &.active,
+        &:active,
+        &:focus {
+                color: #{map-get($dark-grays, "100")} !important;
+                background-color: #{map-get($dark-grays, "900")};
+        }
+    }
+    .btn-outline-secondary {
+        border-color: #{map-get($dark-grays, "600")};
+        color: #{map-get($dark-grays, "600")};
+        &:hover,
+        &.active,
+        &:active,
+        &:focus {
+                color: #{map-get($dark-grays, "300")} !important;
+                background-color: #{map-get($dark-grays, "600")};
+        }
+    }
+
+    .btn-soft-light {
+        color: #{map-get($dark-grays, "300")};
+        background-color: #{rgba(map-get($dark-grays, "300"), 0.18)};
+        border-color: #{rgba(map-get($dark-grays, "300"), 0.12)};
+        &:hover,
+        &.active,
+        &:active,
+        &:focus {
+            color: #{map-get($dark-grays, "900")};
+            background-color: #{map-get($dark-grays, "300")};
+            border-color: #{map-get($dark-grays, "300")};
+        }
+    }
+    .btn-soft-dark {
+        color: #{map-get($dark-grays, "900")};
+        background-color: #{rgba(map-get($dark-grays, "900"), 0.18)};
+        border-color: #{rgba(map-get($dark-grays, "900"), 0.12)};
+        &:hover,
+        &.active,
+        &:active,
+        &:focus {
+            color: #{map-get($dark-grays, "100")};
+            background-color: #{map-get($dark-grays, "900")};
+            border-color: #{map-get($dark-grays, "900")};
+        }
+    }
+    .btn-soft-secondary {
+        color: #{map-get($dark-grays, "600")};
+        background-color: #{rgba(map-get($dark-grays, "600"), 0.18)};
+        border-color: #{rgba(map-get($dark-grays, "600"), 0.12)};
+        &:hover,
+        &.active,
+        &:active,
+        &:focus {
+            color: #{map-get($dark-grays, "100")};
+            background-color: #{map-get($dark-grays, "600")};
+            border-color: #{map-get($dark-grays, "600")};
+        }
+    }
+}

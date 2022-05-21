@@ -1,0 +1,76 @@
+// 
+// footer.scss
+//
+
+.footer {
+    bottom: 0;
+    padding: 19px 15px 20px;
+    position: absolute;
+    right: 0;
+    color: $text-muted;
+    left: $leftbar-width;
+    background-color: $footer-bg;
+
+    .footer-links {
+        a {
+            color: $text-muted;
+            margin-left: 1.5rem;
+            transition: all .4s;
+            &:hover {
+                color: #{map-get($grays, "900")};
+            }
+            &:first-of-type {
+                margin-left: 0;
+            }
+        }
+    }
+}
+
+.footer-alt {
+    left: 0 !important;
+    text-align: center;
+    background-color: transparent;
+}
+
+@include media-breakpoint-down(md) {
+    .footer {
+        left: 0 !important;
+        text-align: center;
+    }
+}
+
+body[data-layout-mode="horizontal"] {
+    .footer {
+        left: 0 !important;
+    }
+
+    &[data-layout-width="boxed"] {
+        .footer {
+            max-width: $boxed-layout-width !important;
+        }
+    }
+}
+
+body[data-layout-mode="detached"] {
+    @include media-breakpoint-up(lg) {
+        .footer {
+            position: inherit;
+            margin: 0 10px;
+        }
+    }
+}
+
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .footer {
+        .footer-links {
+            a {
+                &:hover {
+                    color: #{map-get($dark-grays, "900")};
+                }
+            }
+        }
+    }
+}

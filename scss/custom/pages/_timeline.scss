@@ -1,0 +1,246 @@
+// 
+// timeline.scss
+//
+
+.timeline {
+    margin-bottom: 50px;
+    position: relative;
+
+    &:before {
+        background-color: #{map-get($grays, "300")};
+        bottom: 0;
+        content: "";
+        left: 50%;
+        position: absolute;
+        top: 30px;
+        width: 2px;
+        z-index: 0;
+    }
+
+    .time-show {
+        margin-bottom: 30px;
+        margin-top: 30px;
+        position: relative;
+    }
+
+    .timeline-box {
+        background: $card-bg;
+        display: block;
+        margin: 15px 0;
+        position: relative;
+        padding: 20px;
+        border-radius: $card-border-radius;
+        box-shadow: $components-shadow;
+    }
+
+    .timeline-album {
+        margin-top: 12px;
+
+        a {
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        img {
+            height: 36px;
+            width: auto;
+            border-radius: 3px;
+        }
+    }
+}
+
+@include media-breakpoint-up(md) {
+    .timeline {
+        .time-show {
+            margin-right: -69px;
+            text-align: right;
+        }
+
+        .timeline-box {
+            margin-left: 45px;
+        }
+
+        .timeline-icon {
+            background: #{map-get($grays, "300")};
+            border-radius: 50%;
+            display: block;
+            height: 20px;
+            left: -54px;
+            margin-top: -10px;
+            position: absolute;
+            text-align: center;
+            top: 50%;
+            width: 20px;
+
+            i {
+                color: #{map-get($grays, "600")};
+                font-size: 13px;
+                position: absolute;
+                left: 4px;
+                margin-top: 1px;
+            }
+        }
+
+        .timeline-desk {
+            display: table-cell;
+            vertical-align: top;
+            width: 50%;
+        }
+    }
+
+    .timeline-item {
+        display: table-row;
+
+        &:before {
+            content: "";
+            display: block;
+            width: 50%;
+        }
+
+        .timeline-desk {
+            .arrow {
+                border-bottom: 12px solid transparent;
+                border-right: 12px solid $card-bg !important;
+                border-top: 12px solid transparent;
+                display: block;
+                height: 0;
+                left: -12px;
+                margin-top: -12px;
+                position: absolute;
+                top: 50%;
+                width: 0;
+            }
+        }
+
+        &.timeline-item-left {
+            &:after {
+                content: "";
+                display: block;
+                width: 50%;
+            }
+
+            .timeline-desk {
+                .arrow-alt {
+                    border-bottom: 12px solid transparent;
+                    border-left: 12px solid $card-bg !important;
+                    border-top: 12px solid transparent;
+                    display: block;
+                    height: 0;
+                    left: auto;
+                    margin-top: -12px;
+                    position: absolute;
+                    right: -12px;
+                    top: 50%;
+                    width: 0;
+                }
+
+                .album {
+                    float: right;
+                    margin-top: 20px;
+
+                    a {
+                        float: right;
+                        margin-left: 5px;
+                    }
+                }
+            }
+
+            .timeline-icon {
+                left: auto;
+                right: -56px;
+            }
+
+            &:before {
+                display: none;
+            }
+
+            .timeline-box {
+                margin-right: 45px;
+                margin-left: 0;
+                text-align: right;
+            }
+        }
+    }
+}
+
+@include media-breakpoint-down(md) {
+    .timeline {
+        .time-show {
+            text-align: center;
+            position: relative;
+        }
+
+        .timeline-icon {
+            display: none;
+        }
+    }
+}
+
+// timeline small
+.timeline-sm {
+    padding-left: 110px;
+
+    .timeline-sm-item {
+        position: relative;
+        padding-bottom: 20px;
+        padding-left: 40px;
+        border-left: 2px solid #{map-get($grays, "300")};
+
+        &:after {
+            content: "";
+            display: block;
+            position: absolute;
+            top: 3px;
+            left: -7px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: $card-bg;
+            border: 2px solid $primary;
+        }
+
+        .timeline-sm-date {
+            position: absolute;
+            left: -104px;
+        }
+    }
+}
+
+@media (max-width: 420px) {
+    .timeline-sm {
+        padding-left: 0px;
+
+        .timeline-sm-date {
+            position: relative !important;
+            display: block;
+            left: 0px !important;
+            margin-bottom: 10px;
+        }
+    }
+}
+
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .timeline {
+        &:before {
+            background-color: #{map-get($dark-grays, "300")};
+        }
+    }
+    @include media-breakpoint-up(md) {
+        .timeline {
+            .timeline-icon {
+                background: #{map-get($dark-grays, "300")};
+                i {
+                    color: #{map-get($dark-grays, "600")};
+                }
+            }
+        }
+    }
+    .timeline-sm {
+        .timeline-sm-item {
+            border-left: 2px solid #{map-get($dark-grays, "300")};
+        }
+    }
+}

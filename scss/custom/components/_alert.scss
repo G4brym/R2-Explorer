@@ -1,0 +1,28 @@
+//
+// alert.scss
+//
+
+@each $color, $value in $theme-colors {
+  .alert-#{$color} {
+    color: shade-color($value, 30%);
+    background-color: rgba($value, 0.18);
+    border-color: rgba($value, 0.18);
+    .alert-link {
+      color: shade-color($value, 30%);
+    }
+  }
+}
+
+// Dark Mode
+body[data-layout-color="dark"] {
+  @each $color, $value in $dark-theme-colors {
+    .alert-#{$color} {
+      color: tint-color($value, 10%);
+      background-color: rgba($value, 0.15);
+      border-color: rgba($value, 0.15);
+      .alert-link {
+        color: shade-color($value, 30%);
+      }
+    }
+  }
+}

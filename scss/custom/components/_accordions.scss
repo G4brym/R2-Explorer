@@ -1,0 +1,20 @@
+// 
+// accordions.scss
+//
+
+.custom-accordion {
+    .accordion-arrow {
+        font-size: 1.2rem;
+        position: absolute;
+        right: 0;
+    }
+    a {
+        &.collapsed {
+            i.accordion-arrow {
+                &:before {
+                    content: "\F0142";
+                }
+            }
+        }
+    }
+}

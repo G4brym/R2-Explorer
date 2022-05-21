@@ -1,0 +1,156 @@
+// 
+// tables.scss
+//
+
+th {
+    font-weight: $table-head-font-weight;
+}
+
+//Table centered (Custom)
+.table-centered {
+    td,th {
+        vertical-align: middle !important;
+    }
+}
+
+
+// Table 
+
+.table-nowrap {
+    th,td {
+        white-space: nowrap;
+    }
+}
+
+// Custom table components (Custom)
+.table {
+    .table-user {
+        img {
+            height: 30px;
+            width: 30px;
+        }
+    }
+    &.table-bordered {
+        tbody {
+            border-top: $border-width solid;
+            border-top-color: inherit;
+        }
+    }
+}
+
+.action-icon {
+    color: #{map-get($grays, "600")};
+    font-size: 1.2rem;
+    display: inline-block;
+    padding: 0 3px;
+
+    &:hover {
+        color: #{map-get($grays, "700")};
+    }
+}
+
+table {
+    // Table Hover
+    &.table-hover {
+        tbody {
+            tr {
+                &:hover {
+                    > * {
+                        --ct-table-accent-bg: #f3f7f9;
+                    }
+                }
+            }
+        }
+    }       
+    // Table Active 
+    tr {
+        &.table-active {
+            --ct-table-accent-bg: #f3f7f9;
+        }
+    }
+    //  Table Striped
+    &.table-striped {
+        tbody {
+            tr {
+                &:nth-of-type(odd) {
+                    >* {
+                        --ct-table-accent-bg: #f3f7f9;
+                    }
+                }
+                table {
+                    &:not(.table-striped) {
+                        th, td {
+                            --ct-table-accent-bg: transparent;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .action-icon {
+        color: #{map-get($dark-grays, "600")};
+        font-size: 1.2rem;
+        display: inline-block;
+        padding: 0 3px;
+    
+        &:hover {
+            color: #{map-get($dark-grays, "700")};
+        }
+    }
+    // Table Light - Dark
+    .table-light {
+        --ct-table-bg: #3e4954;
+        color: $white;
+        border-color: $table-group-separator-color;
+    }
+    .table-dark {
+        --ct-table-bg: #424e5a;
+        tbody, tr {
+            border-color: #{lighten(map-get($dark-grays, "300"), 5%)};
+        }
+    }
+    table {
+        // Table Hover
+        &.table-hover {
+            tbody {
+                tr {
+                    &:hover {
+                        > * {
+                            --ct-table-accent-bg: #3e4954;
+                        }
+                    }
+                }
+            }
+        }       
+        // Table Active 
+        tr, td {
+            &.table-active {
+                --ct-table-accent-bg: #{rgba($black, 0.075)};
+            }
+        }
+        //  Table Striped
+        &.table-striped {
+            tbody {
+                tr {
+                    &:nth-of-type(odd) {
+                        >* {
+                            --ct-table-accent-bg: #3b4651;
+                        }
+                    }
+                    table {
+                        &:not(.table-striped) {
+                            th, td {
+                                --ct-table-accent-bg: transparent;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

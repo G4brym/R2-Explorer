@@ -1,0 +1,83 @@
+//
+// toastr.scss
+//
+
+.jq-toast-single {
+    padding: 15px;
+    font-family: $font-family-base;
+    background-color: $primary;
+    font-size: 13px;
+    line-height: 22px;
+    h2 {
+        font-family: $font-family-base;
+    }
+    a {
+        font-size: $font-size-base;
+        &:hover {
+            color: $white;
+        }
+    }
+}
+
+.jq-has-icon {
+    padding: 10px;
+}
+
+.close-jq-toast-single {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    font-size: 20px;
+    cursor: pointer;
+    height: 32px;
+    width: 32px;
+    background-color: #{map-get($grays, "900")};
+    border-radius: 50%;
+    text-align: center;
+    line-height: 32px;
+    color: #{map-get($grays, "100")};
+}
+
+.jq-toast-loader {
+    height: 3px;
+    top: 0;
+    border-radius: 0;
+}
+
+@each $color,$value in $theme-colors {
+    .jq-icon-#{$color} {
+        background-color: #{$value};
+        color: $white;
+        border-color: #{$value};
+    }
+}
+
+// For error
+.jq-icon-error {
+    background-color: $danger;
+    color: #{map-get($grays, "100")};
+    border-color: $danger;
+}
+
+.jq-icon-info, .jq-icon-warning, .jq-icon-error, .jq-icon-success {
+    background-image: none;
+}
+
+.close-jq-toast-single {
+    color: #{map-get($grays, "100")};
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .close-jq-toast-single {
+        background-color: #{map-get($dark-grays, "900")};
+        color: #{map-get($dark-grays, "300")};
+    }
+    .jq-icon-error {
+        color: #{map-get($dark-grays, "300")};
+    }
+    .close-jq-toast-single {
+        color: #{map-get($dark-grays, "300")};
+    }
+}

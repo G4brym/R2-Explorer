@@ -1,0 +1,76 @@
+//
+// flot.scss
+//
+
+.flotTip {
+    padding: 8px 12px;
+    background-color: #{map-get($grays, "900")};
+    z-index: 100;
+    color: #{map-get($grays, "100")};
+    opacity: 1;
+    border-radius: 3px;
+}
+
+.legend {
+    font-size: 14px;
+    
+    tr {
+        height: 30px;
+        font-family: $font-family-secondary;
+    }
+
+    > div {
+        background-color: transparent !important;
+    }
+}
+
+.legendLabel {
+    padding-left: 5px !important;
+    line-height: 10px;
+    padding-right: 10px;
+    font-size: 13px;
+    font-weight: $font-weight-medium;
+    color: #{map-get($grays, "600")};
+    text-transform: uppercase;
+}
+
+.legendColorBox {
+    div {
+        div {
+            border-radius: 50%;
+        }
+    }
+}
+
+.flot-text {
+    color: $text-muted !important;
+}
+
+.flot-svg {
+    text {
+        fill: $text-muted !important;
+    }
+}
+
+@include media-breakpoint-down(md) {
+    .legendLabel {
+        display: none;
+    }
+}
+
+.legendIcon {
+    width: 1.5em;
+    height: 1.5em;
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .flotTip {
+        background-color: #{map-get($dark-grays, "900")};
+        color: #{map-get($dark-grays, "100")};
+    }
+    .legendLabel {
+        color: #{map-get($dark-grays, "600")};
+    }
+}

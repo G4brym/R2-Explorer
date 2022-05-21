@@ -1,0 +1,55 @@
+// 
+// kanbanboard.scss
+//
+
+.tasklist {
+    min-height: 40px;
+    margin-bottom: 0;
+
+    li {
+        background-color: $card-bg;
+        border: 1px solid #{map-get($grays, "300")};
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 3px;
+        box-shadow: $components-shadow;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .btn-sm {
+            padding: 2px 8px;
+            font-size: 12px;
+        }
+    }
+
+    .form-check {
+        margin-left: 20px;
+        margin-top: 5px;
+        .form-check-input {
+            margin-left: 0;
+        }
+    }
+}
+
+.task-placeholder {
+    border: 1px dashed #{map-get($grays, "300")} !important;
+    background-color: #{map-get($grays, "100")} !important;
+    padding: 20px;
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .tasklist {
+        li {
+            background-color: #{lighten(map-get($dark-grays, "200"), 2%)};
+            border: 1px solid #{map-get($dark-grays, "300")};
+        }
+    }
+    .task-placeholder {
+        border: 1px dashed #{map-get($dark-grays, "300")} !important;
+        background-color: #{map-get($dark-grays, "100")} !important;
+    }
+}

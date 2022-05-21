@@ -1,0 +1,122 @@
+//
+// helper.scss
+//
+
+// Minimum width
+
+.width-xs {
+    min-width: 80px;
+}
+
+.width-sm {
+    min-width: 100px;
+}
+
+.width-md {
+    min-width: 120px;
+}
+
+.width-lg {
+    min-width: 140px;
+}
+
+.width-xl {
+    min-width: 160px;
+}
+
+
+// Font Family
+.font-family-primary {
+    font-family: $font-family-base;
+}
+
+.font-family-secondary {
+    font-family: $font-family-secondary;
+}
+
+// Text specify lines (Only chrome browser support)
+
+.sp-line-1,
+.sp-line-2,
+.sp-line-3,
+.sp-line-4 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+.sp-line-1 {
+    -webkit-line-clamp: 1;
+}
+
+.sp-line-2 {
+    -webkit-line-clamp: 2;
+}
+
+
+.sp-line-3 {
+    -webkit-line-clamp: 3;
+}
+
+.sp-line-4 {
+    -webkit-line-clamp: 4;
+}
+
+// Icons
+.icon-dual {
+    color: $text-muted;
+    fill: #{rgba(map-get($grays, "600"), 0.12)};
+}
+
+@each $color, $value in $theme-colors {
+    .icon-dual-#{$color} {
+        color: $value;
+        fill: #{rgba($value, 0.16)};
+    }
+}
+
+.icons-xs {
+    height: 16px;
+    width: 16px;
+}
+
+.icons-sm {
+    height: 24px;
+    width: 24px;
+}
+
+.icons-md {
+    height: 32px;
+    width: 32px;
+}
+
+.icons-lg {
+    height: 40px;
+    width: 40px;
+}
+
+.icons-xl {
+    height: 48px;
+    width: 48px;
+}
+
+.icons-xxl {
+    height: 60px;
+    width: 60px;
+}
+
+// Hover item
+.item-hovered {
+    &:hover {
+        background-color: $dropdown-link-hover-bg;
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .icon-dual {
+        fill: #{rgba(map-get($dark-grays, "600"), 0.12)};
+    }
+}

@@ -1,0 +1,18 @@
+// 
+// profile.scss
+//
+
+.post-user-comment-box {
+    background-color: #{map-get($grays, "100")};
+    margin: 0 -.75rem;
+    padding: 1rem;
+    margin-top: 20px;
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .post-user-comment-box {
+        background-color: #{map-get($dark-grays, "100")};
+    }
+}

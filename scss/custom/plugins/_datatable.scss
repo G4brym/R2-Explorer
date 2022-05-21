@@ -1,0 +1,191 @@
+//
+// datatable.scss
+//
+
+.dataTables_wrapper.container-fluid {
+    padding: 0;
+}
+
+table.dataTable {
+    border-collapse: collapse !important;
+    margin-bottom: 15px !important;
+
+    tbody {
+        // Multi select table
+
+        > tr.selected, 
+        >tr >.selected {
+            background-color: $primary;
+            
+            td {
+                border-color: $primary;
+            }
+        }
+        td {
+            &:focus {
+                outline: none !important;
+            }
+        }
+        // Key Tables
+        th.focus,td.focus{
+            outline: 2px solid $primary !important;
+            outline-offset: -1px;
+            color: $primary;
+            background-color: rgba($primary, 0.15);
+        }
+    }
+    thead {
+        .sorting,
+        .sorting_asc,
+        .sorting_desc,
+        .sorting_asc_disabled,
+        .sorting_desc_disabled{
+            &:before {
+                right: 1em;
+                left: auto;
+                content: "\2191";
+            }
+            &:after {
+                right: 0.5em;
+                left: auto;
+                content: "\2193";
+            }
+        }
+        > tr {
+            > th {
+                &.sorting_asc,
+                &.sorting_desc,
+                &.sorting {
+                    padding-right: 30px;
+                    padding-left: $table-cell-padding-x;
+                }
+            }
+        }
+    }
+}
+
+.dataTables_info {
+    font-weight: $label-font-weight;
+}
+
+
+// Responsive data table
+table.dataTable.dtr-inline.collapsed {
+    > tbody {
+        >tr[role=row] {
+            > td, > th {
+                &:first-child{
+                    &:before{
+                        box-shadow: $box-shadow-lg;
+                        background-color: $success;
+                        top: $table-cell-padding-y;
+                    }
+                }
+            }
+        }
+        >tr.parent {
+            > td, > th {
+                &:first-child{
+                    &:before{
+                        background-color: $danger;
+                        top: $table-cell-padding-y;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Data Table copy button
+div.dt-button-info {
+    background-color: $primary;
+    border: none;
+    color: $white;
+    box-shadow: none;
+    border-radius: 3px;
+    text-align: center;
+    z-index: 21;
+
+    h2 {
+        border-bottom: none;
+        background-color: rgba($white, 0.2);
+        color: $white;
+    }
+}
+
+@include media-breakpoint-down(md) {
+    li.paginate_button.previous,li.paginate_button.next {
+        display: inline-block;
+        font-size: 1.5rem;
+    }
+ 
+    li.paginate_button {
+        display: none;
+    }
+    .dataTables_paginate {
+        ul {
+            text-align: center;
+            display: block;
+            margin: $spacer 0 0 !important;
+        }
+    }
+    div.dt-buttons {
+        display: inline-table;
+        margin-bottom: $spacer;
+    }
+}
+
+
+.activate-select {
+    .sorting_1 {
+        background-color: $dropdown-link-hover-bg;
+    }
+}
+
+
+// datatable
+div.dataTables_wrapper {
+    div.dataTables_filter{
+      text-align: right;
+  
+      @media (max-width: 767px){
+        text-align: center;
+      }
+  
+  
+      input{
+        margin-left: 0.5em;
+        margin-right: 0;
+      }
+    }
+}
+
+div.table-responsive > 
+div.dataTables_wrapper {
+    > div.row > div[class^="col-"]:last-child {
+        padding-right: 0;
+    }
+    > div.row > div[class^="col-"]:first-child {
+        padding-left: 0;
+    }
+}
+
+
+table {
+    &.dataTable {
+        &>thead {
+            .sorting:before,
+            .sorting:after,
+            .sorting_asc:before,
+            .sorting_asc:after,
+            .sorting_desc:before,
+            .sorting_desc:after,
+            .sorting_asc_disabled:before,
+            .sorting_asc_disabled:after,
+            .sorting_desc_disabled:before,
+            .sorting_desc_disabled:after {
+                bottom: 1em;
+            }
+        }
+    }
+}

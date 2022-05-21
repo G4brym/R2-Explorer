@@ -1,0 +1,156 @@
+//
+// chartist.scss
+//
+
+.ct-golden-section:before {
+    float: none;
+}
+
+.ct-grid {
+    stroke: rgba($text-muted,.2);
+}
+
+.ct-chart {
+    max-height: 300px;
+    .ct-label {
+        fill: #{map-get($grays, "500")};
+        color: #{map-get($grays, "500")};
+        font-size: 12px;
+        line-height: 1;
+    }
+}
+
+.ct-chart.simple-pie-chart-chartist {
+    .ct-label {
+        color: $white;
+        fill: $white;
+        font-size: 16px;
+    }
+}
+
+.ct-chart {
+    .ct-series {
+        &.ct-series-a {
+            .ct-bar,
+            .ct-line,
+            .ct-point,
+            .ct-slice-donut {
+                stroke: $blue;
+            }
+        }
+        &.ct-series-b {
+            .ct-bar,
+            .ct-line,
+            .ct-point,
+            .ct-slice-donut {
+                stroke: $success;
+            }
+        }
+        &.ct-series-c {
+            .ct-bar,
+            .ct-line,
+            .ct-point,
+            .ct-slice-donut {
+                stroke: $warning;
+            }
+        }
+        &.ct-series-d {
+            .ct-bar,
+            .ct-line,
+            .ct-point,
+            .ct-slice-donut {
+                stroke: $danger;
+            }
+        }
+        &.ct-series-e {
+            .ct-bar,
+            .ct-line,
+            .ct-point,
+            .ct-slice-donut {
+                stroke: $info;
+            }
+        }
+        &.ct-series-f {
+            .ct-bar,
+            .ct-line,
+            .ct-point,
+            .ct-slice-donut {
+                stroke: $pink;
+            }
+        }
+        &.ct-series-g {
+            .ct-bar,
+            .ct-line,
+            .ct-point,
+            .ct-slice-donut {
+                stroke: $primary;
+            }
+        }
+    }
+}
+
+
+.ct-series-a {
+    .ct-area,
+    .ct-slice-pie {
+        fill: $blue;
+    }
+}
+
+.ct-series-b {
+    .ct-area,
+    .ct-slice-pie {
+        fill: $success;
+    }
+}
+
+.ct-series-c {
+    .ct-area,
+    .ct-slice-pie {
+        fill: $warning;
+    }
+}
+
+.ct-series-d {
+    .ct-area,
+    .ct-slice-pie {
+        fill: $danger;
+    }
+}
+
+.ct-area {
+    fill-opacity: .33;
+}
+
+.chartist-tooltip {
+    position: absolute;
+    display: inline-block;
+    opacity: 0;
+    min-width: 10px;
+    padding: 2px 10px;
+    border-radius: 3px;
+    background: #{map-get($grays, "900")};
+    color: #{map-get($grays, "100")};
+    text-align: center;
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity .2s linear;
+    &.tooltip-show {
+        opacity: 1;
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .ct-chart {
+        .ct-label {
+            fill: #{map-get($grays, "500")};
+            color: #{map-get($grays, "500")};
+        }
+    }
+    .chartist-tooltip {
+        background: #{map-get($dark-grays, "900")};
+        color: #{map-get($dark-grays, "300")};
+    }
+}

@@ -1,0 +1,32 @@
+// 
+// search-results.scss
+//
+
+.search-result-box {
+    .tab-content {
+        padding: 30px 30px 10px 30px;
+        box-shadow: none;
+    }
+    .search-item {
+        padding-bottom: 20px;
+        border-bottom: 1px solid #{map-get($grays, "100")};
+        margin-bottom: 20px;
+    }
+
+    .nav-bordered {
+        .nav-link {
+            padding: 10px 5px!important;
+            margin-right: 10px;
+        }
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .search-result-box {
+        .search-item {
+            border-bottom: 1px solid #{map-get($dark-grays, "300")};
+        }
+    }
+}

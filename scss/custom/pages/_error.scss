@@ -1,0 +1,72 @@
+// 
+// error.scss
+//
+
+// Error text with shadow
+.text-error {
+    color: $primary;
+    text-shadow: rgba($primary,0.3) 5px 1px, rgba($primary,0.2) 10px 3px;
+    font-size: 84px;
+    line-height: 90px;
+    font-family: $font-family-secondary;
+}
+
+// Animation text
+.error-text-box {
+    font-size: 10rem;
+    font-family: $font-family-secondary;
+    min-height: 200px;
+
+    .text {
+        fill: none;
+        stroke-width: 6;
+        stroke-linejoin: round;
+        stroke-dasharray: 30 100;
+        stroke-dashoffset: 0;
+        animation: stroke 9s infinite linear;
+    }
+    
+    .text:nth-child(5n + 1) {
+        stroke: $danger;
+        animation-delay: -1.2s;
+    }
+    
+    .text:nth-child(5n + 2) {
+        stroke: $warning;
+        animation-delay: -2.4s;
+    }
+    
+    .text:nth-child(5n + 3) {
+        stroke: $primary;
+        animation-delay: -3.6s;
+    }
+    
+    .text:nth-child(5n + 4) {
+        stroke: $info;
+        animation-delay: -4.8s;
+    }
+    
+    .text:nth-child(5n + 5) {
+        stroke: $success;
+        animation-delay: -6s;
+    }
+}
+
+@keyframes stroke {
+    100% {
+        stroke-dashoffset: -400;
+    }
+}
+
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+    .error-text-box {
+        .text {
+            fill: $danger;
+            stroke: $danger;
+            stroke-width: 6;
+            stroke-dasharray: 0 0;
+            stroke-dashoffset: 0;
+            animation: none;
+        }
+    }
+}

@@ -1,0 +1,47 @@
+//
+// morris.scss
+//
+
+.morris-chart {
+    text {
+        font-family: $font-family-secondary !important;
+        fill: $dropdown-link-color;
+    }
+}
+.morris-hover {
+    position: absolute;
+    z-index: 10;
+
+    &.morris-default-style {
+        font-size: 12px;
+        text-align: center;
+        border-radius: 5px;
+        padding: 10px 12px;
+        background: #{map-get($grays, "900")};
+        color: #{map-get($grays, "100")};
+        font-family: $font-family-base;
+
+        .morris-hover-row-label {
+            font-weight: bold;
+            margin: 0.25em 0;
+            font-family: $font-family-secondary;
+        }
+
+        .morris-hover-point {
+            white-space: nowrap;
+            margin: 0.1em 0;
+            color: $white;
+        }
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .morris-hover {
+        &.morris-default-style {
+            background: #{map-get($grays, "900")};
+            color: #{map-get($grays, "300")};
+        }
+    }
+}

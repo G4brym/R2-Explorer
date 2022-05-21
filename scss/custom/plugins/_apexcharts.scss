@@ -1,0 +1,137 @@
+//
+// apexcharts.scss
+//
+.apex-charts {
+    min-height: 10px !important;
+    text {
+        font-family: $font-family-base !important;
+        fill: $text-muted;
+        font-weight: $label-font-weight;
+    }
+    .apexcharts-canvas {
+        margin: 0 auto;
+    }
+}
+
+.apexcharts-tooltip-title,
+.apexcharts-tooltip-text,
+.apexcharts-legend-text  {
+    font-family: $font-family-base !important;
+}
+
+.apexcharts-legend-series {
+    font-weight: $label-font-weight;
+}
+
+.apexcharts-gridline {
+    pointer-events: none;
+    stroke: $apex-grid-color;
+}
+
+.apexcharts-legend-text {
+    color: $text-muted !important;
+}
+
+.apexcharts-yaxis,
+.apexcharts-xaxis {
+    text {
+        font-family: $font-family-base !important;
+        fill: $text-muted;
+        font-weight: $label-font-weight;
+    }
+}
+
+.apexcharts-point-annotations,
+.apexcharts-xaxis-annotations,
+.apexcharts-yaxis-annotations {
+    text {
+        fill: $text-muted;
+    }
+}
+
+.apexcharts-radar-series {
+    polygon {
+        fill: transparent;
+        stroke: #{map-get($grays, "300")};
+    }
+    line {
+        stroke: #{map-get($grays, "300")};
+    }
+}
+
+.apexcharts-pie-label, 
+.apexcharts-datalabel, 
+.apexcharts-datalabel-label,
+.apexcharts-datalabel-value {
+    fill: $text-muted !important;
+}
+
+.apexcharts-plot-series {
+    .apexcharts-datalabel{
+        fill: $white !important;
+    }
+}
+
+.apexcharts-datalabels-group {
+    text {
+        fill: $text-muted !important;
+        font-family: $font-family-base !important;
+    }
+}
+
+// Scatter images chart
+.scatter-images-chart {
+    .apexcharts-legend {
+        overflow: hidden !important;
+        min-height: 17px;
+    }
+    .apexcharts-legend-marker {
+        background: none !important;
+        margin-right: 7px !important;
+    }
+    .apexcharts-legend-series {
+        align-items: flex-start !important;
+    }
+}
+
+.apexcharts-pie-series {
+    path {
+        stroke: transparent !important;
+    }
+}
+
+.apexcharts-track {
+    path {
+        stroke: #{lighten(map-get($grays, "300"),5%)};
+    }
+}
+
+.apexcharts-xaxis {
+    line {
+        stroke: #{map-get($grays, "400")} !important;
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .apexcharts-radar-series {
+        polygon {
+            stroke: #{map-get($dark-grays, "300")};
+        }
+        line {
+            stroke: #{map-get($dark-grays, "300")};
+        }
+    }
+    .apexcharts-track {
+        path {
+            stroke: #{lighten(map-get($dark-grays, "300"),5%)};
+        }
+    }
+    .apexcharts-xaxis {
+        line {
+            stroke: #{map-get($dark-grays, "400")} !important;
+        }
+    }
+    
+}

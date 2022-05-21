@@ -1,0 +1,80 @@
+// 
+// gallery.scss
+//
+
+.filter-menu {
+    margin-bottom: 20px;
+
+    a {
+        transition: all 0.3s ease-out;
+        color: #{map-get($grays, "900")};
+        border-radius: 3px;
+        padding: 5px 10px;
+        display: inline-block;
+        margin-bottom: 5px;
+        font-weight: $font-weight-medium;
+        font-family: $font-family-secondary;
+
+        &:hover {
+            background-color: rgba($primary,0.15);
+            color: $primary;
+        }
+        
+        &.active {
+            background-color: $primary;
+            color: $white;
+        }
+    }
+}
+
+// Gallary Thumb
+.gal-box {
+    background-color: $card-bg;
+    border-radius: 3px;
+    box-shadow: $box-shadow;
+    margin-bottom: $grid-gutter-width;
+
+    .image-popup {
+        padding: 10px;
+        display: block;
+
+        img {
+            cursor: zoom-in;
+        }
+    }
+
+    .gall-info {
+        padding: 15px;
+        border-top: 1px solid #{map-get($grays, "200")};
+        position: relative;
+
+        h4 {
+            display: block;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .gal-like-btn {
+            position: absolute;
+            right: 15px;
+            font-size: 22px;
+            top: 24px;
+        }
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .filter-menu {
+        a {
+            color: #{map-get($dark-grays, "900")};
+        }
+    }
+    .gal-box {
+        .gall-info {
+            border-top: 1px solid #{map-get($dark-grays, "200")};
+        }
+    }
+}

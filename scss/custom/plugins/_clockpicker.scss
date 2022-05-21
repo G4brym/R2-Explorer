@@ -1,0 +1,136 @@
+//
+// clockpicker.scss
+//
+
+.sp-container{
+    background-color: $dropdown-bg;
+    z-index: 9;
+    button{
+      padding: .25rem .5rem;
+        font-size: .71094rem;
+        border-radius: .2rem;
+        font-weight: 400;
+        color: #{map-get($grays, "900")};
+    
+        &.sp-palette-toggle{
+          background-color: #{map-get($grays, "100")};
+        }
+        
+        &.sp-choose{
+          background-color: $success;
+          margin-left: 5px;
+          margin-right: 0;
+        }
+    }
+}
+
+  .sp-palette-container{
+    border-right: 1px solid #{map-get($grays, "300")};
+  }
+  
+  .sp-input{
+    background-color: $input-bg;
+    border-color: $input-border-color !important;
+    color: $input-color;
+    &:focus{
+      outline: none;
+    }
+  }
+
+
+  .clockpicker-popover {
+    .btn-default {
+        background-color: $primary;
+        color: $white;
+    }
+}
+
+.clockpicker-popover {
+    background: $dropdown-bg;
+    box-shadow: $box-shadow;
+    border: 1px solid $dropdown-border-color;
+    .popover-title {
+        background-color: transparent;
+        font-weight: $font-weight-medium;
+    }
+    .clockpicker-plate {
+        background: $dropdown-link-hover-bg;
+        border: 1px solid $dropdown-border-color;
+    }
+    .popover-content {
+        background-color: transparent;
+    }
+}
+
+.clockpicker-tick {
+    color: $dropdown-link-color;
+    &:hover {
+        background-color: rgba($primary, 0.35);
+    }
+}
+
+.clockpicker-canvas line {
+    stroke: $primary;
+}
+
+.clockpicker-canvas-bg {
+    fill: rgba($primary, 0.35);
+}
+
+.clockpicker-canvas-bearing,
+.clockpicker-canvas-fg {
+    fill: $primary;
+}
+
+.clockpicker-button {
+    display: block;
+    width: 100%;
+}
+  
+  
+  
+  [dir="rtl"]{
+  
+    .sp-alpha{
+      direction: ltr;
+    }
+  
+    .sp-original-input-container {
+      .sp-add-on{
+          border: none;
+        border-top-right-radius: 0!important;
+        border-bottom-right-radius: 0!important;
+        border-top-left-radius: 4px!important;
+        border-bottom-left-radius: 4px!important
+      }
+    } 
+  
+    input.spectrum.with-add-on{
+      border: 1px solid $input-border-color;
+      border-left: 0;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-top-right-radius: $input-border-radius;
+      border-bottom-right-radius: $input-border-radius;
+  
+    }
+  }
+
+  .sp-original-input-container .sp-add-on{
+      border: none !important;
+  }
+
+  // Dark Mode
+body[data-layout-color="dark"] {
+  .sp-container{
+    button{
+        color: #{map-get($dark-grays, "900")};
+        &.sp-palette-toggle{
+          background-color: #{map-get($dark-grays, "300")};
+        }
+      }
+    }
+  .sp-palette-container{
+    border-right: 1px solid #{map-get($dark-grays, "300")};
+  }
+}

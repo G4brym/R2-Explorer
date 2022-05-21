@@ -1,0 +1,68 @@
+// 
+// ecommerce.scss
+//
+
+.product-box {
+    position: relative;
+    overflow: hidden;
+
+    .product-action {
+        position: absolute;
+        right: 0;
+        top: 0;
+        padding: $card-spacer-x $card-spacer-x 0 $card-spacer-x;
+        z-index: 3;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(100%);
+        transition: all 0.3s ease 0s;
+    }
+
+    &:hover {
+        .product-action {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+    }
+
+    .product-info {
+        padding-top: $card-spacer-x;
+    }
+
+    .product-price-tag {
+        height: 48px;
+        line-height: 48px;
+        font-weight: 700;
+        font-size: 20px;
+        background-color: #{map-get($grays, "100")};
+        text-align: center;
+        padding: 0 10px;
+        border-radius: 3px;
+    }
+}
+
+// Product detail page
+.product-thumb {
+    padding: 3px;
+    margin-top: 3px;
+
+    &.active {
+        background-color: #{map-get($grays, "700")} !important;
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .product-box {
+        .product-price-tag {
+            background-color: #{map-get($dark-grays, "100")};
+        }
+    }
+    .product-thumb {
+        &.active {
+            background-color: #{map-get($dark-grays, "700")} !important;
+        }
+    }
+}

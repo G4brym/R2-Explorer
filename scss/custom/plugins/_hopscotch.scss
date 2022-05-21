@@ -1,0 +1,80 @@
+//
+// hopscotch.scss
+//
+
+div.hopscotch-bubble {
+    border: 3px solid $primary;
+    border-radius: 5px;
+    z-index: 999;
+
+    .hopscotch-next,
+    .hopscotch-prev {
+        background-color: $primary !important;
+        background-image: none !important;
+        border-color: $primary !important;
+        text-shadow: none !important;
+        margin: 0 0 0 5px !important;
+        font-family: $font-family-base;
+        color: $white !important;
+    }
+
+    .hopscotch-bubble-number {
+        background: $danger;
+        padding: 0;
+        border-radius: 50%;
+    }
+
+    .hopscotch-bubble-arrow-container {
+        &.left {
+            .hopscotch-bubble-arrow-border {
+                border-right: 19px solid $primary;
+            }
+
+            .hopscotch-bubble-arrow {
+                border: none;
+            }
+        }
+
+        &.right {
+            .hopscotch-bubble-arrow {
+                border-left: 19px solid $primary;
+                left: -2px;
+            }
+
+            .hopscotch-bubble-arrow-border {
+                border-left: 0 solid $primary;
+            }
+        }
+
+        &.up {
+            .hopscotch-bubble-arrow {
+                border-bottom: 19px solid $primary;
+                top: 0;
+            }
+
+            .hopscotch-bubble-arrow-border {
+                border-bottom: 0 solid rgba(0, 0, 0, .5);
+            }
+        }
+
+        &.down {
+            .hopscotch-bubble-arrow {
+                border-top: 19px solid $primary;
+                top: -2px;
+            }
+
+            .hopscotch-bubble-arrow-border {
+                border-top: 0 solid rgba(0, 0, 0, .5);
+            }
+        }
+    }
+
+    h3 {
+        font-family: $font-family-secondary;
+        margin-bottom: 10px;
+    }
+
+    .hopscotch-content {
+        font-family: $font-family-base;
+    }
+}

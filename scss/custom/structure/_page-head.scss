@@ -1,0 +1,61 @@
+// 
+// page-title.scss
+//
+
+.page-title-box {
+    .page-title {
+        font-size: 1.25rem;
+        margin: 0;
+        line-height: 75px;
+        color: #{map-get($grays, "900")};
+    }
+
+    .page-title-right {
+        float: right;
+        margin-top: 22px;
+    }
+
+    .breadcrumb {
+        padding-top: 5px;
+    }
+}
+
+
+@include media-breakpoint-down(md) {
+    .page-title-box {
+        .page-title {
+            display: block;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            line-height: 70px;
+        }
+
+        .breadcrumb {
+            display: none;
+        }
+    }
+}
+
+@media (max-width: 640px) {
+    .page-title-box {
+        .page-title-right {
+            display: none;
+        }
+    }
+}
+
+@media (max-width: 419px) {
+    .page-title-box .breadcrumb {
+        display: none;
+    }
+}
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .page-title-box {
+        .page-title {
+            color: #{map-get($dark-grays, "900")};
+        }
+    }
+}

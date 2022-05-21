@@ -1,0 +1,63 @@
+//
+// avatar.scss (avatar thumbnail sizes)
+//
+
+.avatar-xs {
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+.avatar-sm {
+    height: 2.25rem;
+    width: 2.25rem;
+}
+
+.avatar-md {
+    height: 3.5rem;
+    width: 3.5rem;
+}
+
+.avatar-lg {
+    height: 4.5rem;
+    width: 4.5rem;
+}
+
+.avatar-xl {
+    height: 6rem;
+    width: 6rem;
+}
+
+.avatar-xxl {
+    height: 7.5rem;
+    width: 7.5rem;
+}
+
+.avatar-title {
+    align-items: center;
+    color: $white;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    width: 100%;
+}
+
+.avatar-group {
+    padding-left: 12px;
+
+    .avatar-group-item {
+        margin: 0 0 10px -12px;
+        display: inline-block;
+        border: 2px solid $white;
+        border-radius: 50%;
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .avatar-group {
+        .avatar-group-item {
+            border: 2px solid #{map-get($dark-grays, "200")};
+        }
+    }
+}

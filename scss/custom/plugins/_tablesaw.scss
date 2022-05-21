@@ -1,0 +1,122 @@
+// 
+// tablesaw.scss
+//
+
+.tablesaw {
+    thead {
+        background: #{map-get($grays, "100")};
+        background-image: none;
+        border: none;
+        th {
+            text-shadow: none;
+        }
+        tr:first-child th {
+            border: none;
+            font-weight: 500;
+            font-family: $font-family-secondary;
+        }
+    }
+    td {
+        border-top: 1px solid #{map-get($grays, "100")} !important;
+        border-bottom-width: 0px;
+    }
+}
+
+.tablesaw td,
+.tablesaw tbody th {
+    font-size: inherit;
+    line-height: inherit;
+    padding: 10px !important;
+}
+
+.tablesaw-stack tbody tr,
+.tablesaw tbody tr {
+    border-bottom: none;
+}
+
+.tablesaw-bar .btn-select.btn-small:after,
+.tablesaw-bar .btn-select.btn-micro:after {
+    font-size: 8px;
+    padding-right: 10px;
+}
+
+.tablesaw-swipe .tablesaw-cell-persist {
+    box-shadow: none;
+    border-color: #{map-get($grays, "100")};
+}
+
+.tablesaw-enhanced .tablesaw-bar .btn {
+    text-shadow: none;
+    background-image: none;
+    text-transform: none;
+    border: 1px solid #{map-get($grays, "300")};
+    padding: 3px 10px;
+    color: #{map-get($grays, "900")};
+
+    &:after {
+        display: none;
+    }
+}
+
+.tablesaw-enhanced .tablesaw-bar .btn.btn-select {
+    &:hover {
+        background: $white;
+    }
+}
+
+.tablesaw-enhanced .tablesaw-bar .btn:hover,
+.tablesaw-enhanced .tablesaw-bar .btn:focus,
+.tablesaw-enhanced .tablesaw-bar .btn:active {
+    color: $primary !important;
+    background-color: $table-hover-bg;
+    outline: none !important;
+    box-shadow: none !important;
+    background-image: none;
+}
+
+.tablesaw-columntoggle-popup {
+    .btn-group {
+        display: block;
+    }
+}
+
+.tablesaw-swipe .tablesaw-swipe-cellpersist {
+    border-right: 2px solid #{map-get($grays, "100")};
+}
+
+.tablesaw-sortable-btn {
+    cursor: pointer;
+}
+
+.tablesaw-swipe-cellpersist {
+    width: auto!important;
+}
+
+.tablesaw-bar-section label {
+    color: inherit;
+    margin-bottom: .5rem;
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .tablesaw {
+        thead {
+            background: #{map-get($dark-grays, "100")};
+        }
+        td {
+            border-top: 1px solid #{map-get($dark-grays, "100")} !important;
+        }
+    }
+    .tablesaw-swipe .tablesaw-cell-persist {
+        border-color: #{map-get($dark-grays, "100")};
+    }
+    
+    .tablesaw-enhanced .tablesaw-bar .btn {
+        border: 1px solid #{map-get($dark-grays, "300")};
+        color: #{map-get($dark-grays, "900")};
+    }
+    .tablesaw-swipe .tablesaw-swipe-cellpersist {
+        border-right: 2px solid #{map-get($dark-grays, "100")};
+    }
+}

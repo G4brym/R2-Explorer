@@ -1,0 +1,82 @@
+// 
+// nav.scss
+//
+
+.nav-tabs,.nav-pills {
+    > li {
+        > a {
+            color: #{map-get($grays, "700")};
+            font-weight: $label-font-weight;
+        }
+    }
+}
+
+.nav-pills {
+    > a {
+        color: #{map-get($grays, "700")};
+        font-weight: $label-font-weight;   
+    }
+}
+
+.nav-fill, .nav-justified {
+    .nav-item {
+        .nav-link {
+            width: auto;
+        }
+    }  
+} 
+
+
+//Navtab custom
+.navtab-bg {
+    .nav-link {
+        background-color: $card-cap-bg;
+        margin: 0 5px;
+    }
+}
+
+
+// Nav bordered
+
+.nav-bordered {
+    border-bottom: 2px solid #{rgba(map-get($grays, "600"), 0.2)} !important;
+    .nav-item {
+        margin-bottom: -1px;
+    }
+
+    li {
+        a {
+            border: 0 !important;
+            padding: 10px 20px;
+        }
+    }
+
+a.active {
+    border-bottom: 2px solid $primary !important;
+}
+}
+
+.tab-content {
+    padding: 20px 0 0 0;
+}  
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .nav-tabs,.nav-pills {
+        > li {
+            > a {
+                color: #{map-get($dark-grays, "700")};
+            }
+        }
+    }
+    
+    .nav-pills {
+        > a {
+            color: #{map-get($dark-grays, "700")}; 
+        }
+    }
+    .nav-bordered {
+        border-bottom: 2px solid #{rgba(map-get($dark-grays, "600"), 0.2)} !important;
+    }
+}

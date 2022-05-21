@@ -1,0 +1,72 @@
+//
+// c3.scss
+//
+
+.c3-tooltip {
+    box-shadow: $box-shadow-lg;
+    opacity: 1;
+
+    td {
+        border-left: none;
+        font-family: $font-family-secondary;
+
+        >span {
+            background: #{map-get($grays, "900")};
+        }
+    }
+
+    tr {
+        border: none !important;
+    }
+
+    th {
+        background-color: #{map-get($grays, "900")};
+        color: #{map-get($grays, "100")};
+    }
+}
+
+.c3-chart-arcs-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.c3 {
+    text {
+        font-family: $font-family-base;
+        fill: $dropdown-link-color;
+    }
+}
+
+.c3-legend-item {
+    font-family: $font-family-secondary;
+    font-size: 14px;
+}
+
+.c3 line,
+.c3 path {
+    stroke: #{map-get($grays, "400")};
+}
+
+.c3-chart-arc.c3-target g path {
+    stroke: $white;
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .c3-tooltip {
+        td {
+            >span {
+                background: #{map-get($dark-grays, "900")};
+            }
+        }
+        th {
+            background-color: #{map-get($dark-grays, "900")};
+            color: #{map-get($dark-grays, "100")};
+        }
+    }
+    .c3 line,
+    .c3 path {
+        stroke: #{map-get($dark-grays, "400")};
+    }
+}

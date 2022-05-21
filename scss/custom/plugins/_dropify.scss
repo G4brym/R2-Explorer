@@ -1,0 +1,42 @@
+//
+// dropify.scss
+//
+
+@font-face {
+    font-family: 'dropify';
+    src: url("../../../fonts/dropify.eot");
+    src: url("../../../fonts/dropify.eot#iefix") format("embedded-opentype"), url("../../../fonts/dropify.woff") format("woff"), url("../../../fonts/dropify.ttf") format("truetype"), url("../../../fonts/dropify.svg#dropify") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+
+.dropify-wrapper {
+    border: 2px dashed $input-border-color;
+    background: $input-bg;
+    border-radius: 6px;
+    color: $input-color;
+
+    &:hover {
+        background-image: linear-gradient(-45deg,$card-cap-bg 25%,transparent 25%,transparent 50%,  $card-cap-bg 50%,$card-cap-bg 75%,transparent 75%,transparent);
+    }
+
+    .dropify-preview {
+        background-color: #{lighten(map-get($grays, "200"),5%)};
+    }
+}
+
+.file-icon {
+    p {
+        font-size: 20px;
+    }
+}
+
+
+// Dark Mode
+body[data-layout-color="dark"] {
+    .dropify-wrapper {
+        .dropify-preview {
+            background-color: #{lighten(map-get($dark-grays, "200"),5%)};
+        }
+    }
+}

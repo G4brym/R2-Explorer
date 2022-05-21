@@ -1,0 +1,23 @@
+//
+// reboot.scss
+//
+
+body {
+    padding-right: 0px !important;
+        padding-left: 0px !important;
+    &.loading {
+        visibility: hidden;
+        opacity: 0;
+    }
+}
+
+
+// Forms
+label {
+    font-weight: $label-font-weight;
+}
+
+
+button:focus {
+    outline: none;
+}

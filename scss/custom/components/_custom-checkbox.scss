@@ -1,0 +1,17 @@
+// 
+// Custom-radio.scss
+//
+
+
+// checkbox & radio color
+@each $color,
+$value in $theme-colors {
+    .form-check {
+        &.form-check-#{$color} {
+            .form-check-input:checked {
+                background-color: $value !important;
+                border-color: $value !important;
+            }
+        }
+    }
+}    
