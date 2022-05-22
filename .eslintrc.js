@@ -13,5 +13,6 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
-  }
+  },
+  ignorePatterns: ['functions/proxy.js']
 }
