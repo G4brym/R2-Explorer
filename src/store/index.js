@@ -18,11 +18,12 @@ export default createStore({
       state.s3 = new S3({
         region: 'auto',
         maxRetries: 1,
-        endpoint: 'https://r2.massadas.com/proxy?0983f9c21d0167d8d677be145016932e.r2.cloudflarestorage.com/',
+        endpoint: 'https://0983f9c21d0167d8d677be145016932e.r2.cloudflarestorage.com/',
         accessKeyId: payload.accessKey,
         secretAccessKey: payload.secretKey,
         s3DisableBodySigning: false,
-        s3ForcePathStyle: true
+        s3ForcePathStyle: true,
+        paramValidation: false
       })
 
       console.log(state.s3)
