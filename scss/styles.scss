@@ -1,3 +1,17 @@
 .content-page {
   margin-left: unset;
 }
+
+.footer {
+  left: 0;
+}
+
+.folder {
+  cursor: pointer;
+}
+
+.folder-tree {
+  li > a {
+    cursor: pointer;
+  }
+}
