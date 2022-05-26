@@ -7,63 +7,29 @@
       </div>
     </form>
     <div class="mt-2 mt-md-0">
-      <file-tree :bucket-name="bucketName" :current-folder="currentFolder" @navigate="navigate" />
+      <folder-tree @navigate="navigate" />
     </div>
   </div>
 
   <div class="mt-3">
-    <folders :folders="folders" @navigate="navigate" />
+    <folders @navigate="navigate" />
   </div> <!-- end .mt-3-->
 
   <div class="mt-3">
-    <files :files="files" />
+    <files />
   </div> <!-- end .mt-3-->
 
 </template>
 <script>
 import Folders from '@/components/Folders'
 import Files from '@/components/Files'
-import FileTree from '@/components/FileTree'
+import FolderTree from '@/components/FolderTree'
 export default {
-  data: function () {
-    return {
-      bucketName: 'homebox',
-      currentFolder: '',
-      files: [],
-      folders: []
-    }
-  },
+  components: { FolderTree, Files, Folders },
   methods: {
     navigate (folder) {
-      console.log(folder)
-      this.currentFolder = folder
-      this.refresh()
-    },
-    refresh () {
-      const self = this
-      this.$store.state.s3.listObjects({
-        Bucket: this.bucketName,
-        Prefix: this.currentFolder,
-        Delimiter: '/'
-      }, function (err, data) {
-        if (err) {
-          console.log('Error', err)
-        } else {
-          console.log(data)
-          self.files = data.Contents.map(function (obj) {
-            return {
-              ...obj,
-              name: obj.Key.replace(self.currentFolder, '')
-            }
-          })
-          self.folders = data.CommonPrefixes
-        }
-      })
+      this.$store.dispatch('navigate', folder)
     }
-  },
-  components: { FileTree, Files, Folders },
-  mounted () {
-    this.refresh()
   }
 }
 </script>

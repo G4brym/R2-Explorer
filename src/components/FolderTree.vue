@@ -1,7 +1,7 @@
 <template>
   <ol class="breadcrumb m-0 folder-tree">
     <li class="breadcrumb-item">
-      <a v-text="bucketName"  @click="$emit('navigate', '')"></a>
+      <a v-text="this.$store.state.activeBucket"  @click="$emit('navigate', '')"></a>
     </li>
     <template v-for="(folder, index) in tree" :key="index">
       <li class="breadcrumb-item" :class="{'active': index === tree.length -1}" >
@@ -13,14 +13,13 @@
 
 <script>
 export default {
-  props: ['bucketName', 'currentFolder'],
   emits: ['navigate'],
   computed: {
     tree () {
-      if (!this.currentFolder) {
+      if (!this.$store.state.currentFolder) {
         return []
       }
-      const folders = this.currentFolder.split('/').filter((obj) => {
+      const folders = this.$store.state.currentFolder.split('/').filter((obj) => {
         return obj !== ''
       })
 

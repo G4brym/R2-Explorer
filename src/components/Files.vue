@@ -1,7 +1,7 @@
 <template>
-  <h5 class="mb-3" v-if="files">Files</h5>
+  <h5 class="mb-3" v-if="$store.state.files">Files</h5>
 
-  <div class="table-responsive">
+  <div>
     <table class="table table-centered table-nowrap mb-0">
       <thead class="table-light">
       <tr>
@@ -13,7 +13,7 @@
       </thead>
       <tbody>
 
-      <tr v-for="file in files" :key="file.Key">
+      <tr v-for="file in $store.state.files" :key="file.Key">
         <td>
           <i data-feather="folder" class="icon-dual"></i>
           <span class="ms-2 fw-semibold"><a href="javascript: void(0);" class="text-reset" v-text="file.name"></a></span>
@@ -25,11 +25,10 @@
           <div class="btn-group dropdown">
             <a href="javascript: void(0);" class="table-action-btn dropdown-toggle arrow-none btn btn-light btn-xs" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
             <div class="dropdown-menu dropdown-menu-end">
-              <a class="dropdown-item" href="#"><i class="mdi mdi-share-variant me-2 text-muted vertical-middle"></i>Share</a>
-              <a class="dropdown-item" href="#"><i class="mdi mdi-link me-2 text-muted vertical-middle"></i>Get Sharable Link</a>
-              <a class="dropdown-item" href="#"><i class="mdi mdi-pencil me-2 text-muted vertical-middle"></i>Rename</a>
-              <a class="dropdown-item" href="#"><i class="mdi mdi-download me-2 text-muted vertical-middle"></i>Download</a>
-              <a class="dropdown-item" href="#"><i class="mdi mdi-delete me-2 text-muted vertical-middle"></i>Remove</a>
+              <a class="dropdown-item" @click="notImplemented"><i class="bi bi-share-fill me-1 pointer"></i>Get Sharable Link</a>
+              <a class="dropdown-item" @click="notImplemented"><i class="bi bi-pencil-fill me-1 pointer"></i>Rename</a>
+              <a class="dropdown-item" @click="download(file)" :download="compiledfile"><i class="bi bi-cloud-download-fill me-1 pointer"></i>Download</a>
+              <a class="dropdown-item" @click="notImplemented"><i class="bi bi-trash-fill me-1 pointer"></i>Remove</a>
             </div>
           </div>
         </td>
@@ -38,10 +37,40 @@
       </tbody>
     </table>
   </div>
+  <a style="display: none" ref="downloader"></a>
 </template>
 
 <script>
+import { saveAs } from 'file-saver'
+
 export default {
-  props: ['files']
+  data: function () {
+    return {
+      compiledfile: undefined
+    }
+  },
+  methods: {
+    download (file) {
+      // const self = this
+      this.$store.state.s3.getObject({
+        Bucket: this.$store.state.activeBucket,
+        Key: file.Key
+      }, function (err, data) {
+        if (err) console.log(err, err.stack) // an error occurred
+        else {
+          console.log(data)
+          const blob = new Blob([data.Body], { type: data.ContentType })
+
+          saveAs(blob, file.name)
+        }
+      })
+    },
+    notImplemented () {
+      this.$toast.open({
+        message: 'Not implemented yet',
+        type: 'error'
+      })
+    }
+  }
 }
 </script>

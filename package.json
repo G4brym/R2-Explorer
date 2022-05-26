@@ -10,9 +10,11 @@
   "dependencies": {
     "aws-sdk": "^2.1140.0",
     "core-js": "^3.8.3",
+    "file-saver": "^2.0.5",
     "util": "^0.12.4",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
+    "vue-toast-notification": "^3.0.4",
     "vuex": "^4.0.0"
   },
   "devDependencies": {

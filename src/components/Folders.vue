@@ -1,9 +1,9 @@
 <template>
-  <h5 class="mb-2" v-if="folders">Folders</h5>
+  <h5 class="mb-2" v-if="$store.state.files">Folders</h5>
 
   <div class="row mx-n1 g-0">
 
-    <div class="col-xl-3 col-lg-6" v-for="folder in folders" :key="folder.Prefix">
+    <div class="col-xl-3 col-lg-6" v-for="folder in $store.state.folders" :key="folder.Prefix">
       <div class="card m-1 shadow-none border folder" @click="$emit('navigate', folder.Prefix)">
         <div class="p-2">
           <div class="row align-items-center">
@@ -27,7 +27,6 @@
 
 <script>
 export default {
-  props: ['folders'],
   emits: ['navigate']
 }
 </script>

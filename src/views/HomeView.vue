@@ -21,7 +21,7 @@
           <!-- Left sidebar -->
           <div class="inbox-leftbar">
             <div class="btn-group d-block mb-2">
-              <button type="button" class="btn btn-success w-100 waves-effect waves-light dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="mdi mdi-plus"></i> Create New</button>
+              <button type="button" class="btn btn-success w-100 waves-effect waves-light dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-cloud-plus-fill"></i> Upload</button>
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="#"><i class="mdi mdi-folder-plus-outline me-1"></i> Folder</a>
                 <a class="dropdown-item" href="#"><i class="mdi mdi-file-plus-outline me-1"></i> File</a>
@@ -30,17 +30,13 @@
               </div>
             </div>
             <div class="mail-list mt-3">
-              <a href="#" class="list-group-item border-0"><i class="mdi mdi-folder-outline font-18 align-middle me-2"></i>My Files</a>
-              <a href="#" class="list-group-item border-0"><i class="mdi mdi-google-drive font-18 align-middle me-2"></i>Google Drive</a>
-              <a href="#" class="list-group-item border-0"><i class="mdi mdi-dropbox font-18 align-middle me-2"></i>Dropbox</a>
-              <a href="#" class="list-group-item border-0"><i class="mdi mdi-share-variant font-18 align-middle me-2"></i>Share with me</a>
-              <a href="#" class="list-group-item border-0"><i class="mdi mdi-clock-outline font-18 align-middle me-2"></i>Recent</a>
-              <a href="#" class="list-group-item border-0"><i class="mdi mdi-star-outline font-18 align-middle me-2"></i>Starred</a>
-              <a href="#" class="list-group-item border-0"><i class="mdi mdi-delete font-18 align-middle me-2"></i>Deleted Files</a>
+              <template v-for="bucket in $store.state.buckets" :key="bucket.Name">
+                <a :class="{'text-black': $store.state.activeBucket === bucket.Name}" @click="changeBucket(bucket)" class="list-group-item border-0" href="#"><i class="bi bi-bucket-fill me-2"></i>{{ bucket.Name }}</a>
+              </template>
             </div>
 
             <div class="mt-5">
-              <h4><span class="badge rounded-pill p-1 px-2 badge-soft-secondary">FREE</span></h4>
+<!--              <h4><span class="badge rounded-pill p-1 px-2 badge-soft-secondary">FREE</span></h4>-->
               <h6 class="text-uppercase mt-3">Storage</h6>
               <div class="progress my-2 progress-sm">
                 <div class="progress-bar progress-lg bg-success" role="progressbar" style="width: 46%" aria-valuenow="46" aria-valuemin="0" aria-valuemax="100"></div>
@@ -52,7 +48,9 @@
           <!-- End Left sidebar -->
 
           <div class="inbox-rightbar">
-            <gallery />
+            <drag-and-drop>
+              <gallery />
+            </drag-and-drop>
           </div>
           <!-- end inbox-rightbar-->
 
@@ -69,9 +67,13 @@
 // import { ListBucketsCommand } from 'aws-sdk/client-s3'
 
 import Gallery from '@/components/Gallery'
+import DragAndDrop from '@/components/DragAndDrop'
 export default {
-  components: { Gallery },
-  beforeMount () {
+  components: { DragAndDrop, Gallery },
+  methods: {
+    changeBucket (bucket) {
+      this.$store.commit('changeBucket', bucket.Name)
+    }
   }
 }
 </script>
