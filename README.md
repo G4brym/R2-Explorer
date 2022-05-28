@@ -5,6 +5,19 @@
 npm install
 ```
 
+## TODO
+- maybe image previewer/thumbnail using workers
+- pdf previewer inside the browser
+- tooltip when over time ago
+- dropdown menu when right click over file or folder
+- create folder
+- upload folders with files
+
+
+## Known issues
+Because r2 don't have signed url's the file downloads is made to local storage then it is downloaded as an url
+This as a limitation of around 2gb of max file
+
 ### Compiles and hot-reloads for development
 ```
 npm run serve

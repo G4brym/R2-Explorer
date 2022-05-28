@@ -59,6 +59,7 @@ export default createStore({
               name: obj.Key.replace(state.currentFolder, '')
             }
           })
+          console.log(state.files)
           state.folders = data.CommonPrefixes
         }
       })

@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-6">
-          2022 &copy; UBold theme by <a href="">Coderthemes</a>
+          2022 &copy;
         </div>
         <div class="col-md-6">
           <div class="text-md-end footer-links d-none d-sm-block">

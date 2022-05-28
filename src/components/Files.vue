@@ -18,8 +18,7 @@
           <i data-feather="folder" class="icon-dual"></i>
           <span class="ms-2 fw-semibold"><a href="javascript: void(0);" class="text-reset" v-text="file.name"></a></span>
         </td>
-        <td v-text="file.LastModified.toString()">
-        </td>
+        <td>{{ timeAgo(file.LastModified) }} ago</td>
         <td>{{ file.Size }} Kb</td>
         <td>
           <div class="btn-group dropdown">
@@ -42,6 +41,7 @@
 
 <script>
 import { saveAs } from 'file-saver'
+import utils from '../utils'
 
 export default {
   data: function () {
@@ -50,6 +50,9 @@ export default {
     }
   },
   methods: {
+    timeAgo: (time) => {
+      return utils.timeSince(time)
+    },
     download (file) {
       // const self = this
       this.$store.state.s3.getObject({
