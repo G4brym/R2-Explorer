@@ -10,6 +10,7 @@ import VueToast from 'vue-toast-notification'
 // Import one of the available themes
 // import 'vue-toast-notification/dist/theme-default.css';
 import 'vue-toast-notification/dist/theme-sugar.css'
+import 'sweetalert2/src/sweetalert2.scss'
 
 require('bootstrap/js/dist/dropdown')
 

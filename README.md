@@ -12,6 +12,8 @@ npm install
 - dropdown menu when right click over file or folder
 - create folder
 - upload folders with files
+- get connected user info
+- pagination
 
 
 ## Known issues

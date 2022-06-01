@@ -21,12 +21,10 @@
           <!-- Left sidebar -->
           <div class="inbox-leftbar">
             <div class="btn-group d-block mb-2">
-              <button type="button" class="btn btn-success w-100 waves-effect waves-light dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-cloud-plus-fill"></i> Upload</button>
+              <button type="button" class="btn btn-success w-100 waves-effect waves-light dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-plus-circle-fill"></i> New</button>
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="#"><i class="mdi mdi-folder-plus-outline me-1"></i> Folder</a>
-                <a class="dropdown-item" href="#"><i class="mdi mdi-file-plus-outline me-1"></i> File</a>
-                <a class="dropdown-item" href="#"><i class="mdi mdi-file-document me-1"></i> Document</a>
-                <a class="dropdown-item" href="#"><i class="mdi mdi-upload me-1"></i> Choose File</a>
+                <a class="dropdown-item pointer" @click="newFolder"><i class="bi bi-folder-fill me-1"></i> Folder</a>
+                <a class="dropdown-item pointer" href="#"><i class="bi bi-file-earmark-text-fill me-1"></i> File</a>
               </div>
             </div>
             <div class="mail-list mt-3">
@@ -49,7 +47,7 @@
 
           <div class="inbox-rightbar">
             <drag-and-drop>
-              <gallery />
+              <gallery v-if="$store.state.files && $store.state.folders"/>
             </drag-and-drop>
           </div>
           <!-- end inbox-rightbar-->
@@ -63,9 +61,7 @@
 </template>
 
 <script>
-// import repo from '@/repository'
-// import { ListBucketsCommand } from 'aws-sdk/client-s3'
-
+import Swal from 'sweetalert2'
 import Gallery from '@/components/Gallery'
 import DragAndDrop from '@/components/DragAndDrop'
 export default {
@@ -73,6 +69,46 @@ export default {
   methods: {
     changeBucket (bucket) {
       this.$store.commit('changeBucket', bucket.Name)
+    },
+    newFolder () {
+      const self = this
+
+      Swal.fire({
+        title: 'New folder',
+        input: 'text',
+        showCancelButton: true,
+        inputValidator: (value) => {
+          if (!value) {
+            return 'You need to write something!'
+          }
+        }
+      }).then((data) => {
+        if (data.isConfirmed === true) {
+          let folderPath = self.$store.state.currentFolder + '/' + data.value + '/'
+          if (folderPath.startsWith('/')) {
+            folderPath = folderPath.substring(1)
+          }
+
+          console.log(folderPath)
+          self.$store.state.s3.upload({ Bucket: self.$store.state.activeBucket, Key: folderPath, ContentLength: 0, Body: 'Folder placeholder' }).promise().then(
+            function (data) {
+              self.$toast.open({
+                message: 'Folder created!',
+                type: 'success'
+              })
+              self.$store.commit('refreshObjects')
+              console.log('Successfully uploaded ', data)
+            },
+            function (err) {
+              self.$toast.open({
+                message: 'Something went wrong!',
+                type: 'error'
+              })
+              console.log('There was an error creating your folder: ', err.message)
+            }
+          )
+        }
+      })
     }
   }
 }

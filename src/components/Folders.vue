@@ -1,5 +1,5 @@
 <template>
-  <h5 class="mb-2" v-if="$store.state.files">Folders</h5>
+  <h5 class="mb-2" v-if="$store.state.folders.length > 0">Folders</h5>
 
   <div class="row mx-n1 g-0">
 

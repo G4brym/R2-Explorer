@@ -53,13 +53,15 @@ export default createStore({
         if (err) {
           console.log('Error loading objects', err)
         } else {
-          state.files = data.Contents.map(function (obj) {
+          const files = data.Contents.filter(function (obj) {
+            return !obj.Key.endsWith('/')
+          })
+          state.files = files.map(function (obj) {
             return {
               ...obj,
               name: obj.Key.replace(state.currentFolder, '')
             }
           })
-          console.log(state.files)
           state.folders = data.CommonPrefixes
         }
       })
@@ -74,6 +76,9 @@ export default createStore({
   },
   actions: {
     navigate (context, folder) {
+      if (folder === '/') {
+        folder = ''
+      }
       context.commit('goTo', folder)
       context.commit('refreshObjects')
     }
