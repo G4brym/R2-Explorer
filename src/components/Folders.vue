@@ -15,7 +15,7 @@
               </div>
             </div>
             <div class="col">
-              <a class="fw-bold" v-text="folder.Prefix"></a>
+              <a class="fw-bold" v-text="folder.name"></a>
             </div>
           </div> <!-- end row -->
         </div> <!-- end .p-2-->

@@ -62,7 +62,15 @@ export default createStore({
               name: obj.Key.replace(state.currentFolder, '')
             }
           })
-          state.folders = data.CommonPrefixes
+
+          state.folders = data.CommonPrefixes.map(function (obj) {
+            const split = obj.Prefix.split('/')
+
+            return {
+              ...obj,
+              name: split[split.length - 2]
+            }
+          })
         }
       })
     },

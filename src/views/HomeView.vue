@@ -84,10 +84,7 @@ export default {
         }
       }).then((data) => {
         if (data.isConfirmed === true) {
-          let folderPath = self.$store.state.currentFolder + '/' + data.value + '/'
-          if (folderPath.startsWith('/')) {
-            folderPath = folderPath.substring(1)
-          }
+          const folderPath = self.$store.state.currentFolder + data.value + '/'
 
           console.log(folderPath)
           self.$store.state.s3.upload({ Bucket: self.$store.state.activeBucket, Key: folderPath, ContentLength: 0, Body: 'Folder placeholder' }).promise().then(
