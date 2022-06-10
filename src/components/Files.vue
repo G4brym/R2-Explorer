@@ -27,11 +27,13 @@
               <a href="javascript: void(0);" class="table-action-btn dropdown-toggle arrow-none btn btn-light btn-xs"
                  data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
               <div class="dropdown-menu dropdown-menu-end">
+                <a class="dropdown-item" @click="open(file)"><i
+                  class="bi bi-box-arrow-in-right me-1 pointer"></i>Open</a>
                 <a class="dropdown-item" @click="notImplemented"><i class="bi bi-share-fill me-1 pointer"></i>Get
                   Sharable Link</a>
                 <a class="dropdown-item" @click="notImplemented"><i
                   class="bi bi-pencil-fill me-1 pointer"></i>Rename</a>
-                <a class="dropdown-item" @click="download(file)" :download="compiledfile"><i
+                <a class="dropdown-item" @click="download(file)"><i
                   class="bi bi-cloud-download-fill me-1 pointer"></i>Download</a>
                 <a class="dropdown-item" @click="notImplemented"><i class="bi bi-trash-fill me-1 pointer"></i>Remove</a>
               </div>
@@ -44,7 +46,7 @@
         <tr>
           <td colspan="100%">
             <div class="empty-list">
-              <span class="title">This bucket is empty</span>
+              <span class="title">This Folder is empty</span>
               <span class="desc">Drag and Drop files to upload</span>
             </div>
 
@@ -54,6 +56,9 @@
 
       </tbody>
     </table>
+
+    <file-preview v-if="openedFile !== undefined" :fileData="openedFile" @close="openedFile = undefined" />
+
   </div>
   <a style="display: none" ref="downloader"></a>
 </template>
@@ -61,19 +66,37 @@
 <script>
 import { saveAs } from 'file-saver'
 import utils from '../utils'
+import FilePreview from '@/components/FilePreview'
 
 export default {
   data: function () {
     return {
-      compiledfile: undefined
+      openedFile: undefined
     }
   },
   methods: {
-    timeAgo: (time) => {
+    timeAgo (time) {
       return utils.timeSince(time)
     },
-    bytesToSize: (time) => {
+    bytesToSize (time) {
       return utils.bytesToSize(time)
+    },
+    open (file) {
+      const self = this
+      this.$store.state.s3.getObject({
+        Bucket: this.$store.state.activeBucket,
+        Key: file.Key
+      }, function (err, data) {
+        if (err) console.log(err, err.stack) // an error occurred
+        else {
+          const blob = new Blob([data.Body], { type: data.ContentType })
+          self.openedFile = {
+            title: file.name,
+            data: URL.createObjectURL(blob),
+            contentType: data.ContentType
+          }
+        }
+      })
     },
     download (file) {
       // const self = this
@@ -96,6 +119,9 @@ export default {
         type: 'error'
       })
     }
+  },
+  components: {
+    FilePreview
   }
 }
 </script>

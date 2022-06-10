@@ -13,6 +13,7 @@ import 'vue-toast-notification/dist/theme-sugar.css'
 import 'sweetalert2/src/sweetalert2.scss'
 
 require('bootstrap/js/dist/dropdown')
+require('bootstrap/js/dist/modal')
 
 const app = createApp(App)
 
