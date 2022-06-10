@@ -17,8 +17,9 @@ npm install
 
 
 ## Known issues
-Because r2 don't have signed url's the file downloads is made to local storage then it is downloaded as an url
-This as a limitation of around 2gb of max file
+- Because r2 don't have signed url's the file downloads is made to local storage then it is downloaded as an url. This as a limitation of around 2gb of max file
+- Rename files with special characters is not possible [sdk issue](https://github.com/aws/aws-sdk-js/issues/1949)
+
 
 ### Compiles and hot-reloads for development
 ```

@@ -33,7 +33,8 @@ export default {
           params: {
             Bucket: self.$store.state.activeBucket,
             Key: self.$store.state.currentFolder + obj.name,
-            Body: obj
+            Body: obj,
+            ContentType: obj.type
           }
         })
 

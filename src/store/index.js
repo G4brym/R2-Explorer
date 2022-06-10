@@ -59,7 +59,8 @@ export default createStore({
           state.files = files.map(function (obj) {
             return {
               ...obj,
-              name: obj.Key.replace(state.currentFolder, '')
+              name: obj.Key.replace(state.currentFolder, ''),
+              path: state.currentFolder
             }
           })
 

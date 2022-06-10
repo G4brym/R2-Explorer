@@ -27,15 +27,15 @@
               <a href="javascript: void(0);" class="table-action-btn dropdown-toggle arrow-none btn btn-light btn-xs"
                  data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots-vertical"></i></a>
               <div class="dropdown-menu dropdown-menu-end">
-                <a class="dropdown-item" @click="open(file)"><i
+                <a class="dropdown-item pointer" @click="open(file)"><i
                   class="bi bi-box-arrow-in-right me-1 pointer"></i>Open</a>
-                <a class="dropdown-item" @click="notImplemented"><i class="bi bi-share-fill me-1 pointer"></i>Get
+                <a class="dropdown-item pointer" @click="notImplemented"><i class="bi bi-share-fill me-1 pointer"></i>Get
                   Sharable Link</a>
-                <a class="dropdown-item" @click="notImplemented"><i
+                <a class="dropdown-item pointer" @click="renameFile(file)"><i
                   class="bi bi-pencil-fill me-1 pointer"></i>Rename</a>
-                <a class="dropdown-item" @click="download(file)"><i
+                <a class="dropdown-item pointer" @click="download(file)"><i
                   class="bi bi-cloud-download-fill me-1 pointer"></i>Download</a>
-                <a class="dropdown-item" @click="notImplemented"><i class="bi bi-trash-fill me-1 pointer"></i>Remove</a>
+                <a class="dropdown-item pointer" @click="deleteFile(file)"><i class="bi bi-trash-fill me-1 pointer"></i>Remove</a>
               </div>
             </div>
           </td>
@@ -57,7 +57,7 @@
       </tbody>
     </table>
 
-    <file-preview v-if="openedFile !== undefined" :fileData="openedFile" @close="openedFile = undefined" />
+    <file-preview v-if="openedFile !== undefined" :fileData="openedFile" @close="openedFile = undefined"/>
 
   </div>
   <a style="display: none" ref="downloader"></a>
@@ -67,6 +67,7 @@
 import { saveAs } from 'file-saver'
 import utils from '../utils'
 import FilePreview from '@/components/FilePreview'
+import Swal from 'sweetalert2'
 
 export default {
   data: function () {
@@ -75,6 +76,64 @@ export default {
     }
   },
   methods: {
+    deleteFile (file) {
+      const self = this
+
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$store.state.s3.deleteObject({
+            Bucket: this.$store.state.activeBucket,
+            Key: file.Key
+          }).promise()
+          self.$store.commit('refreshObjects')
+        }
+      })
+    },
+    renameFile (file) {
+      const self = this
+
+      Swal.fire({
+        title: 'Rename file',
+        input: 'text',
+        inputValue: file.name,
+        showCancelButton: true,
+        inputValidator: (value) => {
+          if (!value) {
+            return 'You need to write something!'
+          }
+        }
+      }).then((data) => {
+        if (data.isConfirmed === true) {
+          self.$store.state.s3.copyObject({
+            Bucket: self.$store.state.activeBucket,
+            CopySource: `${self.$store.state.activeBucket}/${file.Key}`,
+            Key: `${file.path}${data.value}`
+          })
+            .promise()
+            .then(() => {
+              self.$store.state.s3.deleteObject({
+                Bucket: self.$store.state.activeBucket,
+                Key: file.Key
+              }).promise()
+              self.$toast.open({
+                message: 'File deleted',
+                type: 'success'
+              })
+              self.$store.commit('refreshObjects')
+            }
+            )
+            .catch((e) => console.error(e))
+        }
+      })
+    },
     timeAgo (time) {
       return utils.timeSince(time)
     },
