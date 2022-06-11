@@ -5,20 +5,30 @@
 npm install
 ```
 
+## Features
+- PDF previewer
+- Image previewer
+- Upload one or multiple files
+- Create folders
+- Rename files/folders
+- Download files/folders
+- Delete files/folders
+- Right click dropdown menu with file options
+
+
 ## TODO
-- maybe image previewer/thumbnail using workers
-- pdf previewer inside the browser
-- tooltip when over time ago
-- dropdown menu when right click over file or folder
-- create folder
+- Upload folders
+- image thumbnail using workers
+- tooltip with absolute time in over time ago
 - upload folders with files
 - get connected user info
 - pagination
+- Download for files bigger than 2gb with presigned url's
 
 
 ## Known issues
 - Because r2 don't have signed url's the file downloads is made to local storage then it is downloaded as an url. This as a limitation of around 2gb of max file
-- Rename files with special characters is not possible [sdk issue](https://github.com/aws/aws-sdk-js/issues/1949)
+- Rename files with special characters is not possible with current [sdk issue](https://github.com/aws/aws-sdk-js/issues/1949)
 
 
 ### Compiles and hot-reloads for development
