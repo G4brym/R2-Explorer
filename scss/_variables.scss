@@ -495,7 +495,7 @@ $border-radius-pill:          50rem;
 // scss-docs-end border-radius-variables
 
 // scss-docs-start box-shadow-variables
-$box-shadow:                  var(--#{$variable-prefix}box-shadow); 
+$box-shadow:                  var(--#{$variable-prefix}box-shadow);
 $box-shadow-sm:               var(--#{$variable-prefix}box-shadow-sm);
 $box-shadow-lg:               var(--#{$variable-prefix}box-shadow-lg);
 $box-shadow-inset:            var(--#{$variable-prefix}box-shadow-inset);
@@ -1498,7 +1498,7 @@ $breadcrumb-margin-bottom:          1rem;
 $breadcrumb-bg:                     null;
 $breadcrumb-divider-color:          var(--#{$variable-prefix}breadcrumb-divider-color);
 $breadcrumb-active-color:           var(--#{$variable-prefix}breadcrumb-active-color);
-$breadcrumb-divider:                quote("\F0142");
+$breadcrumb-divider:                quote("\F231");
 $breadcrumb-divider-flipped:        $breadcrumb-divider;
 $breadcrumb-border-radius:          $border-radius;
 // scss-docs-end breadcrumb-variables

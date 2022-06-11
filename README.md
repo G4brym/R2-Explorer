@@ -10,14 +10,16 @@ npm install
 - Image previewer
 - Upload one or multiple files
 - Create folders
-- Rename files/folders
-- Download files/folders
-- Delete files/folders
+- Rename files
+- Download files
+- Delete files
 - Right click dropdown menu with file options
 
 
 ## TODO
 - Upload folders
+- Rename folders
+- Delete folders
 - image thumbnail using workers
 - tooltip with absolute time in over time ago
 - upload folders with files

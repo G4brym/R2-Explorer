@@ -1,11 +1,11 @@
 <template>
   <ul id="right-click-menu" ref="menu" tabindex="-1" v-if="viewMenu" @blur="closeMenu"
       :style="{top: top, left: left}">
-    <li class="pointer" @click="open(file)"><i class="bi bi-box-arrow-in-right me-1"></i>Open</li>
-    <li class="pointer" @click="notImplemented"><i class="bi bi-share-fill me-1"></i>Get Sharable Link</li>
-    <li class="pointer" @click="renameFile(file)"><i class="bi bi-pencil-fill me-1"></i>Rename</li>
-    <li class="pointer" @click="download(file)"><i class="bi bi-cloud-download-fill me-1"></i>Download</li>
-    <li class="pointer" @click="deleteFile(file)"><i class="bi bi-trash-fill me-1"></i>Remove</li>
+    <li class="pointer" v-if="canPreview" @click="openFile"><i class="bi bi-box-arrow-in-right me-1"></i>Open</li>
+    <li class="pointer" @click="notImplemented" v-if="canShare"><i class="bi bi-share-fill me-1"></i>Get Sharable Link</li>
+    <li class="pointer" @click="renameFile"><i class="bi bi-pencil-fill me-1"></i>Rename</li>
+    <li class="pointer" @click="downloadFile" v-if="canDownload"><i class="bi bi-cloud-download-fill me-1"></i>Download</li>
+    <li class="pointer" @click="deleteFile"><i class="bi bi-trash-fill me-1"></i>Remove</li>
   </ul>
 </template>
 
@@ -16,6 +16,10 @@ import { saveAs } from 'file-saver'
 export default {
   data: function () {
     return {
+      file: undefined,
+      canDownload: false,
+      canPreview: false,
+      canShare: false,
       viewMenu: false,
       top: '0px',
       left: '0px'
@@ -36,11 +40,15 @@ export default {
     },
 
     closeMenu: function () {
-      // this.viewMenu = false
+      this.viewMenu = false
     },
 
-    openMenu: function (e) {
+    openMenu: function (e, obj, canPreview = false, canDownload = true, canShare = true) {
       this.viewMenu = true
+      this.file = obj
+      this.canPreview = canPreview
+      this.canDownload = canDownload
+      this.canShare = canShare
 
       this.$nextTick(function () {
         this.$refs.menu.focus()
@@ -49,7 +57,7 @@ export default {
       }.bind(this))
       // e.preventDefault()
     },
-    deleteFile (file) {
+    deleteFile () {
       const self = this
 
       Swal.fire({
@@ -64,19 +72,26 @@ export default {
         if (result.isConfirmed) {
           this.$store.state.s3.deleteObject({
             Bucket: this.$store.state.activeBucket,
-            Key: file.Key
+            Key: self.file.Key
           }).promise()
+            .then(() =>
+              self.$toast.open({
+                message: 'File deleted',
+                type: 'success'
+              }))
           self.$store.commit('refreshObjects')
         }
+
+        self.closeMenu()
       })
     },
-    renameFile (file) {
+    renameFile () {
       const self = this
 
       Swal.fire({
         title: 'Rename file',
         input: 'text',
-        inputValue: file.name,
+        inputValue: self.file.name,
         showCancelButton: true,
         inputValidator: (value) => {
           if (!value) {
@@ -87,17 +102,17 @@ export default {
         if (data.isConfirmed === true) {
           self.$store.state.s3.copyObject({
             Bucket: self.$store.state.activeBucket,
-            CopySource: `${self.$store.state.activeBucket}/${file.Key}`,
-            Key: `${file.path}${data.value}`
+            CopySource: `${self.$store.state.activeBucket}/${self.file.Key}`,
+            Key: `${self.file.path}${data.value}`
           })
             .promise()
             .then(() => {
               self.$store.state.s3.deleteObject({
                 Bucket: self.$store.state.activeBucket,
-                Key: file.Key
+                Key: self.file.Key
               }).promise()
               self.$toast.open({
-                message: 'File deleted',
+                message: 'File renamed',
                 type: 'success'
               })
               self.$store.commit('refreshObjects')
@@ -105,39 +120,42 @@ export default {
             )
             .catch((e) => console.error(e))
         }
+
+        self.closeMenu()
       })
     },
-    open (file) {
+    openFile () {
       const self = this
       this.$store.state.s3.getObject({
         Bucket: this.$store.state.activeBucket,
-        Key: file.Key
+        Key: self.file.Key
       }, function (err, data) {
         if (err) console.log(err, err.stack) // an error occurred
         else {
           const blob = new Blob([data.Body], { type: data.ContentType })
-          self.openedFile = {
-            title: file.name,
-            data: URL.createObjectURL(blob),
-            contentType: data.ContentType
-          }
+          self.$emit('openFile', {
+            ...self.file,
+            data: URL.createObjectURL(blob)
+          })
+          self.closeMenu()
         }
       })
     },
-    download (file) {
+    downloadFile () {
       // TODO: implement download for fiels bigger than 2gb
 
       // const self = this
       this.$store.state.s3.getObject({
         Bucket: this.$store.state.activeBucket,
-        Key: file.Key
+        Key: self.file.Key
       }, function (err, data) {
         if (err) console.log(err, err.stack) // an error occurred
         else {
           console.log(data)
           const blob = new Blob([data.Body], { type: data.ContentType })
 
-          saveAs(blob, file.name)
+          saveAs(blob, self.file.name)
+          self.closeMenu()
         }
       })
     },
@@ -146,6 +164,7 @@ export default {
         message: 'Not implemented yet',
         type: 'error'
       })
+      this.closeMenu()
     }
   }
 }

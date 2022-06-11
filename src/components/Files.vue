@@ -39,9 +39,9 @@
       </tbody>
     </table>
 
-    <file-preview v-if="openedFile !== undefined" :fileData="openedFile" @close="openedFile = undefined"/>
+    <file-preview ref="preview"/>
 
-    <context-menu ref="menu"/>
+    <context-menu ref="menu" @openFile="openFile"/>
   </div>
 </template>
 
@@ -51,16 +51,10 @@ import FilePreview from '@/components/FilePreview'
 import ContextMenu from '@/components/contextMenu'
 
 export default {
-  data: function () {
-    return {
-      openedFile: undefined
-    }
-  },
   methods: {
     openMenu (event, file) {
-      // console.log(event)
-      // console.log(file)
-      this.$refs.menu.openMenu(event)
+      const canPreview = this.$refs.preview.getType(file.extension) !== undefined
+      this.$refs.menu.openMenu(event, file, canPreview)
     },
 
     timeAgo (time) {
@@ -68,8 +62,10 @@ export default {
     },
     bytesToSize (time) {
       return utils.bytesToSize(time)
+    },
+    openFile (fileData) {
+      this.$refs.preview.openPreview(fileData)
     }
-
   },
   components: {
     ContextMenu,

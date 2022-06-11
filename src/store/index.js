@@ -13,7 +13,7 @@ export default createStore({
     activeBucket: 'homebox',
     currentFolder: '',
     files: [],
-    folder: [],
+    folders: [],
     buckets: []
   },
   getters: {},
@@ -57,10 +57,13 @@ export default createStore({
             return !obj.Key.endsWith('/')
           })
           state.files = files.map(function (obj) {
+            const name = obj.Key.replace(state.currentFolder, '')
+
             return {
               ...obj,
-              name: obj.Key.replace(state.currentFolder, ''),
-              path: state.currentFolder
+              name: name,
+              path: state.currentFolder,
+              extension: name.split('.').pop()
             }
           })
 
@@ -69,7 +72,9 @@ export default createStore({
 
             return {
               ...obj,
-              name: split[split.length - 2]
+              name: split[split.length - 2],
+              path: state.currentFolder,
+              Key: obj.Prefix
             }
           })
         }

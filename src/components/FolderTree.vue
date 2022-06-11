@@ -1,10 +1,10 @@
 <template>
   <ol class="breadcrumb m-0 folder-tree">
     <li class="breadcrumb-item">
-      <a v-text="this.$store.state.activeBucket"  @click="$emit('navigate', '')"></a>
+      <a v-text="this.$store.state.activeBucket" @click="$emit('navigate', '')"></a>
     </li>
     <template v-for="(folder, index) in tree" :key="index">
-      <li class="breadcrumb-item" :class="{'active': index === tree.length -1}" >
+      <li class="breadcrumb-item" :class="{'active': index === tree.length -1}">
         <a v-text="folder.name" @click="$emit('navigate', folder.path)"></a>
       </li>
     </template>
@@ -35,3 +35,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.breadcrumb-item + .breadcrumb-item::before {
+  font-family: "bootstrap-icons" !important;
+  content: "\F231";
+  color: black;
+}
+</style>
