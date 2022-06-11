@@ -1,8 +1,11 @@
 <template>
 
-    <div :class="{'upload-box': isHover}" @dragover.prevent="dragover" @dragleave.prevent="dragleave" @drop.prevent="drop">
-        <slot></slot>
-    </div>
+  <div :class="{'upload-box': isHover}" @dragover.prevent="dragover" @dragleave.prevent="dragleave"
+       @drop.prevent="drop">
+    <slot></slot>
+  </div>
+
+  <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="uploader" multiple directory="" webkitdirectory="" moxdirectory=""/>
 
 </template>
 
@@ -18,17 +21,22 @@ export default {
     }
   },
   methods: {
+    openUploader () {
+      this.$refs.uploader.click()
+    },
     dragover (event) {
       this.isHover = true
     },
     dragleave (event) {
       this.isHover = false
     },
-    drop (event) {
+    inputFiles (event) {
+      this.uploadFiles(event.target.files)
+    },
+    uploadFiles (files) {
       const self = this
-      event.preventDefault()
-      // console.log('drop', event.dataTransfer.files)
-      Array.from(event.dataTransfer.files).forEach(obj => {
+
+      Array.from(files).forEach(obj => {
         const upload = new AWS.S3.ManagedUpload({
           params: {
             Bucket: self.$store.state.activeBucket,
@@ -60,6 +68,11 @@ export default {
           }
         )
       })
+    },
+    drop (event) {
+      event.preventDefault()
+      // console.log('drop', event.dataTransfer.files)
+      this.uploadFiles(event.dataTransfer.files)
     }
   }
 }

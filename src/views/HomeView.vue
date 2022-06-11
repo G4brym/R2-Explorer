@@ -24,7 +24,7 @@
               <button type="button" class="btn btn-success w-100 waves-effect waves-light dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bi bi-plus-circle-fill"></i> New</button>
               <div class="dropdown-menu">
                 <a class="dropdown-item pointer" @click="newFolder"><i class="bi bi-folder-fill me-1"></i> Folder</a>
-                <a class="dropdown-item pointer" href="#"><i class="bi bi-file-earmark-text-fill me-1"></i> File</a>
+                <a class="dropdown-item pointer" @click="$refs.uploader.openUploader()"><i class="bi bi-file-earmark-text-fill me-1"></i> File</a>
               </div>
             </div>
             <div class="mail-list mt-3">
@@ -46,7 +46,7 @@
           <!-- End Left sidebar -->
 
           <div class="inbox-rightbar">
-            <drag-and-drop>
+            <drag-and-drop ref="uploader">
               <gallery v-if="$store.state.files && $store.state.folders"/>
             </drag-and-drop>
           </div>
