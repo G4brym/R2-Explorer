@@ -1,0 +1,17 @@
+{
+  "name": "test",
+  "version": "0.0.0",
+  "devDependencies": {
+    "wrangler": "^2.0.15"
+  },
+  "private": true,
+  "scripts": {
+    "start": "wrangler dev",
+    "publish": "wrangler publish"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.113.0",
+    "@aws-sdk/s3-request-presigner": "^3.118.0",
+    "itty-router": "^2.6.1"
+  }
+}
