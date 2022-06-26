@@ -4,7 +4,7 @@ import { S3Client } from '@aws-sdk/client-s3'
 import { listDisks } from './api/listDisks'
 import { listContents } from './api/listContents'
 import { getDownloadUrl } from './api/getDownloadUrl'
-import { getUploadUrl } from './api/getUploadUrl'
+import { uploadFiles } from './api/uploadFiles'
 import { createFolder } from './api/createFolder'
 import { deleteObject } from './api/deleteObject'
 import { renameObject } from './api/renameObject'
@@ -16,8 +16,8 @@ router.get('/api/disks/:disk', listContents)
 router.post('/api/disks/:disk/rename', renameObject)
 router.post('/api/disks/:disk/folder', createFolder)
 router.post('/api/disks/:disk/download', getDownloadUrl)
-router.post('/api/disks/:disk/upload', getUploadUrl)
-router.delete('/api/disks/:disk', deleteObject)
+router.post('/api/disks/:disk/upload', uploadFiles)
+router.post('/api/disks/:disk/delete', deleteObject)
 
 // Handle CORS
 router.options('/api/*', (request, env, context) => {

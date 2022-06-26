@@ -6,7 +6,7 @@
         <div class="page-title-right">
 
         </div>
-        <h4 class="page-title">File Manager</h4>
+<!--        <h4 class="page-title">File Manager</h4>-->
       </div>
     </div>
   </div>
@@ -64,6 +64,7 @@
 import Swal from 'sweetalert2'
 import Gallery from '@/components/Gallery'
 import DragAndDrop from '@/components/DragAndDrop'
+import repo from '@/repo'
 export default {
   components: { DragAndDrop, Gallery },
   methods: {
@@ -84,25 +85,13 @@ export default {
         }
       }).then((data) => {
         if (data.isConfirmed === true) {
-          const folderPath = self.$store.state.currentFolder + data.value + '/'
-
-          console.log(folderPath)
-          self.$store.state.s3.upload({ Bucket: self.$store.state.activeBucket, Key: folderPath, ContentLength: 0, Body: 'Folder placeholder' }).promise().then(
-            function (data) {
-              self.$toast.open({
-                message: 'Folder created!',
-                type: 'success'
-              })
-              self.$store.commit('refreshObjects')
-              console.log('Successfully uploaded ', data)
-            },
-            function (err) {
-              self.$toast.open({
-                message: 'Something went wrong!',
-                type: 'error'
-              })
-              console.log('There was an error creating your folder: ', err.message)
-            }
+          repo.createFolder(data.value).then((data) => {
+            self.$toast.open({
+              message: 'Folder created!',
+              type: 'success'
+            })
+            self.$store.dispatch('refreshObjects')
+          }
           )
         }
       })

@@ -32,10 +32,10 @@
       <div class="logo-box">
         <a class="logo logo-light text-center">
                 <span class="logo-sm">
-                   <span class="logo-lg-text-light">R2</span>
+                   <span class="logo-lg-text-light">R2E</span>
                 </span>
           <span class="logo-lg">
-                   <span class="logo-lg-text-light">R2 Web Drive</span>
+                   <span class="logo-lg-text-light">R2 Explorer</span>
                 </span>
         </a>
       </div>

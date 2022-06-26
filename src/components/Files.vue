@@ -58,7 +58,7 @@ export default {
     },
 
     timeAgo (time) {
-      return utils.timeSince(time)
+      return utils.timeSince(new Date(time))
     },
     bytesToSize (time) {
       return utils.bytesToSize(time)

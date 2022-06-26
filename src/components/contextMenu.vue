@@ -2,16 +2,20 @@
   <ul id="right-click-menu" ref="menu" tabindex="-1" v-if="viewMenu" @blur="closeMenu"
       :style="{top: top, left: left}">
     <li class="pointer" v-if="canPreview" @click="openFile"><i class="bi bi-box-arrow-in-right me-1"></i>Open</li>
-    <li class="pointer" @click="notImplemented" v-if="canShare"><i class="bi bi-share-fill me-1"></i>Get Sharable Link</li>
+    <li class="pointer" @click="notImplemented" v-if="canShare"><i class="bi bi-share-fill me-1"></i>Get Sharable Link
+    </li>
     <li class="pointer" @click="renameFile"><i class="bi bi-pencil-fill me-1"></i>Rename</li>
-    <li class="pointer" @click="downloadFile" v-if="canDownload"><i class="bi bi-cloud-download-fill me-1"></i>Download</li>
+    <li class="pointer" @click="downloadFile" v-if="canDownload"><i class="bi bi-cloud-download-fill me-1"></i>Download
+    </li>
     <li class="pointer" @click="deleteFile"><i class="bi bi-trash-fill me-1"></i>Remove</li>
   </ul>
+
 </template>
 
 <script>
 import Swal from 'sweetalert2'
 import { saveAs } from 'file-saver'
+import repo from '@/repo'
 
 export default {
   data: function () {
@@ -70,16 +74,13 @@ export default {
         confirmButtonText: 'Yes, delete it!'
       }).then((result) => {
         if (result.isConfirmed) {
-          this.$store.state.s3.deleteObject({
-            Bucket: this.$store.state.activeBucket,
-            Key: self.file.Key
-          }).promise()
-            .then(() =>
-              self.$toast.open({
-                message: 'File deleted',
-                type: 'success'
-              }))
-          self.$store.commit('refreshObjects')
+          repo.deleteObject(self.file.path, self.file.name).then(() => {
+            self.$toast.open({
+              message: 'File deleted',
+              type: 'success'
+            })
+            self.$store.dispatch('refreshObjects')
+          })
         }
 
         self.closeMenu()
@@ -100,25 +101,13 @@ export default {
         }
       }).then((data) => {
         if (data.isConfirmed === true) {
-          self.$store.state.s3.copyObject({
-            Bucket: self.$store.state.activeBucket,
-            CopySource: `${self.$store.state.activeBucket}/${self.file.Key}`,
-            Key: `${self.file.path}${data.value}`
+          repo.renameObject(self.file.name, data.value).then(() => {
+            self.$toast.open({
+              message: 'File renamed',
+              type: 'success'
+            })
+            self.$store.dispatch('refreshObjects')
           })
-            .promise()
-            .then(() => {
-              self.$store.state.s3.deleteObject({
-                Bucket: self.$store.state.activeBucket,
-                Key: self.file.Key
-              }).promise()
-              self.$toast.open({
-                message: 'File renamed',
-                type: 'success'
-              })
-              self.$store.commit('refreshObjects')
-            }
-            )
-            .catch((e) => console.error(e))
         }
 
         self.closeMenu()
@@ -142,21 +131,9 @@ export default {
       })
     },
     downloadFile () {
-      // TODO: implement download for fiels bigger than 2gb
-
-      // const self = this
-      this.$store.state.s3.getObject({
-        Bucket: this.$store.state.activeBucket,
-        Key: self.file.Key
-      }, function (err, data) {
-        if (err) console.log(err, err.stack) // an error occurred
-        else {
-          console.log(data)
-          const blob = new Blob([data.Body], { type: data.ContentType })
-
-          saveAs(blob, self.file.name)
-          self.closeMenu()
-        }
+      const self = this
+      repo.getDownloadPresignUrl(self.file.name).then((response) => {
+        saveAs(response.data.url, self.file.name)
       })
     },
     notImplemented () {

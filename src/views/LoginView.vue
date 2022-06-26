@@ -15,7 +15,6 @@
 
 <script>
 // import repo from '@/repository'
-// import { ListBucketsCommand } from 'aws-sdk/client-s3'
 
 export default {
   beforeMount () {

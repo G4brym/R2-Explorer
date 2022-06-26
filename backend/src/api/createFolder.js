@@ -5,13 +5,14 @@ async function createFolder (request, env, context) {
   const body = await request.json()
   const { s3Client } = context
   const { disk } = request.params
+  console.log(body)
 
-  const { path } = body.path
+  const { path } = body
 
   const command = new PutObjectCommand({
     Bucket: disk,
     Key: `${path}`,
-    ContentLength: 0,
+    ContentLength: 18,
     Body: 'Folder placeholder'
   })
 

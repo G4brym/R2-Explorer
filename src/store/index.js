@@ -1,16 +1,13 @@
 import { createStore } from 'vuex'
-import S3 from 'aws-sdk/clients/s3'
-import * as AWS from 'aws-sdk'
+import axios from 'axios'
+import repo from '@/repo'
 
 export default createStore({
   state: {
     user: {
-      accountId: null,
-      accessKey: null,
-      secretKey: null
+      email: null
     },
-    s3: null,
-    activeBucket: 'homebox',
+    activeBucket: null,
     currentFolder: '',
     files: [],
     folders: [],
@@ -18,74 +15,21 @@ export default createStore({
   },
   getters: {},
   mutations: {
-    loadUserFromKeys (state, payload) {
-      state.user = payload
-      const self = this
-
-      AWS.config.update({
-        region: 'auto',
-        accessKeyId: payload.accessKey,
-        secretAccessKey: payload.secretKey,
-        maxRetries: 2,
-        endpoint: `https://${payload.accountId}.r2.cloudflarestorage.com/`,
-        s3DisableBodySigning: false,
-        s3ForcePathStyle: true
-      })
-
-      state.s3 = new S3({})
-
-      state.s3.listBuckets({}, function (err, data) {
-        if (err) {
-          console.log('Error loading buckets', err)
-        } else {
-          state.buckets = data.Buckets
-          state.activeBucket = data.Buckets[0].Name
-          self.commit('refreshObjects')
-        }
-      })
-    },
-    refreshObjects (state) {
-      state.s3.listObjects({
-        Bucket: state.activeBucket,
-        Prefix: state.currentFolder,
-        Delimiter: '/'
-      }, function (err, data) {
-        if (err) {
-          console.log('Error loading objects', err)
-        } else {
-          const files = data.Contents.filter(function (obj) {
-            return !obj.Key.endsWith('/')
-          })
-          state.files = files.map(function (obj) {
-            const name = obj.Key.replace(state.currentFolder, '')
-
-            return {
-              ...obj,
-              name: name,
-              path: state.currentFolder,
-              extension: name.split('.').pop()
-            }
-          })
-
-          state.folders = data.CommonPrefixes.map(function (obj) {
-            const split = obj.Prefix.split('/')
-
-            return {
-              ...obj,
-              name: split[split.length - 2],
-              path: state.currentFolder,
-              Key: obj.Prefix
-            }
-          })
-        }
-      })
+    loadObjects (state, payload) {
+      state.files = payload.files
+      state.folders = payload.folders
     },
     changeBucket (state, payload) {
       state.activeBucket = payload
-      this.commit('refreshObjects')
+      this.dispatch('refreshObjects')
     },
     goTo (state, folder) {
       state.currentFolder = folder
+    },
+    loadUserDisks (state, data) {
+      state.buckets = data.Buckets
+      this.commit('changeBucket', data.Buckets[0].Name)
+      this.dispatch('refreshObjects')
     }
   },
   actions: {
@@ -94,7 +38,15 @@ export default createStore({
         folder = ''
       }
       context.commit('goTo', folder)
-      context.commit('refreshObjects')
+      context.dispatch('refreshObjects')
+    },
+    loadUserDisks ({ commit }) {
+      axios.get('/api/disks').then(response => {
+        commit('loadUserDisks', response.data)
+      })
+    },
+    async refreshObjects ({ commit }) {
+      commit('loadObjects', await repo.listObjects())
     }
   },
   modules: {}

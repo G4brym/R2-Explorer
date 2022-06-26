@@ -11,9 +11,12 @@ import VueToast from 'vue-toast-notification'
 // import 'vue-toast-notification/dist/theme-default.css';
 import 'vue-toast-notification/dist/theme-sugar.css'
 import 'sweetalert2/src/sweetalert2.scss'
+import axios from 'axios'
 
 require('bootstrap/js/dist/dropdown')
 require('bootstrap/js/dist/modal')
+
+axios.defaults.baseURL = 'http://localhost:8787'
 
 const app = createApp(App)
 
@@ -23,8 +26,4 @@ app.use(VueToast)
 
 app.mount('#app')
 
-store.commit('loadUserFromKeys', {
-  accountId: '0983f9c21d0167d8d677be145016932e',
-  accessKey: '112326db443e709a2e6ea23bc2af7754',
-  secretKey: 'e6892b8890a2e4d889eecf903bf8e476fa2f6d3f460f3286684c7d9dd39cfb47'
-})
+store.dispatch('loadUserDisks')

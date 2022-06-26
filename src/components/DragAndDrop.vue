@@ -10,8 +10,7 @@
 </template>
 
 <script>
-
-import * as AWS from 'aws-sdk'
+import repo from '@/repo'
 
 export default {
   data: function () {
@@ -34,39 +33,13 @@ export default {
       this.uploadFiles(event.target.files)
     },
     uploadFiles (files) {
-      const self = this
-
-      Array.from(files).forEach(obj => {
-        const upload = new AWS.S3.ManagedUpload({
-          params: {
-            Bucket: self.$store.state.activeBucket,
-            Key: self.$store.state.currentFolder + obj.name,
-            Body: obj,
-            ContentType: obj.type
-          }
+      repo.uploadObjects(files).then(() => {
+        self.isHover = false
+        self.$toast.open({
+          message: 'File uploaded!',
+          type: 'success'
         })
-
-        const promise = upload.promise()
-
-        promise.then(
-          function (data) {
-            self.isHover = false
-            self.$toast.open({
-              message: 'File uploaded!',
-              type: 'success'
-            })
-            self.$store.commit('refreshObjects')
-            console.log('Successfully uploaded ', data)
-          },
-          function (err) {
-            self.isHover = false
-            self.$toast.open({
-              message: 'Something went wrong!',
-              type: 'error'
-            })
-            console.log('There was an error uploading your photo: ', err.message)
-          }
-        )
+        self.$store.dispatch('refreshObjects')
       })
     },
     drop (event) {

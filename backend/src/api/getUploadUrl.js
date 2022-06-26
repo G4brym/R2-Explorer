@@ -7,8 +7,8 @@ async function getUploadUrl (request, env, context) {
   const { s3Client } = context
   const { disk } = request.params
 
-  const { name } = body.name
-  const { path } = body.path
+  const { name } = body
+  const { path } = body
 
   const command = new PutObjectCommand({
     Bucket: disk,
