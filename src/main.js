@@ -18,6 +18,7 @@ require('bootstrap/js/dist/modal')
 
 // axios.defaults.baseURL = 'http://localhost:8787'
 axios.defaults.baseURL = 'https://be-drive.massadas.com'
+axios.defaults.withCredentials = true
 
 const app = createApp(App)
 
