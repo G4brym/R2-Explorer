@@ -16,7 +16,8 @@ import axios from 'axios'
 require('bootstrap/js/dist/dropdown')
 require('bootstrap/js/dist/modal')
 
-axios.defaults.baseURL = 'http://localhost:8787'
+// axios.defaults.baseURL = 'http://localhost:8787'
+axios.defaults.baseURL = 'https://be-drive.massadas.com'
 
 const app = createApp(App)
 

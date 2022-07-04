@@ -38,7 +38,7 @@ router.all('*', () => new Response('404, not found!', { status: 404 }))
 
 export default {
   async fetch (request, env, context) {
-    const s3Client = await getS3ForEmail(env, request.headers.get('Cf-Access-Authenticated-User-Email') || 'g4bryrm98@gmail.com')
+    const s3Client = await getS3ForEmail(env, request.headers.get('Cf-Access-Authenticated-User-Email'))
 
     return router
       .handle(request, env, { ...context, s3Client })

@@ -2,7 +2,7 @@ import { getS3, JsonResponse } from './core'
 import { ListBucketsCommand } from '@aws-sdk/client-s3'
 
 async function registerEmail (request, env, context) {
-  const email = request.headers.get('Cf-Access-Authenticated-User-Email') || 'g4bryrm98@gmail.com'
+  const email = request.headers.get('Cf-Access-Authenticated-User-Email')
   const body = await request.json()
   const { accountId, accessToken, secretToken } = body
 
