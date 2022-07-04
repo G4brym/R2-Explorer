@@ -1,6 +1,5 @@
 import { Router } from 'itty-router'
 import { config } from './config'
-import { S3Client } from '@aws-sdk/client-s3'
 import { listDisks } from './api/listDisks'
 import { listContents } from './api/listContents'
 import { getDownloadUrl } from './api/getDownloadUrl'
@@ -8,8 +7,14 @@ import { uploadFiles } from './api/uploadFiles'
 import { createFolder } from './api/createFolder'
 import { deleteObject } from './api/deleteObject'
 import { renameObject } from './api/renameObject'
+import { registerEmail } from './api/register'
+import { isRegisted } from './api/isRegisted'
+import { getS3ForEmail } from './api/core'
 
 const router = Router()
+
+router.get('/api/is-registed', isRegisted)
+router.post('/api/register', registerEmail)
 
 router.get('/api/disks', listDisks)
 router.get('/api/disks/:disk', listContents)
@@ -33,20 +38,7 @@ router.all('*', () => new Response('404, not found!', { status: 404 }))
 
 export default {
   async fetch (request, env, context) {
-    const s3Client = new S3Client({
-      region: 'auto',
-      endpoint: `https://${config.accountid}.r2.cloudflarestorage.com`,
-      credentials: {
-
-        accessKeyId: `${config.access_key_id}`,
-        secretAccessKey: `${config.access_key_secret}`
-      },
-      accessKeyId: `${config.access_key_id}`,
-      secretAccessKey: `${config.access_key_secret}`,
-      s3DisableBodySigning: false,
-      s3ForcePathStyle: true,
-      maxRetries: 2
-    })
+    const s3Client = await getS3ForEmail(env, request.headers.get('Cf-Access-Authenticated-User-Email') || 'g4bryrm98@gmail.com')
 
     return router
       .handle(request, env, { ...context, s3Client })

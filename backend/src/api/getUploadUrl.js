@@ -5,6 +5,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 async function getUploadUrl (request, env, context) {
   const body = await request.json()
   const { s3Client } = context
+  if (s3Client === null) return JsonResponse('unauthorized', 401)
   const { disk } = request.params
 
   const { name } = body

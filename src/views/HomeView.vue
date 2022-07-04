@@ -65,6 +65,7 @@ import Swal from 'sweetalert2'
 import Gallery from '@/components/Gallery'
 import DragAndDrop from '@/components/DragAndDrop'
 import repo from '@/repo'
+
 export default {
   components: { DragAndDrop, Gallery },
   methods: {
@@ -96,6 +97,9 @@ export default {
         }
       })
     }
+  },
+  created () {
+    this.$store.dispatch('loadUserDisks')
   }
 }
 </script>

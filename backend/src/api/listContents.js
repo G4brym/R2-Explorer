@@ -3,6 +3,7 @@ import { ListObjectsV2Command } from '@aws-sdk/client-s3'
 
 async function listContents (request, env, context) {
   const { s3Client } = context
+  if (s3Client === null) return JsonResponse('unauthorized', 401)
   const { disk } = request.params
   const { path } = request.query || ''
 

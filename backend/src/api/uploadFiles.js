@@ -4,6 +4,7 @@ import { PutObjectCommand } from '@aws-sdk/client-s3'
 async function uploadFiles (request, env, context) {
   const form = await request.formData()
   const { s3Client } = context
+  if (s3Client === null) return JsonResponse('unauthorized', 401)
   const { disk } = request.params
 
   // const path = form.get('path')

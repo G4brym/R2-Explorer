@@ -25,5 +25,3 @@ app.use(router)
 app.use(VueToast)
 
 app.mount('#app')
-
-store.dispatch('loadUserDisks')
