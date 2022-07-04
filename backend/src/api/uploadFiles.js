@@ -10,19 +10,26 @@ async function uploadFiles (request, env, context) {
   // const path = form.get('path')
   const files = form.get('files')
 
-  Array.from(files).forEach(async file => {
-    console.log(file)
-    const command = new PutObjectCommand({
-      Bucket: disk,
-      Key: `${file.name}`,
-      Body: file
+  if (Array.isArray(files)) {
+    Array.from(files).forEach(async file => {
+      await uploadFile(s3Client, disk, file)
     })
-
-    await s3Client.send(command)
-  })
-  // console.log(data)
+  } else {
+    await uploadFile(s3Client, disk, files)
+  }
 
   return JsonResponse({ status: 'ok' })
+}
+
+async function uploadFile (s3Client, disk, file) {
+  const command = new PutObjectCommand({
+    Bucket: disk,
+    Key: `${file.name}`,
+    Body: file
+  })
+
+  const data = await s3Client.send(command)
+  // console.log(data)
 }
 
 export { uploadFiles }

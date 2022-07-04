@@ -32,7 +32,7 @@ function getS3 (accountId, accessToken, secretToken) {
 
 async function getS3ForEmail (env, email) {
   let data = await env.WEB_DRIVE.get(email)
-  console.log(data)
+
   if (!data) {
     return null
   }

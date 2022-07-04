@@ -29,7 +29,7 @@
             </div>
             <div class="mail-list mt-3">
               <template v-for="bucket in $store.state.buckets" :key="bucket.Name">
-                <a :class="{'text-black': $store.state.activeBucket === bucket.Name}" @click="changeBucket(bucket)" class="list-group-item border-0" href="#"><i class="bi bi-bucket-fill me-2"></i>{{ bucket.Name }}</a>
+                <button :class="{'text-black': $store.state.activeBucket === bucket.Name}" @click="changeBucket(bucket)" class="list-group-item border-0" href="#"><i class="bi bi-bucket-fill me-2"></i>{{ bucket.Name }}</button>
               </template>
             </div>
 

@@ -5,7 +5,8 @@
     <slot></slot>
   </div>
 
-  <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="uploader" multiple directory="" webkitdirectory="" moxdirectory=""/>
+<!--  <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="uploader" multiple directory="" webkitdirectory="" moxdirectory=""/>-->
+  <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="uploader" multiple/>
 
 </template>
 
@@ -33,6 +34,7 @@ export default {
       this.uploadFiles(event.target.files)
     },
     uploadFiles (files) {
+      const self = this
       repo.uploadObjects(files).then(() => {
         self.isHover = false
         self.$toast.open({

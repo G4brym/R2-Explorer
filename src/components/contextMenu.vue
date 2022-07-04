@@ -16,6 +16,7 @@
 import Swal from 'sweetalert2'
 import { saveAs } from 'file-saver'
 import repo from '@/repo'
+import axios from 'axios'
 
 export default {
   data: function () {
@@ -115,19 +116,19 @@ export default {
     },
     openFile () {
       const self = this
-      this.$store.state.s3.getObject({
-        Bucket: this.$store.state.activeBucket,
-        Key: self.file.Key
-      }, function (err, data) {
-        if (err) console.log(err, err.stack) // an error occurred
-        else {
-          const blob = new Blob([data.Body], { type: data.ContentType })
+      repo.getDownloadPresignUrl(self.file.name).then((response) => {
+        axios({
+          url: response.data.url,
+          method: 'GET',
+          responseType: 'blob'
+        }).then((response) => {
+          const blob = new Blob([response.data])
           self.$emit('openFile', {
             ...self.file,
             data: URL.createObjectURL(blob)
           })
           self.closeMenu()
-        }
+        })
       })
     },
     downloadFile () {
