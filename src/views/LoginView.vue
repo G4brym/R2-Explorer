@@ -20,6 +20,7 @@
         <div class="card-body">
 
           <h3>Please enter your R2 tokens to continue</h3>
+          <span>These tokens will be securely stored in your account KV store and reused when you log in again in the future. <a href="https://developers.cloudflare.com/r2/platform/s3-compatibility/tokens/" target="_blank">See here on how to obtain the R2 tokens</a>.</span>
 
           <div>
             <div class="form-group">

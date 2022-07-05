@@ -4,9 +4,7 @@ import repo from '@/repo'
 
 export default createStore({
   state: {
-    user: {
-      email: null
-    },
+    user: null,
     activeBucket: null,
     currentFolder: '',
     files: [],
@@ -28,6 +26,7 @@ export default createStore({
     },
     loadUserDisks (state, data) {
       state.buckets = data.Buckets
+      state.user = data.user
       this.commit('changeBucket', data.Buckets[0].Name)
       this.dispatch('refreshObjects')
     }
