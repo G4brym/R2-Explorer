@@ -40,7 +40,7 @@ export default {
     // formData.append('name', files)
     // formData.append('path', store.state.currentFolder)
 
-    return axios.post(`/api/disks/${store.state.activeBucket}/upload`, formData, {
+    return axios.post(`/api/disks/${store.state.activeBucket}/upload?path=${store.state.currentFolder}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
