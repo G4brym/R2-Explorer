@@ -36,10 +36,7 @@
             <div class="mt-5">
 <!--              <h4><span class="badge rounded-pill p-1 px-2 badge-soft-secondary">FREE</span></h4>-->
               <h6 class="text-uppercase mt-3">Storage</h6>
-              <div class="progress my-2 progress-sm">
-                <div class="progress-bar progress-lg bg-success" role="progressbar" style="width: 46%" aria-valuenow="46" aria-valuemin="0" aria-valuemax="100"></div>
-              </div>
-              <p class="text-muted font-12 mb-0">7.02 GB (46%) of 15 GB used</p>
+              <p class="text-muted font-12 mb-0">GB used</p>
             </div>
 
           </div>

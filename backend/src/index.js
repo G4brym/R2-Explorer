@@ -9,6 +9,7 @@ import { deleteObject } from './api/deleteObject'
 import { renameObject } from './api/renameObject'
 import { registerEmail } from './api/register'
 import { isRegisted } from './api/isRegisted'
+import { downloadFile } from './api/downloadFile'
 import { getS3ForEmail } from './api/core'
 
 const router = Router()
@@ -21,6 +22,7 @@ router.get('/api/disks/:disk', listContents)
 router.post('/api/disks/:disk/rename', renameObject)
 router.post('/api/disks/:disk/folder', createFolder)
 router.post('/api/disks/:disk/download', getDownloadUrl)
+router.post('/api/disks/:disk/download-file', downloadFile)
 router.post('/api/disks/:disk/upload', uploadFiles)
 router.post('/api/disks/:disk/delete', deleteObject)
 

@@ -15,6 +15,12 @@ export default {
       path
     })
   },
+  downloadFile: (name) => {
+    return axios.post(`/api/disks/${store.state.activeBucket}/download-file`, {
+      name,
+      path: store.state.currentFolder
+    }, { responseType: 'arraybuffer' })
+  },
   getDownloadPresignUrl: (name) => {
     return axios.post(`/api/disks/${store.state.activeBucket}/download`, {
       name,

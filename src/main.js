@@ -16,9 +16,12 @@ import axios from 'axios'
 require('bootstrap/js/dist/dropdown')
 require('bootstrap/js/dist/modal')
 
-// axios.defaults.baseURL = 'http://localhost:8787'
-axios.defaults.baseURL = 'https://r2.massadas.com'
-axios.defaults.withCredentials = true
+if (process.env.NODE_ENV === 'development') {
+  axios.defaults.baseURL = 'http://localhost:8787'
+} else {
+  axios.defaults.withCredentials = true
+  axios.defaults.baseURL = 'https://r2.massadas.com'
+}
 
 const app = createApp(App)
 
