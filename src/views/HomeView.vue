@@ -25,6 +25,7 @@
               <div class="dropdown-menu">
                 <a class="dropdown-item pointer" @click="newFolder"><i class="bi bi-folder-fill me-1"></i> Folder</a>
                 <a class="dropdown-item pointer" @click="$refs.uploader.openUploader()"><i class="bi bi-file-earmark-text-fill me-1"></i> File</a>
+                <a class="dropdown-item pointer" @click="newDisk"><i class="bi bi-bucket-fill me-1"></i> Disk/Bucket</a>
               </div>
             </div>
             <div class="mail-list mt-3">
@@ -89,6 +90,34 @@ export default {
               type: 'success'
             })
             self.$store.dispatch('refreshObjects')
+          }
+          )
+        }
+      })
+    },
+    newDisk () {
+      const self = this
+
+      Swal.fire({
+        title: 'New Disk name',
+        input: 'text',
+        showCancelButton: true,
+        inputValidator: (value) => {
+          if (!value) {
+            return 'You need to write something!'
+          }
+        }
+      }).then((data) => {
+        if (data.isConfirmed === true) {
+          repo.createDisk(data.value).then((resp) => {
+            self.$toast.open({
+              message: 'Disk created!',
+              type: 'success'
+            })
+            self.$store.dispatch('loadUserDisks')
+            setTimeout(function () {
+              self.$store.commit('changeBucket', data.value)
+            }, 500)
           }
           )
         }

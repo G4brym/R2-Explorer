@@ -9,6 +9,9 @@ export default {
       path: folderPath
     })
   },
+  createDisk: (name) => {
+    return axios.post(`/api/disks/${name}`)
+  },
   deleteObject: (path, name) => {
     return axios.post(`/api/disks/${store.state.activeBucket}/delete`, {
       name,
@@ -53,19 +56,22 @@ export default {
       }
     })
 
-    let files = response.data.Contents.filter(function (obj) {
-      return !obj.Key.endsWith('/')
-    })
-    files = files.map(function (obj) {
-      const name = obj.Key.replace(store.state.currentFolder, '')
+    let files = []
+    if (response.data.Contents) {
+      files = response.data.Contents.filter(function (obj) {
+        return !obj.Key.endsWith('/')
+      })
+      files = files.map(function (obj) {
+        const name = obj.Key.replace(store.state.currentFolder, '')
 
-      return {
-        ...obj,
-        name,
-        path: store.state.currentFolder,
-        extension: name.split('.').pop()
-      }
-    })
+        return {
+          ...obj,
+          name,
+          path: store.state.currentFolder,
+          extension: name.split('.').pop()
+        }
+      })
+    }
 
     let folders = []
     if (response.data.CommonPrefixes) {

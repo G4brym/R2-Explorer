@@ -11,6 +11,7 @@ import { registerEmail } from './api/register'
 import { isRegisted } from './api/isRegisted'
 import { downloadFile } from './api/downloadFile'
 import { getS3ForEmail } from './api/core'
+import { createDisk } from './api/createDisk'
 
 const router = Router()
 
@@ -18,6 +19,7 @@ router.get('/api/is-registed', isRegisted)
 router.post('/api/register', registerEmail)
 
 router.get('/api/disks', listDisks)
+router.post('/api/disks/:disk', createDisk)
 router.get('/api/disks/:disk', listContents)
 router.post('/api/disks/:disk/rename', renameObject)
 router.post('/api/disks/:disk/folder', createFolder)

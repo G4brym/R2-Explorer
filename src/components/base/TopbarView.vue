@@ -12,7 +12,7 @@
           </a>
           <div class="dropdown-menu dropdown-menu-end profile-dropdown ">
             <!-- item-->
-            <a href="javascript:void(0);" class="dropdown-item notify-item">
+            <a href="/cdn-cgi/access/logout" class="dropdown-item notify-item">
               <i class="bi bi-asterisk"></i>
               <span>Logout</span>
             </a>
