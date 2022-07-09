@@ -27,6 +27,16 @@ export default createStore({
     loadUserDisks (state, data) {
       state.buckets = data.Buckets
       state.user = data.user
+
+      if (data.Buckets.length === 0) {
+        const self = this
+        repo.createDisk('storage').then(() => {
+          self.dispatch('loadUserDisks')
+        })
+
+        return
+      }
+
       this.commit('changeBucket', data.Buckets[0].Name)
       this.dispatch('refreshObjects')
     }

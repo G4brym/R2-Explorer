@@ -37,9 +37,9 @@ export default {
       path: store.state.currentFolder
     })
   },
-  uploadObjects: (files) => {
+  uploadObjects: (file) => {
     const formData = new FormData()
-    formData.append('files', files[0])
+    formData.append('files', file)
     // formData.append('name', files)
     // formData.append('path', store.state.currentFolder)
 

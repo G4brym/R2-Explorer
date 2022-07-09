@@ -84,12 +84,19 @@ export default {
         }
       }).then((data) => {
         if (data.isConfirmed === true) {
+          const toast = self.$toast.open({
+            message: 'Creating Folder...',
+            type: 'warning'
+          })
+
           repo.createFolder(data.value).then((data) => {
+            self.$store.dispatch('refreshObjects')
+
+            toast.dismiss()
             self.$toast.open({
               message: 'Folder created!',
               type: 'success'
             })
-            self.$store.dispatch('refreshObjects')
           }
           )
         }
@@ -106,18 +113,28 @@ export default {
           if (!value) {
             return 'You need to write something!'
           }
+          if (!value.match(/^[a-z0-9-]{1,61}$/)) {
+            return 'This name is not valid!'
+          }
         }
       }).then((data) => {
         if (data.isConfirmed === true) {
+          const toast = self.$toast.open({
+            message: 'Creating Disk...',
+            type: 'warning'
+          })
+
           repo.createDisk(data.value).then((resp) => {
-            self.$toast.open({
-              message: 'Disk created!',
-              type: 'success'
-            })
             self.$store.dispatch('loadUserDisks')
             setTimeout(function () {
               self.$store.commit('changeBucket', data.value)
             }, 500)
+
+            toast.dismiss()
+            self.$toast.open({
+              message: 'Disk created!',
+              type: 'success'
+            })
           }
           )
         }

@@ -33,16 +33,27 @@ export default {
     inputFiles (event) {
       this.uploadFiles(event.target.files)
     },
-    uploadFiles (files) {
+    async uploadFiles (files) {
+      this.isHover = false
       const self = this
-      repo.uploadObjects(files).then(() => {
-        self.isHover = false
-        self.$toast.open({
-          message: 'File uploaded!',
-          type: 'success'
+
+      for (let i = 0; i < files.length; i++) {
+        const toast = self.$toast.open({
+          message: `Uploading file ${i + 1} from ${files.length}`,
+          type: 'warning'
         })
-        self.$store.dispatch('refreshObjects')
+
+        await repo.uploadObjects(files[i])
+
+        toast.dismiss()
+      }
+
+      self.$toast.open({
+        message: `${files.length} Files uploaded successfully`,
+        type: 'success'
       })
+
+      self.$store.dispatch('refreshObjects')
     },
     drop (event) {
       event.preventDefault()
