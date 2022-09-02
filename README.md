@@ -1,8 +1,9 @@
 # R2-Explorer
 
-This project is meant to be an easy interface to browser, upload and manage your Cloudflare R2 buckets.
+A Google Drive Interface for your Cloudflare R2 Buckets!
 
-The interface is heavily inspired by Google Drive navigation, and the features are also based from they.
+
+This project is meant to be an easy interface to browser, upload and manage your Cloudflare R2 buckets.
 
 Cloudflare Access is used as a very basic authentication mechanism, in order to save r2 credentials in the a KV.
 
@@ -10,6 +11,7 @@ You can test this right now in your browser in https://r2.massadas.com/
 
 
 ## Features
+- **Near instant** bucket/folder navigation
 - PDF previewer
 - Image previewer
 - Upload one or multiple files
@@ -21,6 +23,7 @@ You can test this right now in your browser in https://r2.massadas.com/
 
 
 ## TODO
+- Search files
 - CSV Previewer
 - Upload folders
 - Rename folders
