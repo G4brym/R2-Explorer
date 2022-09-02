@@ -48,7 +48,7 @@ export default {
       this.filename = undefined
     },
     getType (extension) {
-      if (['png', 'jpeg', 'webp'].includes(extension)) {
+      if (['png', 'jpg', 'jpeg', 'webp'].includes(extension)) {
         return 'image'
       } else if (['pdf'].includes(extension)) {
         return 'pdf'

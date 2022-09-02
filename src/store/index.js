@@ -19,6 +19,7 @@ export default createStore({
     },
     changeBucket (state, payload) {
       state.activeBucket = payload
+      state.currentFolder = ''
       this.dispatch('refreshObjects')
     },
     goTo (state, folder) {

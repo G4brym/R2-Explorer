@@ -1,4 +1,4 @@
-# r2-web-drive
+# R2-Explorer
 
 ## Project setup
 ```
