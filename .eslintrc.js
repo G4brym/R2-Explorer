@@ -1,18 +1,12 @@
 module.exports = {
-  root: true,
-  env: {
-    node: true
-  },
-  extends: [
-    'plugin:vue/vue3-essential',
-    '@vue/standard'
-  ],
+  parser: '@typescript-eslint/parser',
+  extends: ['plugin:@typescript-eslint/recommended', 'prettier'],
   parserOptions: {
-    parser: '@babel/eslint-parser'
+    sourceType: 'module',
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'vue/multi-word-component-names': 'off'
-  }
+    'prettier/prettier': 'error',
+    '@typescript-eslint/ban-ts-comment': 'off',
+  },
+  plugins: ['@typescript-eslint', 'prettier'],
 }

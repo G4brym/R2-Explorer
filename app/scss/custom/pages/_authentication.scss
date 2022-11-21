@@ -1,0 +1,120 @@
+//
+// authentication.scss
+//
+
+.authentication-bg.enlarged {
+  min-height: 100px;
+}
+
+.bg-pattern {
+  background-image: url('http://example.com/images/bg-pattern-2.png');
+  background-size: cover;
+}
+
+// authentication pages background
+body.authentication-bg {
+  background-color: $auth-bg-alt;
+  background-size: cover;
+  background-position: center;
+}
+
+body.authentication-bg-pattern {
+  background-image: $auth-img-pattern-bg;
+}
+
+// Logout page
+.logout-icon {
+  width: 140px;
+}
+
+// Authentication fluid
+.auth-fluid {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  flex-direction: row;
+  align-items: stretch;
+  background: $auth-img-bg center;
+  background-size: cover;
+
+  .auth-fluid-form-box {
+    max-width: 480px;
+    border-radius: 0;
+    z-index: 2;
+    padding: 3rem 2rem;
+    background-color: $auth-bg;
+    position: relative;
+    width: 100%;
+  }
+
+  .auth-fluid-right {
+    padding: 6rem 3rem;
+    flex: 1;
+    position: relative;
+    color: $white;
+    background-color: rgba($black, 0.3);
+  }
+}
+
+.auth-brand {
+  margin-bottom: 2rem;
+}
+
+.auth-user-testimonial {
+  position: absolute;
+  margin: 0 auto;
+  padding: 0 1.75rem;
+  bottom: 3rem;
+  left: 0;
+  right: 0;
+
+  p.lead {
+    font-size: 1.125rem;
+    margin: 0 auto 20px auto;
+    max-width: 700px;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .auth-brand {
+    position: absolute;
+    top: 3rem;
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .auth-fluid {
+    display: block;
+
+    .auth-fluid-form-box {
+      max-width: 100%;
+      min-height: 100vh;
+    }
+
+    .auth-fluid-right {
+      display: none;
+    }
+  }
+}
+
+.auth-logo {
+  .logo-light {
+    display: $logo-auth-light-display !important;
+  }
+  .logo-dark {
+    display: $logo-auth-dark-display !important;
+  }
+}
+
+// Dark Mode
+body[data-layout-color='dark'] {
+  .auth-logo {
+    .logo-light {
+      display: block !important;
+    }
+    .logo-dark {
+      display: none !important;
+    }
+  }
+}

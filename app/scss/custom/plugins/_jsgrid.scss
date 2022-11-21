@@ -1,0 +1,168 @@
+//
+// jsgrid.scss
+//
+
+.jsgrid-cell {
+  padding: $table-cell-padding-y;
+  border: $table-border-width solid $table-border-color;
+}
+
+.jsgrid-grid-header,
+.jsgrid-grid-body,
+.jsgrid-header-row > .jsgrid-header-cell,
+.jsgrid-filter-row > .jsgrid-cell,
+.jsgrid-insert-row > .jsgrid-cell,
+.jsgrid-edit-row > .jsgrid-cell {
+  border: none;
+}
+
+.jsgrid-row > .jsgrid-cell {
+  background: transparent !important;
+}
+
+.jsgrid-alt-row {
+  > .jsgrid-cell {
+    background: $table-striped-bg;
+  }
+}
+
+.jsgrid-selected-row {
+  > .jsgrid-cell {
+    background: $table-hover-bg;
+    border-color: $table-border-color;
+  }
+}
+
+.jsgrid-header-row {
+  > .jsgrid-header-cell {
+    background: #{map-get($grays, '100')};
+    text-align: center !important;
+  }
+}
+
+.jsgrid-filter-row {
+  > .jsgrid-cell {
+    background: #{lighten(map-get($grays, '100'), 2%)};
+  }
+}
+
+.jsgrid-edit-row > .jsgrid-cell,
+.jsgrid-insert-row > .jsgrid-cell {
+  background: #{map-get($grays, '100')};
+}
+
+.jsgrid input,
+.jsgrid select,
+.jsgrid textarea {
+  padding: 0.4em 0.6em;
+  outline: none !important;
+  color: $input-color;
+  background-color: $input-bg;
+  border: $input-border-width solid $input-border-color;
+  border-radius: $input-border-radius;
+}
+
+.jsgrid-pager-container {
+  margin-top: 10px;
+}
+
+.jsgrid-pager-page {
+  padding: 0;
+  margin: 0 2px;
+  &.jsgrid-pager-current-page {
+    background-color: $primary;
+    color: $white;
+  }
+}
+
+.jsgrid-pager-page a,
+.jsgrid-pager-current-page {
+  background-color: #{map-get($grays, '100')};
+  border-radius: 50%;
+  height: 24px;
+  width: 24px;
+  display: inline-block;
+  text-align: center;
+  line-height: 24px;
+  color: #{map-get($grays, '700')};
+}
+
+.jsgrid-pager-nav-button {
+  a {
+    color: #{map-get($grays, '700')};
+    font-weight: 600;
+    &:hover {
+      color: $primary;
+    }
+  }
+}
+
+.jsgrid {
+  .jsgrid-button {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-image: url('http://example.com/images/jsgrid.png');
+    background-color: #{map-get($grays, '200')};
+    outline: none !important;
+
+    &:hover {
+      opacity: 0.9;
+      background-color: #{map-get($grays, '100')};
+    }
+  }
+}
+
+.jsgrid-search-mode-button {
+  background-position: 0 -295px;
+}
+
+.jsgrid-insert-button {
+  background-position: 0 -160px;
+}
+
+.jsgrid-header-sort {
+  &:before {
+    position: absolute;
+  }
+}
+
+// Dark Mode
+body[data-layout-color='dark'] {
+  .jsgrid-header-row {
+    > .jsgrid-header-cell {
+      background: #{map-get($dark-grays, '100')};
+    }
+  }
+
+  .jsgrid-filter-row {
+    > .jsgrid-cell {
+      background: #{lighten(map-get($dark-grays, '100'), 2%)};
+    }
+  }
+
+  .jsgrid-edit-row > .jsgrid-cell,
+  .jsgrid-insert-row > .jsgrid-cell {
+    background: #{map-get($dark-grays, '100')};
+  }
+  .jsgrid-pager-page a,
+  .jsgrid-pager-current-page {
+    background-color: #{map-get($dark-grays, '100')};
+    color: #{map-get($dark-grays, '700')};
+  }
+
+  .jsgrid-pager-nav-button {
+    a {
+      color: #{map-get($dark-grays, '700')};
+    }
+  }
+  .jsgrid {
+    .jsgrid-button {
+      background-color: #{map-get($dark-grays, '200')};
+
+      &:hover {
+        background-color: #{map-get($dark-grays, '100')};
+      }
+    }
+  }
+}

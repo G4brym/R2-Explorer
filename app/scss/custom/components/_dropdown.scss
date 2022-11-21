@@ -1,0 +1,141 @@
+//
+// dropdown.scss
+//
+
+.dropdown-menu {
+  padding: 0.3rem;
+  box-shadow: $box-shadow;
+  /*rtl:remove*/
+  animation-name: DropDownSlide;
+  /*rtl:remove*/
+  animation-duration: 0.3s;
+  /*rtl:remove*/
+  animation-fill-mode: both;
+  top: 100%;
+
+  &.show {
+    /*rtl:remove*/
+    top: 100% !important;
+  }
+
+  i {
+    display: inline-block;
+  }
+}
+
+.dropdown-menu-end {
+  right: 0 !important;
+  left: auto !important;
+}
+
+.dropdown-menu[data-popper-placement^='right'],
+.dropdown-menu[data-popper-placement^='top'],
+.dropdown-menu[data-popper-placement^='left'] {
+  top: auto !important;
+  animation: none !important;
+}
+
+@keyframes DropDownSlide {
+  100% {
+    transform: translateY(0);
+  }
+  0% {
+    transform: translateY(15px);
+  }
+}
+
+// Dropdown Large (Custom)
+
+@media (min-width: 600px) {
+  .dropdown-lg {
+    width: $dropdown-lg-width;
+  }
+}
+
+// Dropdown Mega Menu
+
+.dropdown-mega {
+  position: static !important;
+}
+
+.dropdown-megamenu {
+  padding: 20px;
+  left: 20px !important;
+  right: 20px !important;
+  background-image: url('http://example.com/images/megamenu-bg.png');
+  background-position: right bottom;
+  background-repeat: no-repeat;
+}
+
+html[dir='rtl'] .dropdown-megamenu {
+  left: 60px !important;
+  right: -20px !important;
+}
+
+.megamenu-list {
+  li {
+    padding: 5px 20px 5px 25px;
+    position: relative;
+
+    a {
+      color: $dropdown-link-color;
+
+      &:hover {
+        color: $primary;
+      }
+    }
+
+    &:before {
+      content: '\F0142';
+      position: absolute;
+      left: 0;
+      font-family: 'Material Design Icons';
+    }
+  }
+}
+
+html[dir='ltr'] .megamenu-list {
+  li {
+    &:before {
+      content: '\F0141';
+    }
+  }
+}
+
+// Dropdown with Icons
+.dropdown-icon-item {
+  display: block;
+  border-radius: 3px;
+  line-height: 34px;
+  text-align: center;
+  padding: 15px 0 9px;
+  display: block;
+  border: 1px solid transparent;
+  color: $dropdown-link-color;
+
+  img {
+    height: 24px;
+  }
+
+  span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    background-color: $dropdown-link-hover-bg;
+  }
+}
+
+// Dropdown size
+@include media-breakpoint-up(lg) {
+  .dropdown-mega-menu-xl {
+    width: 40rem;
+  }
+
+  .dropdown-mega-menu-lg {
+    width: 26rem;
+  }
+}

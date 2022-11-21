@@ -1,7 +1,0 @@
-name = "drive"
-main = "src/index.js"
-compatibility_date = "2022-06-21"
-
-kv_namespaces = [
-    { binding = "WEB_DRIVE", id = "4355f4de9a624466867c8a2c1dce32df", preview_id = "a4d4a08e61cc4ce884f4869f67378c7a" }
-]
