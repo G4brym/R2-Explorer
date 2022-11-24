@@ -1,6 +1,8 @@
 import { JsonResponse } from './core'
 
 export async function uploadFiles(request: any, env: any, context: any) {
+  if(context.config.readonly === true) return JsonResponse({msg: 'unauthorized'}, 401)
+
   const form = await request.formData()
 
   const { disk } = request.params

@@ -8,6 +8,11 @@ This project is deployed in your own Cloudflare Account as a Worker, and no cred
 
 You can see an example `read-only` right now in your browser in https://r2.massadas.com/
 
+TODO:
+- allow bucket names with spaces
+- write docs on how to setup cloudflare access
+- fix upload
+
 ## Features
 
 - **Near instant** bucket/folder navigation

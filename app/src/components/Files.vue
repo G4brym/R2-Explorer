@@ -50,25 +50,25 @@ import ContextMenu from '@/components/contextMenu'
 
 export default {
   methods: {
-    openMenu(event, file) {
+    openMenu (event, file) {
       const canPreview = this.$refs.preview.getType(file.extension) !== undefined
       this.$refs.menu.openMenu(event, file, canPreview)
     },
 
-    timeAgo(time) {
+    timeAgo (time) {
       return utils.timeSince(new Date(time))
     },
-    bytesToSize(time) {
+    bytesToSize (time) {
       return utils.bytesToSize(time)
     },
-    openFile(fileData) {
+    openFile (fileData) {
       this.$refs.preview.openPreview(fileData)
-    },
+    }
   },
   components: {
     ContextMenu,
-    FilePreview,
-  },
+    FilePreview
+  }
 }
 </script>
 

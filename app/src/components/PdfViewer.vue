@@ -21,30 +21,30 @@ import pdfvuer from 'pdfvuer'
 
 export default {
   components: {
-    pdf: pdfvuer,
+    pdf: pdfvuer
   },
   props: ['pdfUrl'],
-  data() {
+  data () {
     return {
       page: 1,
       numPages: 0,
       pdfdata: undefined,
       errors: [],
-      scale: 'page-width',
+      scale: 'page-width'
     }
   },
-  mounted() {
+  mounted () {
     this.getPdf()
   },
   methods: {
-    getPdf() {
+    getPdf () {
       const self = this
       self.pdfdata = pdfvuer.createLoadingTask(this.pdfUrl)
       self.pdfdata.then((pdf) => {
         self.numPages = pdf.numPages
       })
-    },
-  },
+    }
+  }
 }
 </script>
 <style lang="css" scoped>

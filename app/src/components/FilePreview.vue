@@ -27,34 +27,34 @@ import modal from './modal'
 export default {
   components: {
     PdfViewer,
-    modal,
+    modal
   },
   data: function () {
     return {
       type: undefined,
       filename: undefined,
-      fileData: undefined,
+      fileData: undefined
     }
   },
   methods: {
-    openPreview(file) {
+    openPreview (file) {
       this.type = this.getType(file.extension)
       this.fileData = file.data
       this.filename = file.name
     },
-    close() {
+    close () {
       this.type = undefined
       this.fileData = undefined
       this.filename = undefined
     },
-    getType(extension) {
+    getType (extension) {
       if (['png', 'jpg', 'jpeg', 'webp'].includes(extension)) {
         return 'image'
       } else if (['pdf'].includes(extension)) {
         return 'pdf'
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

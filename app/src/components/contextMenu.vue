@@ -33,7 +33,7 @@ export default {
       canShare: false,
       viewMenu: false,
       top: '0px',
-      left: '0px',
+      left: '0px'
     }
   },
 
@@ -70,7 +70,7 @@ export default {
       )
       // e.preventDefault()
     },
-    deleteFile() {
+    deleteFile () {
       const self = this
 
       Swal.fire({
@@ -80,13 +80,13 @@ export default {
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
+        confirmButtonText: 'Yes, delete it!'
       }).then((result) => {
         if (result.isConfirmed) {
           repo.deleteObject(self.file.path, self.file.name).then(() => {
             self.$toast.open({
               message: 'File deleted',
-              type: 'success',
+              type: 'success'
             })
             self.$store.dispatch('refreshObjects')
           })
@@ -95,7 +95,7 @@ export default {
         self.closeMenu()
       })
     },
-    renameFile() {
+    renameFile () {
       const self = this
 
       Swal.fire({
@@ -107,13 +107,13 @@ export default {
           if (!value) {
             return 'You need to write something!'
           }
-        },
+        }
       }).then((data) => {
         if (data.isConfirmed === true) {
           repo.renameObject(self.file.name, data.value).then(() => {
             self.$toast.open({
               message: 'File renamed',
-              type: 'success',
+              type: 'success'
             })
             self.$store.dispatch('refreshObjects')
           })
@@ -122,14 +122,14 @@ export default {
         self.closeMenu()
       })
     },
-    openFile() {
+    openFile () {
       const self = this
       repo.downloadFile(this.file.name).then((response) => {
         self.closeMenu()
         const blob = new Blob([response.data])
         self.$emit('openFile', {
           ...self.file,
-          data: URL.createObjectURL(blob),
+          data: URL.createObjectURL(blob)
         })
       })
 
@@ -149,7 +149,7 @@ export default {
       //   })
       // })
     },
-    downloadFile() {
+    downloadFile () {
       const self = this
       repo.downloadFile(this.file.name).then((response) => {
         const blob = new Blob([response.data])
@@ -157,14 +157,14 @@ export default {
         self.closeMenu()
       })
     },
-    notImplemented() {
+    notImplemented () {
       this.$toast.open({
         message: 'Not implemented yet',
-        type: 'error',
+        type: 'error'
       })
       this.closeMenu()
-    },
-  },
+    }
+  }
 }
 </script>
 

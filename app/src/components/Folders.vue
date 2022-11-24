@@ -40,12 +40,12 @@ import ContextMenu from '@/components/contextMenu'
 export default {
   emits: ['navigate'],
   components: {
-    ContextMenu,
+    ContextMenu
   },
   methods: {
-    openMenu(event, folder) {
+    openMenu (event, folder) {
       this.$refs.menu.openMenu(event, folder, false, false, false)
-    },
-  },
+    }
+  }
 }
 </script>

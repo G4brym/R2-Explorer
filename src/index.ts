@@ -1,5 +1,5 @@
-import { Router } from 'itty-router'
-import { listDisks } from './api/listDisks'
+import { Request, Router } from 'itty-router'
+import { listBuckets } from './api/listBuckets'
 import { listContents } from './api/listContents'
 import { uploadFiles } from './api/uploadFiles'
 import { createFolder } from './api/createFolder'
@@ -11,9 +11,16 @@ import html from 'explorer:index.html'
 // @ts-ignore
 import app from 'explorer:js/app.js'
 // @ts-ignore
-import favicon from 'explorer:favicon.png'
+import favicon from 'explorer:favicon.svg'
 
-export function R2Explorer() {
+export interface R2ExplorerConfig {
+  readonly?: boolean
+}
+
+export function R2Explorer(config?: R2ExplorerConfig) {
+  config = config || {}
+  if (config.readonly !== false) config.readonly = true
+
   const router = Router()
 
   router.get('/', () => {
@@ -34,22 +41,22 @@ export function R2Explorer() {
     })
   })
 
-  router.get('/favicon.png', () => {
+  router.get('/favicon.svg', () => {
     return new Response(atob(favicon), {
       status: 200,
       headers: {
-        'content-type': 'image/png',
+        'content-type': 'image/svg+xml',
       },
     })
   })
 
-  router.get('/api/disks', listDisks)
-  router.get('/api/disks/:disk', listContents)
-  router.post('/api/disks/:disk/rename', renameObject)
-  router.post('/api/disks/:disk/folder', createFolder)
-  router.post('/api/disks/:disk/download-file', downloadFile)
-  router.post('/api/disks/:disk/upload', uploadFiles)
-  router.post('/api/disks/:disk/delete', deleteObject)
+  router.get('/api/buckets', listBuckets)
+  router.get('/api/buckets/:disk', listContents)
+  router.post('/api/buckets/:disk/rename', renameObject)
+  router.post('/api/buckets/:disk/folder', createFolder)
+  router.post('/api/buckets/:disk/download-file', downloadFile)
+  router.post('/api/buckets/:disk/upload', uploadFiles)
+  router.post('/api/buckets/:disk/delete', deleteObject)
 
   router.get('/api/*', (request: any, env: any, context: any) => {
     return new Response(JSON.stringify({ msg: '404, not found!' }), {
@@ -62,5 +69,7 @@ export function R2Explorer() {
 
   router.all('*', () => new Response('404, not found!', { status: 404 }))
 
-  return router
+  return (request, env, context) => {
+    return router.handle(request, env, { ...context, config: config })
+  }
 }

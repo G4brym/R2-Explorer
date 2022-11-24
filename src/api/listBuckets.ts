@@ -1,6 +1,6 @@
 import { JsonResponse } from './core'
 
-export async function listDisks(request: any, env: any, context: any) {
+export async function listBuckets(request: any, env: any, context: any) {
   const buckets = []
 
   for (const [key, value] of Object.entries(env)) {
@@ -10,5 +10,5 @@ export async function listDisks(request: any, env: any, context: any) {
     }
   }
 
-  return JsonResponse({ Buckets: buckets })
+  return JsonResponse({ Buckets: buckets, config: context.config })
 }

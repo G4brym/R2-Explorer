@@ -24,6 +24,7 @@
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
+                :disabled="$store.state.config.readonly === true"
               >
                 <i class="bi bi-plus-circle-fill"></i> New
               </button>
@@ -81,10 +82,10 @@ import repo from '@/repo'
 export default {
   components: { DragAndDrop, Gallery },
   methods: {
-    changeBucket(bucket) {
+    changeBucket (bucket) {
       this.$store.commit('changeBucket', bucket.Name)
     },
-    newFolder() {
+    newFolder () {
       const self = this
 
       Swal.fire({
@@ -95,12 +96,12 @@ export default {
           if (!value) {
             return 'You need to write something!'
           }
-        },
+        }
       }).then((data) => {
         if (data.isConfirmed === true) {
           const toast = self.$toast.open({
             message: 'Creating Folder...',
-            type: 'warning',
+            type: 'warning'
           })
 
           repo.createFolder(data.value).then((data) => {
@@ -109,13 +110,13 @@ export default {
             toast.dismiss()
             self.$toast.open({
               message: 'Folder created!',
-              type: 'success',
+              type: 'success'
             })
           })
         }
       })
     },
-    newDisk() {
+    newDisk () {
       const self = this
 
       Swal.fire({
@@ -129,12 +130,12 @@ export default {
           if (!value.match(/^[a-z0-9-]{1,61}$/)) {
             return 'This name is not valid!'
           }
-        },
+        }
       }).then((data) => {
         if (data.isConfirmed === true) {
           const toast = self.$toast.open({
             message: 'Creating Disk...',
-            type: 'warning',
+            type: 'warning'
           })
 
           repo.createDisk(data.value).then((resp) => {
@@ -146,15 +147,15 @@ export default {
             toast.dismiss()
             self.$toast.open({
               message: 'Disk created!',
-              type: 'success',
+              type: 'success'
             })
           })
         }
       })
-    },
+    }
   },
-  created() {
+  created () {
     this.$store.dispatch('loadUserDisks')
-  },
+  }
 }
 </script>

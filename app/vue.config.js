@@ -4,13 +4,21 @@ const path = require('path')
 module.exports = defineConfig({
   transpileDependencies: true,
   css: {
-    extract: false,
+    extract: false
   },
   outputDir: path.resolve(__dirname, '../spa'),
   configureWebpack: {
     optimization: {
-      splitChunks: false,
-    },
+      splitChunks: false
+    }
   },
   filenameHashing: false,
+  chainWebpack: config => {
+    config
+      .plugin('html')
+      .tap(args => {
+        args[0].title = 'R2-Explorer'
+        return args
+      })
+  }
 })

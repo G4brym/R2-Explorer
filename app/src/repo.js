@@ -5,40 +5,40 @@ export default {
   createFolder: (name) => {
     const folderPath = store.state.currentFolder + name + '/'
 
-    return axios.post(`/api/disks/${store.state.activeBucket}/folder`, {
-      path: folderPath,
+    return axios.post(`/api/buckets/${store.state.activeBucket}/folder`, {
+      path: folderPath
     })
   },
   createDisk: (name) => {
-    return axios.post(`/api/disks/${name}`)
+    return axios.post(`/api/buckets/${name}`)
   },
   deleteObject: (path, name) => {
-    return axios.post(`/api/disks/${store.state.activeBucket}/delete`, {
+    return axios.post(`/api/buckets/${store.state.activeBucket}/delete`, {
       name,
-      path,
+      path
     })
   },
   downloadFile: (name) => {
     return axios.post(
-      `/api/disks/${store.state.activeBucket}/download-file`,
+      `/api/buckets/${store.state.activeBucket}/download-file`,
       {
         name,
-        path: store.state.currentFolder,
+        path: store.state.currentFolder
       },
       { responseType: 'arraybuffer' }
     )
   },
   getDownloadPresignUrl: (name) => {
-    return axios.post(`/api/disks/${store.state.activeBucket}/download`, {
+    return axios.post(`/api/buckets/${store.state.activeBucket}/download`, {
       name,
-      path: store.state.currentFolder,
+      path: store.state.currentFolder
     })
   },
   renameObject: (oldName, newName) => {
-    return axios.post(`/api/disks/${store.state.activeBucket}/rename`, {
+    return axios.post(`/api/buckets/${store.state.activeBucket}/rename`, {
       oldName,
       newName,
-      path: store.state.currentFolder,
+      path: store.state.currentFolder
     })
   },
   uploadObjects: (file) => {
@@ -47,17 +47,17 @@ export default {
     // formData.append('name', files)
     // formData.append('path', store.state.currentFolder)
 
-    return axios.post(`/api/disks/${store.state.activeBucket}/upload?path=${store.state.currentFolder}`, formData, {
+    return axios.post(`/api/buckets/${store.state.activeBucket}/upload?path=${store.state.currentFolder}`, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+        'Content-Type': 'multipart/form-data'
+      }
     })
   },
   listObjects: async () => {
-    const response = await axios.get(`/api/disks/${store.state.activeBucket}`, {
+    const response = await axios.get(`/api/buckets/${store.state.activeBucket}`, {
       params: {
-        path: store.state.currentFolder,
-      },
+        path: store.state.currentFolder
+      }
     })
 
     let files = []
@@ -72,7 +72,7 @@ export default {
           ...obj,
           name,
           path: store.state.currentFolder,
-          extension: name.split('.').pop(),
+          extension: name.split('.').pop()
         }
       })
     }
@@ -86,14 +86,14 @@ export default {
           ...obj,
           name: split[split.length - 2],
           path: store.state.currentFolder,
-          Key: obj.Prefix,
+          Key: obj.Prefix
         }
       })
     }
 
     return {
       files,
-      folders,
+      folders
     }
-  },
+  }
 }

@@ -34,6 +34,6 @@ import TopbarView from '@/components/base/TopbarView'
 // import SidebarView from '@/components/base/SidebarView'
 import FooterView from '@/components/base/FooterView'
 export default {
-  components: { TopbarView, FooterView },
+  components: { TopbarView, FooterView }
 }
 </script>

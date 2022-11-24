@@ -11,17 +11,14 @@ import VueToast from 'vue-toast-notification'
 // import 'vue-toast-notification/dist/theme-default.css';
 import 'vue-toast-notification/dist/theme-sugar.css'
 import 'sweetalert2/src/sweetalert2.scss'
-// import axios from 'axios'
+import axios from 'axios'
 
 require('bootstrap/js/dist/dropdown')
 require('bootstrap/js/dist/modal')
 
-// if (process.env.NODE_ENV === 'development') {
-//   axios.defaults.baseURL = 'http://localhost:8787'
-// } else {
-//   axios.defaults.withCredentials = true
-//   axios.defaults.baseURL = 'https://r2.massadas.com'
-// }
+if (process.env.NODE_ENV === 'development') {
+  axios.defaults.baseURL = 'http://localhost:8787'
+}
 
 const app = createApp(App)
 

@@ -2,6 +2,11 @@
   <div class="navbar-custom">
     <div class="container-fluid">
       <ul class="list-unstyled topnav-menu float-end mb-0">
+        <li v-if="$store.state.config.readonly" class="dropdown d-none d-lg-inline-block">
+          <a class="nav-link dropdown-toggle arrow-none">
+            <span class="badge bg-danger font-16">Readonly Mode</span>
+          </a>
+        </li>
         <li class="dropdown notification-list topbar-dropdown">
           <a
             v-if="$store.state.user"
@@ -38,7 +43,7 @@
             <span class="logo-lg-text-light">R2E</span>
           </span>
           <span class="logo-lg">
-            <span class="logo-lg-text-light">R2 Explorer</span>
+            <span class="logo-lg-text-light">R2-Explorer</span>
           </span>
         </a>
       </div>

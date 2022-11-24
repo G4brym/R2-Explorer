@@ -15,7 +15,7 @@
 export default {
   emits: ['navigate'],
   computed: {
-    tree() {
+    tree () {
       if (!this.$store.state.currentFolder) {
         return []
       }
@@ -28,11 +28,11 @@ export default {
         folderTree += obj + '/'
         return {
           name: obj,
-          path: folderTree,
+          path: folderTree
         }
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

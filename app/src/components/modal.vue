@@ -27,15 +27,15 @@
 <script>
 export default {
   props: {
-    show: Boolean,
+    show: Boolean
   },
   methods: {
-    handleBackdropClick(event) {
+    handleBackdropClick (event) {
       if (event.target.classList.contains('modal-mask')) {
         this.$emit('close')
       }
-    },
-  },
+    }
+  }
 }
 </script>
 

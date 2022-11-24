@@ -55,15 +55,15 @@
 import axios from 'axios'
 
 export default {
-  data() {
+  data () {
     return {
       account_id: null,
       access_token: null,
-      secret_token: null,
+      secret_token: null
     }
   },
   methods: {
-    register() {
+    register () {
       if (!this.account_id || !this.access_token || !this.secret_token) return null
 
       const self = this
@@ -72,13 +72,13 @@ export default {
         .post('/api/register', {
           accountId: this.account_id,
           accessToken: this.access_token,
-          secretToken: this.secret_token,
+          secretToken: this.secret_token
         })
         .then((data) => {
           if (data.status === 200) {
             this.$toast.open({
               message: 'Credentials Saved, redirecting you...',
-              type: 'success',
+              type: 'success'
             })
             setTimeout(function () {
               self.$router.push({ name: 'home' })
@@ -91,19 +91,19 @@ export default {
           if (error.response.status === 401) {
             this.$toast.open({
               message: 'Invalid Credentials',
-              type: 'error',
+              type: 'error'
             })
           } else {
             console.log(error)
           }
         })
-    },
+    }
   },
-  async beforeCreate() {
+  async beforeCreate () {
     const response = await axios.get('/api/is-registed')
     if (response.data.result === true) {
       this.$router.push({ name: 'home' })
     }
-  },
+  }
 }
 </script>
