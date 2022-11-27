@@ -6,7 +6,7 @@ module.exports = defineConfig({
   css: {
     extract: false
   },
-  outputDir: path.resolve(__dirname, '../spa'),
+  outputDir: path.resolve(__dirname, '../worker/spa'),
   configureWebpack: {
     optimization: {
       splitChunks: false

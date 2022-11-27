@@ -45,7 +45,7 @@ export default {
     return axios.post(`/api/buckets/${store.state.activeBucket}/upload?path=${store.state.currentFolder}`, file, {
       headers: {
         'Content-Type': 'multipart/form-data',
-        'x-filename': btoa(file.name)
+        'x-filename': btoa(unescape(encodeURIComponent(file.name)))
       }
     })
   },

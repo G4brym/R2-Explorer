@@ -4,7 +4,7 @@
   "description": "A Google Drive Interface for your Cloudflare R2 Buckets",
   "main": "dist/umd/index.js",
   "scripts": {
-    "postinstall": "husky install",
+    "postinstallDisabled": "husky install",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
     "build": "npm run build:umd",
@@ -15,7 +15,7 @@
     "test:cov": "jest --coverage --no-cache --runInBand",
     "addscope": "node tools/packagejson name @g4brym/workers-qb",
     "prettify": "prettier . --write --ignore-unknown",
-    "prepare": "husky install"
+    "prepareDisabled": "husky install"
   },
   "publishConfig": {
     "access": "public"

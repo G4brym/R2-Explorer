@@ -7,7 +7,7 @@ export async function uploadFiles(request: any, env: any, context: any) {
   const bucket = env[disk]
   const { path } = request.query
 
-  const filename = btoa(request.headers.get('x-filename'))
+  const filename = decodeURIComponent(escape(atob(request.headers.get('x-filename'))))
   const buf = await request.arrayBuffer()
 
   try {
