@@ -24,7 +24,7 @@
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
-                :disabled="$store.state.config.readonly === true"
+                :disabled="$store.state.config?.readonly === true"
               >
                 <i class="bi bi-plus-circle-fill"></i> New
               </button>

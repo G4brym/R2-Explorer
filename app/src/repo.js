@@ -42,14 +42,10 @@ export default {
     })
   },
   uploadObjects: (file) => {
-    const formData = new FormData()
-    formData.append('files', file)
-    // formData.append('name', files)
-    // formData.append('path', store.state.currentFolder)
-
-    return axios.post(`/api/buckets/${store.state.activeBucket}/upload?path=${store.state.currentFolder}`, formData, {
+    return axios.post(`/api/buckets/${store.state.activeBucket}/upload?path=${store.state.currentFolder}`, file, {
       headers: {
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'multipart/form-data',
+        'x-filename': btoa(file.name)
       }
     })
   },

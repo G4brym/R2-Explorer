@@ -67,6 +67,17 @@ export function R2Explorer(config?: R2ExplorerConfig) {
     })
   })
 
+  // router.options('/api/*', (request, env, context) => {
+  //   return new Response(JSON.stringify({ msg: 'ready' }), {
+  //     headers: {
+  //       'content-type': 'application/json;charset=UTF-8',
+  //       'Access-Control-Allow-Origin': '*',
+  //       'Access-Control-Allow-Headers': 'x-filename',
+  //     },
+  //     status: 200,
+  //   })
+  // })
+
   router.all('*', () => new Response('404, not found!', { status: 404 }))
 
   return (request, env, context) => {

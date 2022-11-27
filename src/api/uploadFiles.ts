@@ -1,24 +1,19 @@
 import { JsonResponse } from './core'
 
 export async function uploadFiles(request: any, env: any, context: any) {
-  if(context.config.readonly === true) return JsonResponse({msg: 'unauthorized'}, 401)
-
-  const form = await request.formData()
+  if (context.config.readonly === true) return JsonResponse({ msg: 'unauthorized' }, 401)
 
   const { disk } = request.params
   const bucket = env[disk]
   const { path } = request.query
 
-  // const path = form.get('path')
-  const files = form.get('files')
+  const filename = btoa(request.headers.get('x-filename'))
+  const buf = await request.arrayBuffer()
 
-  if (Array.isArray(files)) {
-    Array.from(files).forEach(async (file) => {
-      await bucket.put(`${path}${file.name}`, file)
-    })
-  } else {
-    console.log(files)
-    await bucket.put(`${path}${files.name}`, files)
+  try {
+    await bucket.put(`${path}${filename}`, buf)
+  } catch (e) {
+    return new Response(e.message)
   }
 
   return JsonResponse({ status: 'ok' })

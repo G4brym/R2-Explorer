@@ -11,7 +11,7 @@ You can see an example `read-only` right now in your browser in https://r2.massa
 TODO:
 - allow bucket names with spaces
 - write docs on how to setup cloudflare access
-- fix upload
+- txt file previewer
 
 ## Features
 

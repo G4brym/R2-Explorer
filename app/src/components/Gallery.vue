@@ -2,7 +2,7 @@
   <div class="d-md-flex justify-content-between align-items-center">
     <form class="search-bar">
       <div class="position-relative">
-<!--        <input type="text" class="form-control form-control-light" placeholder="Search files..." />-->
+        <!--        <input type="text" class="form-control form-control-light" placeholder="Search files..." />-->
         <span class="mdi mdi-magnify"></span>
       </div>
     </form>

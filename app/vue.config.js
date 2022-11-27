@@ -13,12 +13,10 @@ module.exports = defineConfig({
     }
   },
   filenameHashing: false,
-  chainWebpack: config => {
-    config
-      .plugin('html')
-      .tap(args => {
-        args[0].title = 'R2-Explorer'
-        return args
-      })
+  chainWebpack: (config) => {
+    config.plugin('html').tap((args) => {
+      args[0].title = 'R2-Explorer'
+      return args
+    })
   }
 })
