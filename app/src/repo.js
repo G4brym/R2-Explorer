@@ -18,14 +18,19 @@ export default {
       path
     })
   },
-  downloadFile: (name) => {
+  downloadFile: (file) => {
+    const extra = {}
+    if (file.preview.render === 'arraybuffer') {
+      extra.responseType = 'arraybuffer'
+    }
+
     return axios.post(
       `/api/buckets/${store.state.activeBucket}/download-file`,
       {
-        name,
+        name: file.name,
         path: store.state.currentFolder
       },
-      { responseType: 'arraybuffer' }
+      extra
     )
   },
   getDownloadPresignUrl: (name) => {
@@ -56,6 +61,18 @@ export default {
       }
     })
 
+    function getType (extension) {
+      if (['png', 'jpg', 'jpeg', 'webp'].includes(extension)) {
+        return { type: 'image', render: 'arraybuffer' }
+      } else if (['pdf'].includes(extension)) {
+        return { type: 'pdf', render: 'arraybuffer' }
+      } else if (['txt'].includes(extension)) {
+        return { type: 'text', render: 'text' }
+      } else if (['md'].includes(extension)) {
+        return { type: 'markdown', render: 'text' }
+      }
+    }
+
     let files = []
     if (response.data.Contents) {
       files = response.data.Contents.filter(function (obj) {
@@ -63,12 +80,14 @@ export default {
       })
       files = files.map(function (obj) {
         const name = obj.Key.replace(store.state.currentFolder, '')
+        const extension = name.split('.').pop()
 
         return {
           ...obj,
           name,
           path: store.state.currentFolder,
-          extension: name.split('.').pop()
+          extension,
+          preview: getType(extension)
         }
       })
     }

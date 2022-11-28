@@ -5,16 +5,34 @@
     </template>
 
     <template v-slot:body>
-      <template v-if="type === 'pdf'">
-        <pdf-viewer :pdfUrl="fileData" />
+      <template v-if="fileData === undefined">
+          <div class="text-center">
+            <div class="spinner-border" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <h4 class="text-center">Loading File</h4>
       </template>
-
-      <template v-else-if="type === 'image'">
-        <img :src="fileData" class="preview-image" />
-      </template>
-
       <template v-else>
-        <h4 class="text-center">Unsupported file type</h4>
+        <template v-if="type === 'pdf'">
+          <pdf-viewer :pdfUrl="fileData"/>
+        </template>
+
+        <template v-else-if="type === 'image'">
+          <img :src="fileData" class="preview-image"/>
+        </template>
+
+        <template v-else-if="type === 'text'">
+          <div v-html="fileData.replaceAll('\n', '<br>')"></div>
+        </template>
+
+        <template v-else-if="type === 'markdown'">
+          <div class="markdown" v-html="markdownParser(fileData)"></div>
+        </template>
+
+        <template v-else>
+          <h4 class="text-center">Unsupported file type</h4>
+        </template>
       </template>
     </template>
   </modal>
@@ -23,6 +41,7 @@
 <script>
 import PdfViewer from '@/components/PdfViewer'
 import modal from './modal'
+import { parseMarkdown } from '@/parsers/markdown'
 
 export default {
   components: {
@@ -38,7 +57,7 @@ export default {
   },
   methods: {
     openPreview (file) {
-      this.type = this.getType(file.extension)
+      this.type = file.preview?.type
       this.fileData = file.data
       this.filename = file.name
     },
@@ -47,22 +66,22 @@ export default {
       this.fileData = undefined
       this.filename = undefined
     },
-    getType (extension) {
-      if (['png', 'jpg', 'jpeg', 'webp'].includes(extension)) {
-        return 'image'
-      } else if (['pdf'].includes(extension)) {
-        return 'pdf'
-      }
+    markdownParser (text) {
+      return parseMarkdown(text)
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .preview-image {
   max-width: 100%;
   height: auto;
   display: block;
   margin: auto;
+}
+.markdown > img {
+  width: 100%;
+  height: auto;
 }
 </style>

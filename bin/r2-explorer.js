@@ -34,7 +34,7 @@ fs.writeFileSync(
     "publish": "wrangler publish"
   },
   "dependencies": {
-    "r2-explorer": "^0.2.4"
+    "r2-explorer": "^0.2.5"
   }
 }
 
@@ -50,7 +50,7 @@ fs.writeFileSync(
   `${srcDir}/index.js`,
   `import { R2Explorer } from 'r2-explorer';
 
-const explorer = R2Explorer()
+const explorer = R2Explorer({ readonly: true })
 
 export default {
   async fetch(request, env, context) {

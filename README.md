@@ -2,29 +2,29 @@
 
 A Google Drive Interface for your Cloudflare R2 Buckets!
 
-This project is an easy to use browser interface to upload and manage your Cloudflare R2 buckets.
+This project is deployed/self-hosted in your own Cloudflare Account as a Worker, and no credential/token is required to start using it.
 
-This project is deployed in your own Cloudflare Account as a Worker, and no credential is required to start using it.
-
-You can see an example `read-only` right now in your browser in https://r2.massadas.com/
-
-TODO:
-
-- allow bucket names with spaces
-- write docs on how to setup cloudflare access
-- txt file previewer
+You can see an live example, in `read-only` mode, in your browser at https://r2-explorer.massadas.com/
 
 ## Features
 
-- **Near instant** bucket/folder navigation
-- PDF previewer
-- Image previewer
-- Upload one or multiple files
+- Very quick bucket/folder navigation
+- pdf, image, txt, markdown, etc in-browser preview
+- Drag-and-Drop upload
 - Create folders
 - Rename files
 - Download files
 - Delete files
-- Right click dropdown menu with file options
+- Right click in file for extra options
+
+
+## FAQ
+
+Q. Is there any Authentication for r2-explorer?
+
+A. No. If you want authenticated access, you must setup [Cloudflare Access](https://www.cloudflare.com/products/zero-trust/access/) in your account.
+Access is free up to 50 users.
+
 
 ## Getting Started
 
@@ -52,6 +52,8 @@ bucket_name = 'my-bucket-name'
 preview_bucket_name = 'my-bucket-name'
 ```
 
+If you want to be able to upload/modify your buckets, you must update the `readonly` flag in `src/index.ts` file.
+
 After that just run publish and the project will be up and running for you and everyone you invite to use the Buckets
 
 ```bash
@@ -60,6 +62,8 @@ wrangler publish
 
 ## TODO
 
+- Integration with cloudflare access
+- allow bucket names with spaces
 - Search files
 - CSV Previewer
 - Upload folders
@@ -70,7 +74,6 @@ wrangler publish
 - Upload folders with files
 - Automatically load more files, when the bottom is reached (current limit is 1000 files)
 - Download files bigger than 2gb with presigned url's
-- Allow user to pick to save credentials in cloud or in browser local storage
 
 ## Known issues
 

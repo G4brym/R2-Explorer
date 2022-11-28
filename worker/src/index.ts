@@ -81,6 +81,21 @@ export function R2Explorer(config?: R2ExplorerConfig) {
   router.all('*', () => new Response('404, not found!', { status: 404 }))
 
   return (request, env, context) => {
-    return router.handle(request, env, { ...context, config: config })
+    return router.handle(request, env, { ...context, config: config }).then((response) => {
+      // can modify response here before final return, e.g. CORS headers
+      Object.entries({
+        'access-control-allow-origin': '*',
+        'access-control-allow-headers': '*',
+        'access-control-allow-methods': '*',
+        'timing-allow-origin': '*',
+      }).forEach((entry) => {
+        const [key, value] = entry
+
+        if (!response.headers.has(key)) {
+          response.headers.set(key, value)
+        }
+      })
+      return response
+    })
   }
 }

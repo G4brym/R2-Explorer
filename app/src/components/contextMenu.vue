@@ -54,10 +54,10 @@ export default {
       this.viewMenu = false
     },
 
-    openMenu: function (e, obj, canPreview = false, canDownload = true, canShare = true) {
+    openMenu: function (e, obj, canDownload = true, canShare = true) {
       this.viewMenu = true
       this.file = obj
-      this.canPreview = canPreview
+      this.canPreview = obj.preview !== undefined
       this.canDownload = canDownload
       this.canShare = canShare
 
@@ -123,31 +123,7 @@ export default {
       })
     },
     openFile () {
-      const self = this
-      repo.downloadFile(this.file.name).then((response) => {
-        self.closeMenu()
-        const blob = new Blob([response.data])
-        self.$emit('openFile', {
-          ...self.file,
-          data: URL.createObjectURL(blob)
-        })
-      })
-
-      // const self = this
-      // repo.getDownloadPresignUrl(self.file.name).then((response) => {
-      //   axios({
-      //     url: response.data.url,
-      //     method: 'GET',
-      //     responseType: 'blob'
-      //   }).then((response) => {
-      //     const blob = new Blob([response.data])
-      //     self.$emit('openFile', {
-      //       ...self.file,
-      //       data: URL.createObjectURL(blob)
-      //     })
-      //     self.closeMenu()
-      //   })
-      // })
+      this.$emit('openFile', this.file)
     },
     downloadFile () {
       const self = this

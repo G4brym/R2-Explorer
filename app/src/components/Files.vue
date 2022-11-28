@@ -4,42 +4,43 @@
   <div>
     <table class="table table-centered table-nowrap mb-0">
       <thead class="table-light">
-        <tr>
-          <th class="border-0">Name</th>
-          <th class="border-0">Last Modified</th>
-          <th class="border-0">Size</th>
-        </tr>
+      <tr>
+        <th class="border-0">Name</th>
+        <th class="border-0">Last Modified</th>
+        <th class="border-0">Size</th>
+      </tr>
       </thead>
       <tbody>
-        <template v-if="$store.state.files.length > 0">
-          <tr v-for="file in $store.state.files" :key="file.Key" @contextmenu.prevent="openMenu($event, file)">
-            <td>
-              <i data-feather="folder" class="icon-dual"></i>
-              <span class="ms-2 fw-semibold"
-                ><a href="javascript: void(0);" class="text-reset" v-text="file.name"></a
-              ></span>
-            </td>
-            <td>{{ timeAgo(file.LastModified) }} ago</td>
-            <td>{{ bytesToSize(file.Size) }}</td>
-          </tr>
-        </template>
+      <template v-if="$store.state.files.length > 0">
+        <tr :class="{'pointer': file.preview}" @click="(file.preview) ? openFile(file): null"
+            v-for="file in $store.state.files" :key="file.Key" @contextmenu.prevent="openMenu($event, file)">
+          <td>
+            <i class="bi bi-file font-16" :class="'bi-filetype-' + file.extension"></i>
+            <span class="ms-2 fw-semibold"
+            ><a href="javascript: void(0);" class="text-reset" v-text="file.name"></a
+            ></span>
+          </td>
+          <td>{{ timeAgo(file.LastModified) }} ago</td>
+          <td>{{ bytesToSize(file.Size) }}</td>
+        </tr>
+      </template>
 
-        <template v-else>
-          <tr>
-            <td colspan="100%">
-              <div class="empty-list">
-                <span class="title">This Folder is empty</span>
-                <span class="desc">Drag and Drop files to upload</span>
-              </div>
-            </td>
-          </tr>
-        </template>
+      <template v-else>
+        <tr>
+          <td colspan="100%">
+            <div class="empty-list">
+              <span class="title">This Folder is empty</span>
+              <span class="desc">Drag and Drop files to upload</span>
+            </div>
+          </td>
+        </tr>
+      </template>
       </tbody>
     </table>
 
-    <file-preview ref="preview" />
+    <file-preview ref="preview"/>
 
-    <context-menu ref="menu" @openFile="openFile" />
+    <context-menu ref="menu" @openFile="openFile"/>
   </div>
 </template>
 
@@ -47,12 +48,12 @@
 import utils from '../utils'
 import FilePreview from '@/components/FilePreview'
 import ContextMenu from '@/components/contextMenu'
+import repo from '@/repo'
 
 export default {
   methods: {
     openMenu (event, file) {
-      const canPreview = this.$refs.preview.getType(file.extension) !== undefined
-      this.$refs.menu.openMenu(event, file, canPreview)
+      this.$refs.menu.openMenu(event, file)
     },
 
     timeAgo (time) {
@@ -61,8 +62,24 @@ export default {
     bytesToSize (time) {
       return utils.bytesToSize(time)
     },
-    openFile (fileData) {
-      this.$refs.preview.openPreview(fileData)
+    openFile (file) {
+      this.$refs.preview.type = file.preview.type
+      repo.downloadFile(file).then((response) => {
+        this.$refs.menu.closeMenu()
+
+        let data
+        if (file.preview.render === 'arraybuffer') {
+          const blob = new Blob([response.data])
+          data = URL.createObjectURL(blob)
+        } else {
+          data = response.data
+        }
+
+        this.$refs.preview.openPreview({
+          ...file,
+          data: data
+        })
+      })
     }
   },
   components: {
