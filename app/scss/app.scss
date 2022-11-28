@@ -1,0 +1,85 @@
+/*
+Template Name: Ubold - Responsive Bootstrap 4 Admin Dashboard
+Author: CoderThemes
+Version: 5.0.0
+Website: https://coderthemes.com/
+Contact: support@coderthemes.com
+File: Main Css File
+*/
+
+// Prefix for :root CSS variables
+
+$variable-prefix: 'ct-';
+
+//Fonts
+@import './custom/fonts/fonts';
+
+//Core files
+@import '../node_modules/bootstrap/scss/functions';
+@import '../node_modules/bootstrap/scss/variables';
+@import './variables';
+@import './light-mode';
+@import './dark-mode';
+@import './custom-variables';
+@import '../node_modules/bootstrap/scss/bootstrap';
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css');
+
+//Components
+@import './custom/components/accordions';
+@import './custom/components/alert';
+@import './custom/components/badge';
+@import './custom/components/breadcrumb';
+@import './custom/components/buttons';
+@import './custom/components/card';
+@import './custom/components/dropdown';
+@import './custom/components/forms';
+@import './custom/components/modal';
+@import './custom/components/nav';
+@import './custom/components/pagination';
+@import './custom/components/popover';
+@import './custom/components/progress';
+@import './custom/components/reboot';
+@import './custom/components/tables';
+@import './custom/components/type';
+@import './custom/components/utilities';
+
+// Structure
+@import './custom/structure/general';
+@import './custom/structure/left-menu';
+@import './custom/structure/topbar';
+@import './custom/structure/page-head';
+@import './custom/structure/footer';
+@import './custom/structure/right-sidebar';
+@import './custom/structure/layouts';
+@import './custom/structure/horizontal-nav';
+@import './custom/structure/two-column-menu';
+
+//Components
+@import './custom/components/avatar';
+@import './custom/components/helper';
+@import './custom/components/social';
+@import './custom/components/widgets';
+@import './custom/components/custom-checkbox';
+@import './custom/components/ribbons';
+@import './custom/components/print';
+@import './custom/components/preloader';
+
+//Pages
+@import './custom/pages/authentication';
+@import './custom/pages/components-demo';
+@import './custom/pages/error';
+@import './custom/pages/logout';
+@import './custom/pages/faq';
+@import './custom/pages/maintenance';
+@import './custom/pages/timeline';
+@import './custom/pages/email';
+@import './custom/pages/sitemap';
+@import './custom/pages/search-results';
+@import './custom/pages/pricing';
+@import './custom/pages/gallery';
+@import './custom/pages/coming-soon';
+@import './custom/pages/profile';
+@import './custom/pages/task';
+@import './custom/pages/kanbanboard';
+@import './custom/pages/ecommerce';
+@import './custom/pages/order-detail';

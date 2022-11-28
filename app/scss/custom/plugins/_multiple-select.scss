@@ -1,0 +1,68 @@
+//
+// multi-select.scss
+//
+
+.ms-container {
+  background: transparent url('http://example.com/images/multiple-arrow.png') no-repeat 50% 50%;
+  width: auto;
+  max-width: 370px;
+
+  .ms-list {
+    box-shadow: none;
+    border: $input-border-width solid $input-border-color;
+    box-shadow: $components-shadow-sm;
+
+    &.ms-focus {
+      box-shadow: none;
+      border: $input-border-width solid $input-focus-border-color;
+    }
+  }
+  .ms-selectable {
+    li {
+      &.ms-elem-selectable {
+        border: none;
+        padding: 5px 10px;
+        color: $dropdown-link-color;
+      }
+      &.ms-hover {
+        background-color: $primary;
+        color: $white;
+      }
+    }
+  }
+  .ms-selection {
+    li.ms-elem-selection {
+      border: none;
+      padding: 5px 10px;
+      color: $dropdown-link-color;
+    }
+    li.ms-hover {
+      background-color: $primary;
+      color: $white;
+    }
+  }
+}
+
+.ms-selectable {
+  box-shadow: none;
+  outline: none !important;
+}
+
+.ms-optgroup-label {
+  font-weight: $font-weight-medium;
+  font-family: $font-family-secondary;
+  color: #{map-get($grays, '900')} !important;
+  font-size: 13px;
+}
+
+.ms-container .ms-selectable,
+.ms-container .ms-selection {
+  background-color: $input-bg;
+}
+
+// Dark Mode
+body[data-layout-color='dark'] {
+  .ms-optgroup-label {
+    color: #{map-get($dark-grays, '900')} !important;
+  }
+}
