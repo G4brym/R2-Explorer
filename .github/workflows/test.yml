@@ -25,6 +25,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '14.x'
+      - name: Set RELEASE_VERSION
+        run: echo "RELEASE_VERSION=0.0.1" >> $GITHUB_ENV
+      - name: Apply new version
+        run: node worker/config/preparePublish.js
       - name: Install dashboard modules
         run: cd app && npm install
       - name: Build dashboard
