@@ -28,8 +28,8 @@ jobs:
       - name: Install dashboard modules
         run: cd app && npm install
       - name: Build dashboard
-        run: npm build
+        run: cd app && npm run build
       - name: Install worker modules
-        run: cd ../worker && npm install
+        run: cd worker && npm install
       - name: Build worker
-        run: nom run build
+        run: cd worker && npm run build
