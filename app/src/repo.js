@@ -70,6 +70,8 @@ export default {
         return { type: 'text', render: 'text' }
       } else if (['md'].includes(extension)) {
         return { type: 'markdown', render: 'text' }
+      } else if (['csv'].includes(extension)) {
+        return { type: 'csv', render: 'text' }
       }
     }
 

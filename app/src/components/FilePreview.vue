@@ -6,12 +6,12 @@
 
     <template v-slot:body>
       <template v-if="fileData === undefined">
-          <div class="text-center">
-            <div class="spinner-border" role="status">
-              <span class="visually-hidden">Loading...</span>
-            </div>
+        <div class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
           </div>
-          <h4 class="text-center">Loading File</h4>
+        </div>
+        <h4 class="text-center">Loading File</h4>
       </template>
       <template v-else>
         <template v-if="type === 'pdf'">
@@ -28,6 +28,10 @@
 
         <template v-else-if="type === 'markdown'">
           <div class="markdown" v-html="markdownParser(fileData)"></div>
+        </template>
+
+        <template v-else-if="type === 'csv'">
+          <div class="markdown" v-html="csvParser(fileData)"></div>
         </template>
 
         <template v-else>
@@ -68,6 +72,32 @@ export default {
     },
     markdownParser (text) {
       return parseMarkdown(text)
+    },
+    csvParser: function (text) {
+      let result = ''
+      const rows = text.split('\n')
+      if (rows.length === 0) {
+        return '<h2>Empty csv</h2>'
+      }
+
+      for (const [index, row] of rows.entries()) {
+        let line = ''
+        const columns = row.split(/(\s*"[^"]+"\s*|\s*[^,]+|,)(?=,|$)/g).filter(item => {
+          return item !== '' && item !== ','
+        })
+
+        for (const col of columns) {
+          if (index === 0) {
+            line += `<th>${col.replaceAll('"', '')}</th>`
+          } else {
+            line += `<td>${col.replaceAll('"', '')}</td>`
+          }
+        }
+
+        result += `<tr>${line}</tr>`
+      }
+
+      return `<table class="table">${result}</table>`
     }
   }
 }
@@ -80,6 +110,7 @@ export default {
   display: block;
   margin: auto;
 }
+
 .markdown > img {
   width: 100%;
   height: auto;

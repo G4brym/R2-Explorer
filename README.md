@@ -9,7 +9,7 @@ You can see an live example, in `read-only` mode, in your browser at https://r2-
 ## Features
 
 - Very quick bucket/folder navigation
-- pdf, image, txt, markdown, etc in-browser preview
+- pdf, image, txt, markdown, csv, etc in-browser preview
 - Drag-and-Drop upload
 - Create folders
 - Rename files
@@ -65,7 +65,6 @@ wrangler publish
 - Integration with cloudflare access
 - allow bucket names with spaces
 - Search files
-- CSV Previewer
 - Upload folders
 - Rename folders
 - Delete folders
