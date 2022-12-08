@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Setup .npmrc file to publish to npm
         uses: actions/setup-node@v1
         with:
@@ -18,11 +20,13 @@ jobs:
       - name: Install dashboard modules
         run: cd app && npm install
       - name: Build dashboard
-        run: npm build
+        run: cd app && npm run build
       - name: Install worker modules
-        run: cd ../worker && npm install
+        run: cd worker && npm install
       - name: Build worker
-        run: nom run build
+        run: cd worker && npm run build
+      - name: Apply new version
+        run: node worker/config/preparePublish.js
       - name: Publish to npm
         run: npm publish --access public
         env:

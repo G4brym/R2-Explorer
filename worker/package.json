@@ -1,6 +1,6 @@
 {
   "name": "r2-explorer",
-  "version": "0.2.6",
+  "version": "VERSION_TO_BE_TAGGED",
   "description": "A Google Drive Interface for your Cloudflare R2 Buckets",
   "main": "dist/umd/index.js",
   "scripts": {
@@ -77,8 +77,7 @@
     "wrangler": "^2.4.2"
   },
   "dependencies": {
-    "itty-router": "^2.6.1",
-    "r2-explorer": "^0.2.6"
+    "itty-router": "^2.6.1"
   },
   "bin": {
     "r2-explorer": "bin/r2-explorer.js"

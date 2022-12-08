@@ -34,7 +34,7 @@ fs.writeFileSync(
     "publish": "wrangler publish"
   },
   "dependencies": {
-    "r2-explorer": "^0.2.6"
+    "r2-explorer": "^VERSION_TO_BE_TAGGED"
   }
 }
 
