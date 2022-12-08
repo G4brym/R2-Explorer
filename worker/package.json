@@ -13,7 +13,7 @@
     "package": "npm run build && npm pack",
     "test": "jest --no-cache --runInBand",
     "test:cov": "jest --coverage --no-cache --runInBand",
-    "addscope": "node tools/packagejson name @g4brym/workers-qb",
+    "addscope": "node tools/packagejson name @g4brym/r2-explorer",
     "prettify": "prettier . --write --ignore-unknown",
     "prepareDisabled": "husky install"
   },

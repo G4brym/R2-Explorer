@@ -16,3 +16,13 @@ for (const file of files) {
     })
   })
 }
+
+fs.readFile('README.md', 'utf8', function (err, data) {
+  if (err) {
+    return console.log(err)
+  }
+
+  fs.writeFile('worker/README.md', data, 'utf8', function (err) {
+    if (err) return console.log(err)
+  })
+})
