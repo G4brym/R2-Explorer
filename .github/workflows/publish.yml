@@ -28,7 +28,7 @@ jobs:
       - name: Build worker
         run: cd worker && npm run build
       - name: Publish to npm
-        run: npm publish --access public
+        run: cd worker && npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
       - name: Setup .npmrc file to publish to GitHub Packages
@@ -37,8 +37,8 @@ jobs:
           node-version: '14.x'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@g4brym'
-      - run: npm run addscope
+      - run: cd worker && npm run addscope
       - name: Publish to GitHub Packages
-        run: npm publish
+        run: cd worker && npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
