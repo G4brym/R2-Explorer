@@ -1,0 +1,35 @@
+name: Test
+
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'LICENSE'
+      - '.editorconfig'
+    branches:
+      - master
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - 'LICENSE'
+      - '.editorconfig'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.x'
+      - name: Install dashboard modules
+        run: cd app && npm install
+      - name: Build dashboard
+        run: npm build
+      - name: Install worker modules
+        run: cd ../worker && npm install
+      - name: Build worker
+        run: nom run build
