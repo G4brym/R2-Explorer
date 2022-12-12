@@ -20,7 +20,7 @@ export default {
   },
   downloadFile: (file) => {
     const extra = {}
-    if (file.preview.render === 'arraybuffer') {
+    if (file.preview?.render === 'arraybuffer') {
       extra.responseType = 'arraybuffer'
     }
 

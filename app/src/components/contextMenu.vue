@@ -127,7 +127,7 @@ export default {
     },
     downloadFile () {
       const self = this
-      repo.downloadFile(this.file.name).then((response) => {
+      repo.downloadFile(this.file).then((response) => {
         const blob = new Blob([response.data])
         saveAs(URL.createObjectURL(blob), self.file.name)
         self.closeMenu()
