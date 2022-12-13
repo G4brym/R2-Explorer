@@ -11,7 +11,7 @@
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
     "pdfvuer": "^2.0.1",
-    "sweetalert2": "^11.4.17",
+    "sweetalert2": "^11.4.8",
     "util": "^0.12.4",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
@@ -34,6 +34,8 @@
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-vue": "^8.7.1",
     "sass": "^1.32.7",
-    "sass-loader": "^12.0.0"
+    "sass-loader": "^12.0.0",
+    "loader-utils": ">=2.0.4",
+    "terser": ">=5.14.2"
   }
 }
