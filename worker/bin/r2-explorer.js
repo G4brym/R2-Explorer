@@ -25,7 +25,7 @@ fs.writeFileSync(
   `${dir}/package.json`,
   `{
   "name": "${projectName}",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
   "devDependencies": {
     "wrangler": "^2.4.2"
@@ -34,7 +34,7 @@ fs.writeFileSync(
     "publish": "wrangler publish"
   },
   "dependencies": {
-    "r2-explorer": "^VERSION_TO_BE_TAGGED"
+    "r2-explorer": "^0.0.1"
   }
 }
 

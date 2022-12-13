@@ -23,4 +23,4 @@ pnpm-debug.log*
 *.sw?
 
 # local tests
-wrangler
+my-r2-explorer

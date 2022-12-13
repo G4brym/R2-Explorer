@@ -1,13 +1,10 @@
 export async function downloadFile(request: any, env: any, context: any) {
-  const body = await request.json()
-
-  const { disk } = request.params
+  const { disk, file } = request.params
   const bucket = env[disk]
 
-  const { name } = body
-  const { path } = body
+  const filePath = decodeURIComponent(escape(atob(file)));
 
-  const object = await bucket.get(`${path}${name}`)
+  const object = await bucket.get(filePath)
 
   if (object === null) {
     return new Response('Object Not Found', { status: 404 })

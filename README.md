@@ -81,19 +81,19 @@ wrangler publish
 ## Images
 
 Home Page
-![Home](https://github.com/G4brym/R2-Explorer/raw/master/docs/images/home.png)
+![Home](https://github.com/G4brym/R2-Explorer/raw/main/docs/images/home.png)
 
 Image Previewer
-![Home](https://github.com/G4brym/R2-Explorer/raw/master/docs/images/image-preview.png)
+![Home](https://github.com/G4brym/R2-Explorer/raw/main/docs/images/image-preview.png)
 
 Pdf Previewer
-![Home](https://github.com/G4brym/R2-Explorer/raw/master/docs/images/pdf-preview.png)
+![Home](https://github.com/G4brym/R2-Explorer/raw/main/docs/images/pdf-preview.png)
 
 New Folder
-![Home](https://github.com/G4brym/R2-Explorer/raw/master/docs/images/new-folder.png)
+![Home](https://github.com/G4brym/R2-Explorer/raw/main/docs/images/new-folder.png)
 
 Uploading Files
-![Home](https://github.com/G4brym/R2-Explorer/raw/master/docs/images/uploading-files.png)
+![Home](https://github.com/G4brym/R2-Explorer/raw/main/docs/images/uploading-files.png)
 
 ### Compiles and hot-reloads for development
 

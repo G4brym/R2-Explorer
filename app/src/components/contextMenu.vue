@@ -8,32 +8,33 @@
     :style="{ top: top, left: left }"
   >
     <li class="pointer" v-if="canPreview" @click="openFile"><i class="bi bi-box-arrow-in-right me-1"></i>Open</li>
-    <li class="pointer" @click="notImplemented" v-if="canShare">
-      <i class="bi bi-share-fill me-1"></i>Get Sharable Link
-    </li>
+<!--    <li class="pointer" @click="notImplemented">-->
+<!--      <i class="bi bi-share-fill me-1"></i>Get Sharable Link-->
+<!--    </li>-->
     <li class="pointer" @click="renameFile"><i class="bi bi-pencil-fill me-1"></i>Rename</li>
-    <li class="pointer" @click="downloadFile" v-if="canDownload">
-      <i class="bi bi-cloud-download-fill me-1"></i>Download
-    </li>
+    <a :href="downloadUrl" :download="name">
+      <li class="pointer">
+        <i class="bi bi-cloud-download-fill me-1"></i>Download
+      </li>
+    </a>
     <li class="pointer" @click="deleteFile"><i class="bi bi-trash-fill me-1"></i>Remove</li>
   </ul>
 </template>
 
 <script>
 import Swal from 'sweetalert2'
-import { saveAs } from 'file-saver'
 import repo from '@/repo'
 
 export default {
   data: function () {
     return {
       file: undefined,
-      canDownload: false,
       canPreview: false,
-      canShare: false,
       viewMenu: false,
       top: '0px',
-      left: '0px'
+      left: '0px',
+      downloadUrl: '',
+      name: ''
     }
   },
 
@@ -54,12 +55,12 @@ export default {
       this.viewMenu = false
     },
 
-    openMenu: function (e, obj, canDownload = true, canShare = true) {
+    openMenu: function (e, obj) {
       this.viewMenu = true
       this.file = obj
       this.canPreview = obj.preview !== undefined
-      this.canDownload = canDownload
-      this.canShare = canShare
+      this.name = obj.name
+      this.downloadUrl = `/api/buckets/${this.$store.state.activeBucket}/${btoa(unescape(encodeURIComponent(`${this.$store.state.currentFolder}${obj.name}`)))}`
 
       this.$nextTick(
         function () {
@@ -125,14 +126,6 @@ export default {
     openFile () {
       this.$emit('openFile', this.file)
     },
-    downloadFile () {
-      const self = this
-      repo.downloadFile(this.file).then((response) => {
-        const blob = new Blob([response.data])
-        saveAs(URL.createObjectURL(blob), self.file.name)
-        self.closeMenu()
-      })
-    },
     notImplemented () {
       this.$toast.open({
         message: 'Not implemented yet',
@@ -171,5 +164,13 @@ export default {
 #right-click-menu li:hover {
   background: #1e88e5;
   color: #fafafa;
+}
+
+a {
+  color: unset
+}
+
+a:hover {
+  color: unset
 }
 </style>

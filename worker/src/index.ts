@@ -1,4 +1,4 @@
-import { Request, Router } from 'itty-router'
+import { Router } from 'itty-router'
 import { listBuckets } from './api/listBuckets'
 import { listContents } from './api/listContents'
 import { uploadFiles } from './api/uploadFiles'
@@ -54,9 +54,9 @@ export function R2Explorer(config?: R2ExplorerConfig) {
   router.get('/api/buckets/:disk', listContents)
   router.post('/api/buckets/:disk/rename', renameObject)
   router.post('/api/buckets/:disk/folder', createFolder)
-  router.post('/api/buckets/:disk/download-file', downloadFile)
   router.post('/api/buckets/:disk/upload', uploadFiles)
   router.post('/api/buckets/:disk/delete', deleteObject)
+  router.get('/api/buckets/:disk/:file', downloadFile)
 
   router.get('/api/*', (request: any, env: any, context: any) => {
     return new Response(JSON.stringify({ msg: '404, not found!' }), {

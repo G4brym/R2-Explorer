@@ -24,20 +24,12 @@ export default {
       extra.responseType = 'arraybuffer'
     }
 
-    return axios.post(
-      `/api/buckets/${store.state.activeBucket}/download-file`,
-      {
-        name: file.name,
-        path: store.state.currentFolder
-      },
+    const filePath = btoa(unescape(encodeURIComponent(`${store.state.currentFolder}${file.name}`)))
+
+    return axios.get(
+      `/api/buckets/${store.state.activeBucket}/${filePath}`,
       extra
     )
-  },
-  getDownloadPresignUrl: (name) => {
-    return axios.post(`/api/buckets/${store.state.activeBucket}/download`, {
-      name,
-      path: store.state.currentFolder
-    })
   },
   renameObject: (oldName, newName) => {
     return axios.post(`/api/buckets/${store.state.activeBucket}/rename`, {
