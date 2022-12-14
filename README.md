@@ -6,6 +6,9 @@ This project is deployed/self-hosted in your own Cloudflare Account as a Worker,
 
 You can see an live example, in `read-only` mode, in your browser at https://r2-explorer.massadas.com/
 
+This project is still in development, and there are definitely going to be some weird issues sometimes, but when you find something
+please [open an new issue](https://github.com/G4brym/R2-Explorer/issues/new) for it to get solved.
+
 ## Features
 
 - Very quick bucket/folder navigation
@@ -73,6 +76,7 @@ wrangler publish
 - Upload folders with files
 - Automatically load more files, when the bottom is reached (current limit is 1000 files)
 - Download files bigger than 2gb with presigned url's
+- set folder and file navigation in the url to allow direct share of a specific folder/file
 
 ## Known issues
 

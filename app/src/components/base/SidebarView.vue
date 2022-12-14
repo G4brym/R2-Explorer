@@ -13,8 +13,8 @@
           <i class="bi bi-plus-circle-fill"></i> New
         </button>
         <div class="dropdown-menu">
-          <a class="dropdown-item pointer" @click="newFolder"><i class="bi bi-folder-fill me-1"></i> Folder</a>
-          <a class="dropdown-item pointer" @click="$refs.uploader.openUploader()"
+          <a class="dropdown-item pointer" @click="$emit('newFolder')"><i class="bi bi-folder-fill me-1"></i> Folder</a>
+          <a class="dropdown-item pointer" @click="$emit('openUploader')"
           ><i class="bi bi-file-earmark-text-fill me-1"></i> File</a
           >
         </div>

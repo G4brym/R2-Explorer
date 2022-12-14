@@ -12,10 +12,11 @@
     <!--      <i class="bi bi-share-fill me-1"></i>Get Sharable Link-->
     <!--    </li>-->
     <li class="pointer" @click="renameFile"><i class="bi bi-pencil-fill me-1"></i>Rename</li>
-    <li class="pointer">
-      <a class="d-block w-100" ref="download-button" :href="downloadUrl" :download="name" @click="downloadFile">
-        <i class="bi bi-cloud-download-fill me-1"></i>Download
-      </a>
+    <li class="pointer" @click="downloadFile">
+      <i class="bi bi-cloud-download-fill me-1"></i>Download
+<!--      <a class="d-block w-100" :href="downloadUrl" download>-->
+<!--        <i class="bi bi-cloud-download-fill me-1"></i>Download-->
+<!--      </a>-->
     </li>
     <li class="pointer" @click="deleteFile"><i class="bi bi-trash-fill me-1"></i>Remove</li>
   </ul>
@@ -55,11 +56,14 @@ export default {
       this.viewMenu = false
     },
     downloadFile: function () {
-      setTimeout(() => {
-        this.closeMenu()
-      }, 1000
-      )
-      // this.$refs['download-button'].click()
+      const link = document.createElement('a')
+      link.download = this.file.name
+      link.href = this.downloadUrl
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      this.closeMenu()
     },
     openMenu: function (e, obj) {
       this.viewMenu = true

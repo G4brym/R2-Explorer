@@ -23,15 +23,6 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
   const router = Router()
 
-  router.get('/', () => {
-    return new Response(atob(html), {
-      status: 200,
-      headers: {
-        'content-type': 'text/html;charset=UTF-8',
-      },
-    })
-  })
-
   router.get('/js/app.js', () => {
     return new Response(atob(app), {
       status: 200,
@@ -75,6 +66,15 @@ export function R2Explorer(config?: R2ExplorerConfig) {
         'Access-Control-Allow-Headers': '*',
       },
       status: 200,
+    })
+  })
+
+  router.get('*', () => {
+    return new Response(atob(html), {
+      status: 200,
+      headers: {
+        'content-type': 'text/html;charset=UTF-8',
+      },
     })
   })
 

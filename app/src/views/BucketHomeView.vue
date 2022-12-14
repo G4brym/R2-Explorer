@@ -2,7 +2,7 @@
   <div class="row" style="min-height: 50em">
     <!-- Right Sidebar -->
     <div class="col-sm-12 col-md-3 mt-3">
-      <sidebar-view />
+      <sidebar-view @openUploader="$refs.uploader.openUploader()" @newFolder="newFolder" />
     </div>
 
     <div class="col-sm-12 col-md-9 mt-3">
