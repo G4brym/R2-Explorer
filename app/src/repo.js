@@ -9,9 +9,6 @@ export default {
       path: folderPath
     })
   },
-  createDisk: (name) => {
-    return axios.post(`/api/buckets/${name}`)
-  },
   deleteObject: (path, name) => {
     return axios.post(`/api/buckets/${store.state.activeBucket}/delete`, {
       name,

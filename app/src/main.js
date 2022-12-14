@@ -20,7 +20,12 @@ if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = 'http://localhost:8787'
 }
 
-const app = createApp(App)
+const app = createApp({
+  extends: App,
+  created: function () {
+    this.$store.dispatch('loadUserDisks')
+  }
+})
 
 app.use(store)
 app.use(router)

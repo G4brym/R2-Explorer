@@ -30,17 +30,8 @@ export default createStore({
       state.user = data.user
       state.config = data.config
 
-      if (data.Buckets.length === 0) {
-        const self = this
-        repo.createDisk('storage').then(() => {
-          self.dispatch('loadUserDisks')
-        })
-
-        return
-      }
-
-      this.commit('changeBucket', data.Buckets[0].Name)
-      this.dispatch('refreshObjects')
+      // this.commit('changeBucket', data.Buckets[0].Name)
+      // this.dispatch('refreshObjects')
     }
   },
   actions: {

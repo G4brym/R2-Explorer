@@ -37,3 +37,9 @@ export default {
   components: { TopbarView, FooterView }
 }
 </script>
+
+<style>
+.content-page {
+  margin-top: 0 !important;
+}
+</style>

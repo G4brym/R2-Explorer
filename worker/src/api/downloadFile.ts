@@ -13,6 +13,7 @@ export async function downloadFile(request: any, env: any, context: any) {
   const headers = new Headers()
   object.writeHttpMetadata(headers)
   headers.set('etag', object.httpEtag)
+  headers.set('Content-Disposition', `attachment; filename="${filePath.split('/').pop()}"`)
 
   return new Response(object.body, {
     headers,

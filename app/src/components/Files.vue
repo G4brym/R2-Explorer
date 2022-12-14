@@ -1,7 +1,7 @@
 <template>
   <h5 class="mb-3" v-if="$store.state.files.length > 0">Files</h5>
 
-  <div>
+  <div class="table-responsive">
     <table class="table table-centered table-nowrap mb-0">
       <thead class="table-light">
       <tr>
@@ -17,7 +17,7 @@
           <td>
             <i class="bi bi-file font-16" :class="'bi-filetype-' + file.extension"></i>
             <span class="ms-2 fw-semibold"
-            ><a href="javascript: void(0);" class="text-reset" v-text="file.name"></a
+            ><span class="text-reset" v-text="file.name"></span
             ></span>
           </td>
           <td>{{ timeAgo(file.LastModified) }} ago</td>

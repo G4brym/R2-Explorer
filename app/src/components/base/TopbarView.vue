@@ -39,12 +39,7 @@
       <!-- LOGO -->
       <div class="logo-box">
         <a class="logo logo-light text-center">
-          <span class="logo-sm">
-            <span class="logo-lg-text-light">R2E</span>
-          </span>
-          <span class="logo-lg">
             <span class="logo-lg-text-light">R2-Explorer</span>
-          </span>
         </a>
       </div>
 
@@ -52,3 +47,15 @@
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+@media (max-width: 992px) {
+  .logo-box {
+    width: 100% !important;
+  }
+}
+
+.navbar-custom {
+  position: unset;
+}
+</style>

@@ -8,15 +8,15 @@
     :style="{ top: top, left: left }"
   >
     <li class="pointer" v-if="canPreview" @click="openFile"><i class="bi bi-box-arrow-in-right me-1"></i>Open</li>
-<!--    <li class="pointer" @click="notImplemented">-->
-<!--      <i class="bi bi-share-fill me-1"></i>Get Sharable Link-->
-<!--    </li>-->
+    <!--    <li class="pointer" @click="notImplemented">-->
+    <!--      <i class="bi bi-share-fill me-1"></i>Get Sharable Link-->
+    <!--    </li>-->
     <li class="pointer" @click="renameFile"><i class="bi bi-pencil-fill me-1"></i>Rename</li>
-    <a :href="downloadUrl" :download="name">
-      <li class="pointer">
+    <li class="pointer">
+      <a class="d-block w-100" ref="download-button" :href="downloadUrl" :download="name" @click="downloadFile">
         <i class="bi bi-cloud-download-fill me-1"></i>Download
-      </li>
-    </a>
+      </a>
+    </li>
     <li class="pointer" @click="deleteFile"><i class="bi bi-trash-fill me-1"></i>Remove</li>
   </ul>
 </template>
@@ -54,13 +54,24 @@ export default {
     closeMenu: function () {
       this.viewMenu = false
     },
-
+    downloadFile: function () {
+      setTimeout(() => {
+        this.closeMenu()
+      }, 1000
+      )
+      // this.$refs['download-button'].click()
+    },
     openMenu: function (e, obj) {
       this.viewMenu = true
       this.file = obj
       this.canPreview = obj.preview !== undefined
       this.name = obj.name
-      this.downloadUrl = `/api/buckets/${this.$store.state.activeBucket}/${btoa(unescape(encodeURIComponent(`${this.$store.state.currentFolder}${obj.name}`)))}`
+
+      let prefix = ''
+      if (process.env.NODE_ENV === 'development') {
+        prefix = 'http://localhost:8787'
+      }
+      this.downloadUrl = `${prefix}/api/buckets/${this.$store.state.activeBucket}/${btoa(unescape(encodeURIComponent(`${this.$store.state.currentFolder}${obj.name}`)))}`
 
       this.$nextTick(
         function () {

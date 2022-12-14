@@ -1,18 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-// import BucketHomeView from '@/views/BucketHomeView'
+import BucketHomeView from '@/views/BucketHomeView'
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: BucketHomeView
+  },
+  {
+    path: '/:bucket',
+    name: 'bucket-home',
+    component: BucketHomeView
   }
-  // {
-  //   path: '/:bucket',
-  //   name: 'bucket-home',
-  //   component: BucketHomeView
-  // }
 ]
 
 const router = createRouter({
