@@ -1,6 +1,6 @@
 var fs = require('fs')
 
-const files = ['worker/bin/r2-explorer.js', 'worker/package.json']
+const files = ['worker/bin/r2-explorer.js', 'worker/package.json', 'worker/spa/js/app.js']
 
 for (const file of files) {
   fs.readFile(file, 'utf8', function (err, data) {
