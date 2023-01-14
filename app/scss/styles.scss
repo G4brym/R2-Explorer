@@ -30,34 +30,44 @@
 }
 
 .upload-box {
-  outline: 2px dashed black;
-  //outline-offset: 5px;
-  border-radius: 5px;
-  //background: rgb(128 128 128 / 10%);
-  height: 100%;
-
   .box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 50px;
-    border-radius: 5px;
-    background: rgb(255 255 255 / 85%);
+    display: none;
   }
 
   .drop-files {
     align-items: center;
     justify-content: center;
-    z-index: 10;
+    z-index: -1;
     display: flex;
     position: absolute;
     height: 100%;
     width: 100%;
     top: 0;
-    background: rgb(0 0 0 / 10%);
     flex-direction: column;
   }
+
+  &.active {
+    outline: 2px dashed black;
+    border-radius: 5px;
+    height: 100%;
+
+    .box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 50px;
+      border-radius: 5px;
+      background: rgb(255 255 255 / 85%);
+    }
+
+    .drop-files {
+      background: rgb(0 0 0 / 10%);
+      z-index: 10;
+    }
+
+  }
+
 }
 
 .pointer {
