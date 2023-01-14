@@ -12,11 +12,17 @@
         >
           <i class="bi bi-plus-circle-fill"></i> New
         </button>
-        <div class="dropdown-menu">
-          <a class="dropdown-item pointer" @click="$emit('newFolder')"><i class="bi bi-folder-fill me-1"></i> Folder</a>
-          <a class="dropdown-item pointer" @click="$emit('openUploader')"
-          ><i class="bi bi-file-earmark-text-fill me-1"></i> File</a
-          >
+        <div class="dropdown-menu font-16">
+          <a class="dropdown-item pointer" @click="$emit('newFolder')">
+            <i class="bi bi-folder-plus me-1"></i> New Folder
+          </a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item pointer" @click="$emit('openFilesUploader')">
+            <i class="bi bi-file-earmark-arrow-up me-1"></i> Upload Files
+          </a>
+          <a class="dropdown-item pointer" @click="$emit('openFoldersUploader')">
+            <i class="bi bi-folder2-open me-1"></i> Upload Folders
+          </a>
         </div>
       </div>
       <div class="mail-list mt-3">

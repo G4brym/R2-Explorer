@@ -2,7 +2,7 @@
   <div class="row h-100 py-3">
     <!-- Right Sidebar -->
     <div class="col-sm-12 col-md-3">
-      <sidebar-view @openUploader="$refs.uploader.openUploader()" @newFolder="newFolder"/>
+      <sidebar-view @openFilesUploader="$refs.uploader.openFilesUploader()" @openFoldersUploader="$refs.uploader.openFoldersUploader()" @newFolder="newFolder"/>
     </div>
 
     <div class="col-sm-12 col-md-9">

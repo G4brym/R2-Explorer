@@ -35,8 +35,10 @@ export default {
       path: store.state.currentFolder
     })
   },
-  uploadObjects: (file) => {
-    return axios.post(`/api/buckets/${store.state.activeBucket}/upload?path=${store.state.currentFolder}`, file, {
+  uploadObjects: (file, folder) => {
+    folder = folder || store.state.currentFolder
+
+    return axios.post(`/api/buckets/${store.state.activeBucket}/upload?path=${btoa(unescape(encodeURIComponent(folder)))}`, file, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'x-filename': btoa(unescape(encodeURIComponent(file.name)))
