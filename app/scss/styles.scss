@@ -2,10 +2,21 @@
 
 .content-page {
   margin-left: unset;
+  height: calc(100vh - 70px - 60px);
+  padding: 0 15px;
+
+  > .content {
+    height: 100%;
+
+    > .container-fluid {
+      height: 100%;
+    }
+  }
 }
 
 .footer {
   left: 0;
+  height: 60px;
 }
 
 .folder {
@@ -22,8 +33,31 @@
   outline: 2px dashed black;
   //outline-offset: 5px;
   border-radius: 5px;
-  background: rgb(128 128 128 / 10%);
-  min-height: 100%;
+  //background: rgb(128 128 128 / 10%);
+  height: 100%;
+
+  .box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px;
+    border-radius: 5px;
+    background: rgb(255 255 255 / 85%);
+  }
+
+  .drop-files {
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    display: flex;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    background: rgb(0 0 0 / 10%);
+    flex-direction: column;
+  }
 }
 
 .pointer {

@@ -6,6 +6,12 @@
     @drop.prevent="drop"
   >
     <slot></slot>
+    <div v-if="isHover" class="drop-files">
+      <div class="box">
+          <h3>Drop files to upload</h3>
+        <span class="font-28"><i class="bi bi-cloud-upload-fill"></i></span>
+      </div>
+    </div>
   </div>
 
   <!--  <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="uploader" multiple directory="" webkitdirectory="" moxdirectory=""/>-->
