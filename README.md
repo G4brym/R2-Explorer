@@ -14,6 +14,7 @@ please [open an new issue](https://github.com/G4brym/R2-Explorer/issues/new) for
 - Very quick bucket/folder navigation
 - pdf, image, txt, markdown, csv, etc in-browser preview
 - Drag-and-Drop upload
+- Multiple files and folder uploads
 - Create folders
 - Rename files
 - Download files
@@ -68,7 +69,6 @@ wrangler publish
 - Integration with cloudflare access
 - allow bucket names with spaces
 - Search files
-- Upload folders
 - Rename folders
 - Delete folders
 - Image thumbnail's using Cloudflare workers

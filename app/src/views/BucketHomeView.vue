@@ -1,19 +1,19 @@
 <template>
-  <div class="row" style="min-height: 50em">
+  <div class="row h-100 py-3">
     <!-- Right Sidebar -->
-    <div class="col-sm-12 col-md-3 mt-3">
-      <sidebar-view @openUploader="$refs.uploader.openUploader()" @newFolder="newFolder" />
+    <div class="col-sm-12 col-md-3">
+      <sidebar-view @openFilesUploader="$refs.uploader.openFilesUploader()" @openFoldersUploader="$refs.uploader.openFoldersUploader()" @newFolder="newFolder"/>
     </div>
 
-    <div class="col-sm-12 col-md-9 mt-3">
+    <div class="col-sm-12 col-md-9">
       <div class="card h-100">
-        <div class="card-body">
-            <drag-and-drop ref="uploader">
-              <gallery v-if="$store.state.files && $store.state.folders" />
-            </drag-and-drop>
+        <drag-and-drop ref="uploader">
+          <div class="card-body">
+            <gallery v-if="$store.state.files && $store.state.folders"/>
+            <div class="clearfix"></div>
+          </div>
+        </drag-and-drop>
 
-          <div class="clearfix"></div>
-        </div>
       </div>
       <!-- end card -->
     </div>
@@ -123,7 +123,9 @@ export default {
     this.$watch(
       () => this.$route.params.bucket,
       (bucket, previousbucket) => {
-        if (bucket !== previousbucket) { this.$store.commit('changeBucket', bucket) }
+        if (bucket !== previousbucket) {
+          this.$store.commit('changeBucket', bucket)
+        }
       }
     )
   }

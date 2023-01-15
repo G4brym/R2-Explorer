@@ -1,15 +1,24 @@
 <template>
   <div
-    :class="{ 'upload-box': isHover }"
+    ref="dragContainer"
+    class="upload-box"
+    :class="{ 'active': isHover || false }"
     @dragover.prevent="dragover"
     @dragleave.prevent="dragleave"
     @drop.prevent="drop"
   >
     <slot></slot>
+    <div class="drop-files">
+      <div class="box">
+        <h3>Drop files to upload</h3>
+        <span class="font-28"><i class="bi bi-cloud-upload-fill"></i></span>
+      </div>
+    </div>
   </div>
 
   <!--  <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="uploader" multiple directory="" webkitdirectory="" moxdirectory=""/>-->
-  <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="uploader" multiple />
+  <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="filesUploader" multiple/>
+  <input style="display: none" @change="inputFolders" type="file" webkitdirectory name="files[]" ref="foldersUploader" multiple/>
 </template>
 
 <script>
@@ -19,48 +28,192 @@ export default {
   data: function () {
     return {
       isHover: false,
-      filelist: [] // Store our uploaded files
+      filelist: [], // Store our uploaded files
+      dragContainer: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0
+      }
     }
   },
   methods: {
-    openUploader () {
-      this.$refs.uploader.click()
+    openFilesUploader () {
+      this.$refs.filesUploader.click()
+    },
+    openFoldersUploader () {
+      this.$refs.foldersUploader.click()
     },
     dragover (event) {
+      if (this.$store.state.config?.readonly) {
+        return
+      }
+
+      const coordinates = this.$refs.dragContainer.getBoundingClientRect()
+      this.dragContainer = {
+        top: coordinates.top,
+        bottom: coordinates.bottom,
+        left: coordinates.left,
+        right: coordinates.right
+      }
+
       this.isHover = true
     },
     dragleave (event) {
-      this.isHover = false
+      if (
+        event.clientX < this.dragContainer.left ||
+        event.clientX > this.dragContainer.right ||
+        event.clientY > this.dragContainer.bottom ||
+        event.clientY < this.dragContainer.top
+      ) {
+        this.isHover = false
+      }
     },
     inputFiles (event) {
-      this.uploadFiles(event.target.files)
+      this.uploadFiles({
+        '': event.target.files
+      })
     },
-    async uploadFiles (files) {
-      this.isHover = false
+    inputFolders (event) {
+      const folders = {}
+      for (const file of event.target.files) {
+        const lastIndex = file.webkitRelativePath.lastIndexOf('/')
+        const path = file.webkitRelativePath.slice(0, lastIndex)
+
+        if (folders[path] === undefined) {
+          folders[path] = []
+        }
+
+        folders[path].push(file)
+      }
+
+      this.uploadFiles(folders)
+    },
+    async uploadFiles (folders) {
       const self = this
 
-      for (let i = 0; i < files.length; i++) {
-        const toast = self.$toast.open({
-          message: `Uploading file ${i + 1} from ${files.length}`,
-          type: 'warning'
-        })
+      let totalFiles = 0
 
-        await repo.uploadObjects(files[i])
+      // Create folders and count files
+      for (const [folder, files] of Object.entries(folders)) {
+        // if (folder.slice(-1) === '/') {
+        //   folder = folder.slice(0, -1)
+        // }
 
-        toast.dismiss()
+        if (folder !== '') {
+          repo.createFolder(folder)
+        }
+
+        totalFiles += files.length
+      }
+
+      self.$store.dispatch('refreshObjects')
+
+      // Upload files
+      let uploadCount = 0
+      for (const [folder, files] of Object.entries(folders)) {
+        let targetFolder = folder
+        if (self.$store.state.currentFolder) {
+          if (folder !== '') {
+            targetFolder = self.$store.state.currentFolder + folder
+          } else {
+            targetFolder = self.$store.state.currentFolder
+          }
+        }
+
+        for (const file of files) {
+          uploadCount += 1
+
+          const toast = self.$toast.open({
+            message: `Uploading file ${uploadCount} from ${totalFiles}`,
+            type: 'warning'
+          })
+
+          await repo.uploadObjects(file, targetFolder)
+
+          toast.dismiss()
+        }
       }
 
       self.$toast.open({
-        message: `${files.length} Files uploaded successfully`,
+        message: `${totalFiles} Files uploaded successfully`,
         type: 'success'
       })
 
       self.$store.dispatch('refreshObjects')
     },
-    drop (event) {
-      event.preventDefault()
-      // console.log('drop', event.dataTransfer.files)
-      this.uploadFiles(event.dataTransfer.files)
+    async traverseFileTree (item, path, folders, depth) {
+      const self = this
+      path = path || ''
+
+      // Root files are handled outside
+      if (item.isFile && depth > 0) {
+        const filePromise = new Promise(function (resolve, reject) {
+          item.file(function (file) {
+            folders[path].push(file)
+
+            resolve()
+          })
+        })
+
+        await filePromise
+      } else if (item.isDirectory) {
+        const newPath = path ? path + '/' + item.name : item.name
+        if (folders[newPath] === undefined) {
+          folders[newPath] = []
+        }
+
+        // Get folder contents
+        const dirReader = item.createReader()
+
+        const promise = new Promise(function (resolve, reject) {
+          dirReader.readEntries(async function (entries) {
+            for (let i = 0; i < entries.length; i++) {
+              await self.traverseFileTree(entries[i], newPath, folders, depth + 1)
+            }
+            resolve()
+          })
+        })
+
+        await promise
+      }
+    },
+    async drop (event) {
+      if (!this.isHover) {
+        return
+      }
+
+      // files uploaded on root
+      const rootFiles = event.dataTransfer.files
+
+      // folders and files
+      const items = await event.dataTransfer.items
+      const folders = {}
+
+      for (const item of items) {
+        // webkitGetAsEntry is where the magic happens
+        const entry = item.webkitGetAsEntry()
+        if (entry) {
+          await this.traverseFileTree(entry, '', folders, 0)
+        }
+      }
+
+      // Root files also include the root folders
+      const cleanedRootFiles = []
+      for (const rootFile of rootFiles) {
+        if (folders[rootFile.name] === undefined) {
+          cleanedRootFiles.push(rootFile)
+        }
+      }
+
+      folders[''] = cleanedRootFiles
+
+      // console.log(cleanedRootFiles)
+      // console.log(folders)
+
+      this.uploadFiles(folders)
+
+      this.isHover = false
     }
   }
 }

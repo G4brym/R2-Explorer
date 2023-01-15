@@ -39,7 +39,7 @@
       <!-- LOGO -->
       <div class="logo-box">
         <a class="logo logo-light text-center">
-            <span class="logo-lg-text-light">R2-Explorer</span>
+            <span class="logo-lg-text-light"><i class="bi bi-files"></i> R2-Explorer</span>
         </a>
       </div>
 
