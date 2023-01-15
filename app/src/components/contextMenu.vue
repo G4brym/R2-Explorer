@@ -100,9 +100,8 @@ export default {
       }).then((result) => {
         if (result.isConfirmed) {
           repo.deleteObject(self.file.path, self.file.name).then(() => {
-            self.$toast.open({
-              message: 'File deleted',
-              type: 'success'
+            this.$store.dispatch('makeToast', {
+              message: 'File deleted', timeout: 5000
             })
             self.$store.dispatch('refreshObjects')
           })
@@ -127,9 +126,8 @@ export default {
       }).then((data) => {
         if (data.isConfirmed === true) {
           repo.renameObject(self.file.name, data.value).then(() => {
-            self.$toast.open({
-              message: 'File renamed',
-              type: 'success'
+            this.$store.dispatch('makeToast', {
+              message: 'File renamed', timeout: 5000
             })
             self.$store.dispatch('refreshObjects')
           })
@@ -142,9 +140,8 @@ export default {
       this.$emit('openFile', this.file)
     },
     notImplemented () {
-      this.$toast.open({
-        message: 'Not implemented yet',
-        type: 'error'
+      this.$store.dispatch('makeToast', {
+        message: 'Not implemented yet', timeout: 5000
       })
       this.closeMenu()
     }
