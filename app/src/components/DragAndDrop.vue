@@ -112,7 +112,14 @@ export default {
       // Upload files
       let uploadCount = 0
       for (const [folder, files] of Object.entries(folders)) {
-        const targetFolder = self.$store.state.currentFolder ? self.$store.state.currentFolder + '/' + folder : folder
+        let targetFolder = folder
+        if (self.$store.state.currentFolder) {
+          if (folder !== '') {
+            targetFolder = self.$store.state.currentFolder + folder
+          } else {
+            targetFolder = self.$store.state.currentFolder
+          }
+        }
 
         for (const file of files) {
           uploadCount += 1
