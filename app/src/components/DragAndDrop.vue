@@ -2,7 +2,7 @@
   <div
     ref="dragContainer"
     class="upload-box"
-    :class="{ 'active': isHover || false }"
+    :class="{ 'active': isHover }"
     @dragover.prevent="dragover"
     @dragleave.prevent="dragleave"
     @drop.prevent="drop"
@@ -124,20 +124,16 @@ export default {
         for (const file of files) {
           uploadCount += 1
 
-          const toast = self.$toast.open({
-            message: `Uploading file ${uploadCount} from ${totalFiles}`,
-            type: 'warning'
+          this.$store.dispatch('makeToast', {
+            message: `Uploading file ${uploadCount} from ${totalFiles}`, spin: true
           })
 
           await repo.uploadObjects(file, targetFolder)
-
-          toast.dismiss()
         }
       }
 
-      self.$toast.open({
-        message: `${totalFiles} Files uploaded successfully`,
-        type: 'success'
+      this.$store.dispatch('makeToast', {
+        message: `${totalFiles} Files uploaded successfully`, timeout: 5000
       })
 
       self.$store.dispatch('refreshObjects')

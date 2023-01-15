@@ -9,7 +9,9 @@ export default createStore({
     currentFolder: '',
     files: [],
     folders: [],
-    buckets: []
+    buckets: [],
+    toastMessage: null,
+    toastSpin: false
   },
   getters: {},
   mutations: {
@@ -32,9 +34,26 @@ export default createStore({
 
       // this.commit('changeBucket', data.Buckets[0].Name)
       // this.dispatch('refreshObjects')
+    },
+    changeToastMessage (state, { message, spin }) {
+      state.toastMessage = message
+      state.toastSpin = spin || false
     }
   },
   actions: {
+    makeToast (context, { message, timeout, spin }) {
+      context.commit('changeToastMessage', {
+        message, spin
+      })
+
+      if (timeout !== null && timeout !== undefined) {
+        setTimeout(() => {
+          context.commit('changeToastMessage', {
+            message: null, spin: false
+          })
+        }, timeout)
+      }
+    },
     navigate (context, folder) {
       if (folder === '/') {
         folder = ''
