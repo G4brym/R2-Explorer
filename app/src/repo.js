@@ -55,6 +55,10 @@ export default {
     function getType (extension) {
       if (['png', 'jpg', 'jpeg', 'webp'].includes(extension)) {
         return { type: 'image', render: 'arraybuffer' }
+      } else if (['mp3'].includes(extension)) {
+        return { type: 'audio', render: 'arraybuffer' }
+      } else if (['mp4', 'ogg'].includes(extension)) {
+        return { type: 'video', render: 'arraybuffer' }
       } else if (['pdf'].includes(extension)) {
         return { type: 'pdf', render: 'arraybuffer' }
       } else if (['txt'].includes(extension)) {

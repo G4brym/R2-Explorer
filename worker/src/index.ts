@@ -15,6 +15,7 @@ import favicon from 'explorer:favicon.svg'
 
 export interface R2ExplorerConfig {
   readonly?: boolean
+  cors?: boolean
 }
 
 export function R2Explorer(config?: R2ExplorerConfig) {
@@ -58,16 +59,18 @@ export function R2Explorer(config?: R2ExplorerConfig) {
     })
   })
 
-  router.options('/api/*', (request, env, context) => {
-    return new Response(JSON.stringify({ msg: 'ready' }), {
-      headers: {
-        'content-type': 'application/json;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': '*',
-      },
-      status: 200,
+  if (config.cors === true) {
+    router.options('/api/*', (request, env, context) => {
+      return new Response(JSON.stringify({ msg: 'ready' }), {
+        headers: {
+          'content-type': 'application/json;charset=UTF-8',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': '*',
+        },
+        status: 200,
+      })
     })
-  })
+  }
 
   router.get('*', () => {
     return new Response(atob(html), {
@@ -82,19 +85,22 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
   return (request, env, context) => {
     return router.handle(request, env, { ...context, config: config }).then((response) => {
-      // can modify response here before final return, e.g. CORS headers
-      Object.entries({
-        'access-control-allow-origin': '*',
-        'access-control-allow-headers': '*',
-        'access-control-allow-methods': '*',
-        'timing-allow-origin': '*',
-      }).forEach((entry) => {
-        const [key, value] = entry
+      if (config.cors === true) {
+        // can modify response here before final return, e.g. CORS headers
+        Object.entries({
+          'access-control-allow-origin': '*',
+          'access-control-allow-headers': '*',
+          'access-control-allow-methods': '*',
+          'timing-allow-origin': '*',
+        }).forEach((entry) => {
+          const [key, value] = entry
 
-        if (!response.headers.has(key)) {
-          response.headers.set(key, value)
-        }
-      })
+          if (!response.headers.has(key)) {
+            response.headers.set(key, value)
+          }
+        })
+      }
+
       return response
     })
   }
