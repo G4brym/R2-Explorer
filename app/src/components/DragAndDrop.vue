@@ -128,6 +128,13 @@ export default {
             message: `Uploading file ${uploadCount} from ${totalFiles}`, spin: true
           })
 
+          // Check if file goes over cloudflare 100mb upload
+          if (file.size * 0.000001 > 100) {
+            console.log(`Skipping file ${file.name},
+reason: file is bigger than 100MB,
+Learn more here https://developers.cloudflare.com/workers/platform/limits/#request-limits`)
+            continue
+          }
           await repo.uploadObjects(file, targetFolder)
         }
       }

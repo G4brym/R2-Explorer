@@ -1,6 +1,6 @@
 var fs = require('fs')
 
-const files = ['worker/bin/r2-explorer.js', 'worker/package.json', 'worker/spa/js/app.js']
+const files = ['worker/bin/r2-explorer.js', 'worker/package.json', 'app/src/components/base/FooterView.vue']
 
 for (const file of files) {
   fs.readFile(file, 'utf8', function (err, data) {

@@ -11,16 +11,10 @@ export async function uploadFiles(request: any, env: any, context: any) {
   if (path !== '' && !path.endsWith('/')) {
     path = path + '/'
   }
-  console.log(path)
 
   const filename = decodeURIComponent(escape(atob(request.headers.get('x-filename'))))
-  const buf = await request.arrayBuffer()
 
-  try {
-    await bucket.put(`${path}${filename}`, buf)
-  } catch (e) {
-    return new Response(e.message)
-  }
+  await bucket.put(`${path}${filename}`, request.body)
 
   return JsonResponse({ status: 'ok' })
 }
