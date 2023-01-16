@@ -29,6 +29,12 @@ Q. Is there any Authentication for r2-explorer?
 A. No. If you want authenticated access, you must setup [Cloudflare Access](https://www.cloudflare.com/products/zero-trust/access/) in your account.
 Access is free up to 50 users.
 
+___
+
+Q. Can i upload files bigger than 100MB?
+
+A. You can upload multiple files/folders at once, but each file must be under 100MB [learn more here](https://developers.cloudflare.com/workers/platform/limits/#request-limits).
+
 
 ## Getting Started
 
@@ -73,13 +79,13 @@ wrangler publish
 - Delete folders
 - Image thumbnail's using Cloudflare workers
 - Tooltip when hovering a file with absolute time in "x days time ago" format
-- Upload folders with files
 - Automatically load more files, when the bottom is reached (current limit is 1000 files)
 - Download files bigger than 2gb with presigned url's
 - set folder and file navigation in the url to allow direct share of a specific folder/file
 
 ## Known issues
 
+- When uploading files, each file cannot exceed 100MB of size [learn more here](https://developers.cloudflare.com/workers/platform/limits/#request-limits)
 - Rename files with special characters is not possible with current [sdk issue here](https://github.com/aws/aws-sdk-js/issues/1949)
 
 ## Images
