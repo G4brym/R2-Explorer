@@ -22,6 +22,24 @@
           <img :src="fileData" class="preview-image"/>
         </template>
 
+        <template v-else-if="type === 'audio'">
+          <div class="text-center">
+            <audio controls>
+              <source :src="fileData">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        </template>
+
+        <template v-else-if="type === 'video'">
+          <div class="text-center">
+            <video controls style="max-width: 100%; height: auto">
+              <source :src="fileData">
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </template>
+
         <template v-else-if="type === 'text'">
           <div v-html="fileData.replaceAll('\n', '<br>')"></div>
         </template>
