@@ -12,6 +12,9 @@ import html from 'explorer:index.html'
 import app from 'explorer:js/app.js'
 // @ts-ignore
 import favicon from 'explorer:favicon.svg'
+import {partUpload} from "./api/multipart/partUpload";
+import {createUpload} from "./api/multipart/createUpload";
+import {completeUpload} from "./api/multipart/completeUpload";
 
 export interface R2ExplorerConfig {
   readonly?: boolean
@@ -47,6 +50,9 @@ export function R2Explorer(config?: R2ExplorerConfig) {
   router.post('/api/buckets/:disk/rename', renameObject)
   router.post('/api/buckets/:disk/folder', createFolder)
   router.post('/api/buckets/:disk/upload', uploadFiles)
+  router.post('/api/buckets/:disk/multipart/create', createUpload)
+  router.post('/api/buckets/:disk/multipart/upload', partUpload)
+  router.post('/api/buckets/:disk/multipart/complete', completeUpload)
   router.post('/api/buckets/:disk/delete', deleteObject)
   router.get('/api/buckets/:disk/:file', downloadFile)
 

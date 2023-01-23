@@ -1,7 +1,7 @@
 import axios from 'axios'
 import store from './store'
 
-export default {
+const apiHandler = {
   createFolder: (name) => {
     const folderPath = store.state.currentFolder + name + '/'
 
@@ -33,6 +33,45 @@ export default {
       oldName,
       newName,
       path: store.state.currentFolder
+    })
+  },
+  getKey: (folder, file) => {
+    folder = folder || store.state.currentFolder
+
+    if (folder !== '' && !folder.endsWith('/')) {
+      folder = folder + '/'
+    }
+
+    return `${folder}${file}`
+  },
+  multipartCreate: (file, folder) => {
+    const key = apiHandler.getKey(folder, file.name)
+    console.log(key)
+    return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/create`, null, {
+      params: {
+        key: btoa(unescape(encodeURIComponent(key)))
+      }
+    })
+  },
+  multipartComplete: (file, folder, parts, uploadId) => {
+    const key = apiHandler.getKey(folder, file.name)
+    return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/complete`, {
+      key: btoa(unescape(encodeURIComponent(key))),
+      uploadId,
+      parts
+    })
+  },
+  multipartUpload: (uploadId, partNumber, key, chunk) => {
+    return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/upload`, chunk, {
+      params: {
+        key: btoa(unescape(encodeURIComponent(key))),
+        uploadId,
+        partNumber
+      },
+      // onUploadProgress: progressEvent => console.log(progressEvent),
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     })
   },
   uploadObjects: (file, folder) => {
@@ -109,3 +148,5 @@ export default {
     }
   }
 }
+
+export default apiHandler

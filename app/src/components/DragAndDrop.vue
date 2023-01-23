@@ -128,14 +128,29 @@ export default {
             message: `Uploading file ${uploadCount} from ${totalFiles}`, spin: true
           })
 
-          // Check if file goes over cloudflare 100mb upload
-          if (file.size * 0.000001 > 100) {
-            console.log(`Skipping file ${file.name},
-reason: file is bigger than 100MB,
-Learn more here https://developers.cloudflare.com/workers/platform/limits/#request-limits`)
-            continue
+          // Files bigger than 100MB require multipart upload
+          if (file.size * 0.000001 > 95) {
+            const { uploadId, key } = (await repo.multipartCreate(file, targetFolder)).data
+
+            const chunkSize = 95 * 1024 * 1024
+
+            let partNumber = 1
+            const parts = []
+            // eslint-disable-next-line no-unreachable-loop
+            for (let start = 0; start < file.size; start += chunkSize) {
+              const chunk = file.slice(start, start + chunkSize + 1)
+
+              const data = (await repo.multipartUpload(uploadId, partNumber, key, chunk)).data
+
+              partNumber += 1
+
+              parts.push(data)
+            }
+
+            await repo.multipartComplete(file, targetFolder, parts, uploadId)
+          } else {
+            await repo.uploadObjects(file, targetFolder)
           }
-          await repo.uploadObjects(file, targetFolder)
         }
       }
 
