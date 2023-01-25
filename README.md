@@ -20,6 +20,7 @@ please [open an new issue](https://github.com/G4brym/R2-Explorer/issues/new) for
 - Download files
 - Delete files
 - Right click in file for extra options
+- Multipart upload for big files (Due to [Cloudflare 100MB upload restriction](https://developers.cloudflare.com/workers/platform/limits/#request-limits))
 
 
 ## FAQ
@@ -33,7 +34,8 @@ ___
 
 Q. Can i upload files bigger than 100MB?
 
-A. You can upload multiple files/folders at once, but each file must be under 100MB [learn more here](https://developers.cloudflare.com/workers/platform/limits/#request-limits).
+A. Yes! R2-Explorer now support's [Multipart Upload](https://developers.cloudflare.com/r2/data-access/workers-api/workers-multipart-usage/),
+that splits the files you are uploading in about 95MB chunks for uploading within the Cloudflare 100MB uploading limit.
 
 
 ## Getting Started
@@ -85,7 +87,6 @@ wrangler publish
 
 ## Known issues
 
-- When uploading files, each file cannot exceed 100MB of size [learn more here](https://developers.cloudflare.com/workers/platform/limits/#request-limits)
 - Rename files with special characters is not possible with current [sdk issue here](https://github.com/aws/aws-sdk-js/issues/1949)
 
 ## Images
