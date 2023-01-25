@@ -1,8 +1,8 @@
 <template>
   <h5 class="mb-3" v-if="$store.state.files.length > 0">Files</h5>
 
-  <div class="table-responsive">
-    <table class="table table-centered table-nowrap mb-0">
+  <div class="table-responsive table-files">
+    <table class="table table-centered mb-0">
       <thead class="table-light">
       <tr>
         <th class="border-0">Name</th>
@@ -14,7 +14,7 @@
       <template v-if="$store.state.files.length > 0">
         <tr :class="{'pointer': file.preview}" @click="(file.preview) ? openFile(file): null"
             v-for="file in $store.state.files" :key="file.Key" @contextmenu.prevent="openMenu($event, file)">
-          <td>
+          <td class="col-name">
             <i class="bi bi-file font-16" :class="'bi-filetype-' + file.extension"></i>
             <span class="ms-2 fw-semibold"
             ><span class="text-reset" v-text="file.name"></span
@@ -77,7 +77,7 @@ export default {
 
         this.$refs.preview.openPreview({
           ...file,
-          data: data
+          data
         })
       })
     }
@@ -100,5 +100,17 @@ export default {
     font-weight: bold;
     font-size: 24px;
   }
+}
+
+.table-files {
+  table {width: 100%;}
+  td
+  {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  td.col-name {width: 70%;}
 }
 </style>

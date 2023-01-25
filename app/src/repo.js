@@ -46,7 +46,6 @@ const apiHandler = {
   },
   multipartCreate: (file, folder) => {
     const key = apiHandler.getKey(folder, file.name)
-    console.log(key)
     return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/create`, null, {
       params: {
         key: btoa(unescape(encodeURIComponent(key)))
@@ -61,27 +60,28 @@ const apiHandler = {
       parts
     })
   },
-  multipartUpload: (uploadId, partNumber, key, chunk) => {
+  multipartUpload: (uploadId, partNumber, key, chunk, callback) => {
     return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/upload`, chunk, {
       params: {
         key: btoa(unescape(encodeURIComponent(key))),
         uploadId,
         partNumber
       },
-      // onUploadProgress: progressEvent => console.log(progressEvent),
+      onUploadProgress: callback,
       headers: {
         'Content-Type': 'multipart/form-data'
       }
     })
   },
-  uploadObjects: (file, folder) => {
+  uploadObjects: (file, folder, callback) => {
     folder = folder || store.state.currentFolder
 
     return axios.post(`/api/buckets/${store.state.activeBucket}/upload?path=${btoa(unescape(encodeURIComponent(folder)))}`, file, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'x-filename': btoa(unescape(encodeURIComponent(file.name)))
-      }
+      },
+      onUploadProgress: callback
     })
   },
   listObjects: async () => {

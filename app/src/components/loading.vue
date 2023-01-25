@@ -11,7 +11,7 @@
 .toast-loading {
   position: absolute;
   bottom: 2em;
-  right: 2em;
+  left: 2em;
   color: white;
   z-index: 10;
   background-color: #42BC9C;

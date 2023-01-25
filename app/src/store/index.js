@@ -11,7 +11,8 @@ export default createStore({
     folders: [],
     buckets: [],
     toastMessage: null,
-    toastSpin: false
+    toastSpin: false,
+    uploadingFiles: {}
   },
   getters: {},
   mutations: {
@@ -38,6 +39,19 @@ export default createStore({
     changeToastMessage (state, { message, spin }) {
       state.toastMessage = message
       state.toastSpin = spin || false
+    },
+    addUploadingFiles (state, filenames) {
+      for (const filename of filenames) {
+        state.uploadingFiles[filename] = {}
+      }
+    },
+    clearUploadingFiles (state) {
+      state.uploadingFiles = {}
+    },
+    setUploadProgress (state, { filename, progress }) {
+      if (state.uploadingFiles[filename] === undefined) { return }
+
+      state.uploadingFiles[filename].progress = Math.ceil(progress)
     }
   },
   actions: {
@@ -60,6 +74,15 @@ export default createStore({
       }
       context.commit('goTo', folder)
       context.dispatch('refreshObjects')
+    },
+    addUploadingFiles (context, filenames) {
+      context.commit('addUploadingFiles', filenames)
+    },
+    clearUploadingFiles (context, filenames) {
+      context.commit('clearUploadingFiles')
+    },
+    setUploadProgress (context, { filename, progress }) {
+      context.commit('setUploadProgress', { filename, progress })
     },
     loadUserDisks ({ commit }) {
       axios.get('/api/buckets').then((response) => {

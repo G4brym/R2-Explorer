@@ -11,6 +11,7 @@ export async function createUpload(request: any, env: any, context: any) {
 
   const multipartUpload = await bucket.createMultipartUpload(key);
   console.log(multipartUpload)
+  console.log(multipartUpload.uploadId)
 
   return JsonResponse({
     uploadId: multipartUpload.uploadId,

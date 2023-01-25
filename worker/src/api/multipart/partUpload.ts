@@ -9,7 +9,8 @@ export async function partUpload(request: any, env: any, context: any) {
 
   const {disk} = request.params
   const bucket = env[disk]
-
+  console.log(key)
+  console.log(uploadId)
   const multipartUpload = bucket.resumeMultipartUpload(key, uploadId);
 
   try {
