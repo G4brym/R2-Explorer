@@ -20,7 +20,7 @@ please [open an new issue](https://github.com/G4brym/R2-Explorer/issues/new) for
 - Download files
 - Delete files
 - Right click in file for extra options
-- Multipart upload for big files (Due to [Cloudflare 100MB upload restriction](https://developers.cloudflare.com/workers/platform/limits/#request-limits))
+- Multipart upload for big files
 
 
 ## FAQ
@@ -71,6 +71,18 @@ After that just run publish and the project will be up and running for you and e
 ```bash
 wrangler publish
 ```
+
+## Upgrading your installation
+In order to update to the latest version you just need to install the latest r2-explorer package from npm and re-deploy your application
+
+```bash
+npm install r2-explorer@latest --save
+```
+
+```bash
+wrangler publish
+```
+
 
 ## TODO
 
