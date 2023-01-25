@@ -18,7 +18,8 @@
 
   <!--  <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="uploader" multiple directory="" webkitdirectory="" moxdirectory=""/>-->
   <input style="display: none" @change="inputFiles" type="file" name="files[]" ref="filesUploader" multiple/>
-  <input style="display: none" @change="inputFolders" type="file" webkitdirectory name="files[]" ref="foldersUploader" multiple/>
+  <input style="display: none" @change="inputFolders" type="file" webkitdirectory name="files[]" ref="foldersUploader"
+         multiple/>
 </template>
 
 <script>
@@ -93,6 +94,7 @@ export default {
       const self = this
 
       let totalFiles = 0
+      const filenames = []
 
       // Create folders and count files
       for (const [folder, files] of Object.entries(folders)) {
@@ -105,9 +107,14 @@ export default {
         }
 
         totalFiles += files.length
+
+        for (const file of files) {
+          filenames.push(file.name)
+        }
       }
 
       self.$store.dispatch('refreshObjects')
+      self.$store.dispatch('addUploadingFiles', filenames)
 
       // Upload files
       let uploadCount = 0
@@ -124,24 +131,51 @@ export default {
         for (const file of files) {
           uploadCount += 1
 
-          this.$store.dispatch('makeToast', {
-            message: `Uploading file ${uploadCount} from ${totalFiles}`, spin: true
-          })
+          // this.$store.dispatch('makeToast', {
+          //   message: `Uploading file ${uploadCount} from ${totalFiles}`, spin: true
+          // })
 
-          // Check if file goes over cloudflare 100mb upload
-          if (file.size * 0.000001 > 100) {
-            console.log(`Skipping file ${file.name},
-reason: file is bigger than 100MB,
-Learn more here https://developers.cloudflare.com/workers/platform/limits/#request-limits`)
-            continue
+          const chunkSize = 95 * 1024 * 1024
+          // Files bigger than 100MB require multipart upload
+          if (file.size > chunkSize) {
+            const { uploadId, key } = (await repo.multipartCreate(file, targetFolder)).data
+
+            let partNumber = 1
+            const parts = []
+            // console.log('total: ', file.size)
+            // console.log('chunk: ', chunkSize)
+
+            for (let start = 0; start < file.size; start += chunkSize) {
+              const end = Math.min(start + chunkSize, file.size)
+              const chunk = file.slice(start, end)
+              // console.log(`${start} -> ${end}`)
+
+              const { data } = await repo.multipartUpload(uploadId, partNumber, key, chunk, (progressEvent) => {
+                self.$store.dispatch('setUploadProgress', {
+                  filename: file.name,
+                  progress: (start + progressEvent.loaded) * 100 / file.size
+                })
+              })
+
+              parts.push(data)
+              partNumber += 1
+            }
+
+            await repo.multipartComplete(file, targetFolder, parts, uploadId)
+          } else {
+            await repo.uploadObjects(file, targetFolder, (progressEvent) => {
+              self.$store.dispatch('setUploadProgress', {
+                filename: file.name,
+                progress: progressEvent.loaded * 100 / file.size
+              })
+            })
           }
-          await repo.uploadObjects(file, targetFolder)
         }
       }
 
-      this.$store.dispatch('makeToast', {
-        message: `${totalFiles} Files uploaded successfully`, timeout: 5000
-      })
+      // this.$store.dispatch('makeToast', {
+      //   message: `${totalFiles} Files uploaded successfully`, timeout: 5000
+      // })
 
       self.$store.dispatch('refreshObjects')
     },

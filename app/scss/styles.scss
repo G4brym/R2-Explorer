@@ -2,7 +2,7 @@
 
 .content-page {
   margin-left: unset;
-  height: calc(100vh - 70px - 60px);
+  min-height: calc(100vh - 70px - 60px);
   padding: 0 15px;
 
   > .content {

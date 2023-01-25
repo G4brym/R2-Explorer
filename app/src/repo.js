@@ -1,7 +1,7 @@
 import axios from 'axios'
 import store from './store'
 
-export default {
+const apiHandler = {
   createFolder: (name) => {
     const folderPath = store.state.currentFolder + name + '/'
 
@@ -35,14 +35,53 @@ export default {
       path: store.state.currentFolder
     })
   },
-  uploadObjects: (file, folder) => {
+  getKey: (folder, file) => {
+    folder = folder || store.state.currentFolder
+
+    if (folder !== '' && !folder.endsWith('/')) {
+      folder = folder + '/'
+    }
+
+    return `${folder}${file}`
+  },
+  multipartCreate: (file, folder) => {
+    const key = apiHandler.getKey(folder, file.name)
+    return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/create`, null, {
+      params: {
+        key: btoa(unescape(encodeURIComponent(key)))
+      }
+    })
+  },
+  multipartComplete: (file, folder, parts, uploadId) => {
+    const key = apiHandler.getKey(folder, file.name)
+    return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/complete`, {
+      key: btoa(unescape(encodeURIComponent(key))),
+      uploadId,
+      parts
+    })
+  },
+  multipartUpload: (uploadId, partNumber, key, chunk, callback) => {
+    return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/upload`, chunk, {
+      params: {
+        key: btoa(unescape(encodeURIComponent(key))),
+        uploadId,
+        partNumber
+      },
+      onUploadProgress: callback,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  uploadObjects: (file, folder, callback) => {
     folder = folder || store.state.currentFolder
 
     return axios.post(`/api/buckets/${store.state.activeBucket}/upload?path=${btoa(unescape(encodeURIComponent(folder)))}`, file, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'x-filename': btoa(unescape(encodeURIComponent(file.name)))
-      }
+      },
+      onUploadProgress: callback
     })
   },
   listObjects: async () => {
@@ -109,3 +148,5 @@ export default {
     }
   }
 }
+
+export default apiHandler

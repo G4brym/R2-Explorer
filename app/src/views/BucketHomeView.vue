@@ -22,6 +22,7 @@
   <!-- End row -->
 
   <loading />
+  <UploadingPopup />
 </template>
 
 <script>
@@ -31,9 +32,10 @@ import DragAndDrop from '@/components/DragAndDrop'
 import repo from '@/repo'
 import SidebarView from '@/components/base/SidebarView'
 import Loading from '@/components/loading'
+import UploadingPopup from '@/components/uploadingPopup.vue'
 
 export default {
-  components: { Loading, SidebarView, DragAndDrop, Gallery },
+  components: { UploadingPopup, Loading, SidebarView, DragAndDrop, Gallery },
   methods: {
     changeBucket (bucket) {
       this.$store.commit('changeBucket', bucket.Name)
