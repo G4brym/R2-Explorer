@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import repo from '@/repo'
+import repo from '@/api'
 
 export default {
   data: function () {

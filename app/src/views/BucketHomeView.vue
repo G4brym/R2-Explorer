@@ -1,11 +1,6 @@
 <template>
-  <div class="row h-100 py-3">
-    <!-- Right Sidebar -->
-    <div class="col-sm-12 col-md-3">
-      <sidebar-view @openFilesUploader="$refs.uploader.openFilesUploader()" @openFoldersUploader="$refs.uploader.openFoldersUploader()" @newFolder="newFolder"/>
-    </div>
-
-    <div class="col-sm-12 col-md-9">
+  <div class="row">
+    <div class="col-12">
       <div class="card h-100">
         <drag-and-drop ref="uploader">
           <div class="card-body">
@@ -29,7 +24,7 @@
 import Swal from 'sweetalert2'
 import Gallery from '@/components/Gallery'
 import DragAndDrop from '@/components/DragAndDrop'
-import repo from '@/repo'
+import repo from '@/api'
 import SidebarView from '@/components/base/SidebarView'
 import Loading from '@/components/loading'
 import UploadingPopup from '@/components/uploadingPopup.vue'

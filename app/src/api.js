@@ -1,5 +1,6 @@
 import axios from 'axios'
 import store from './store'
+import preview from '@/preview'
 
 const apiHandler = {
   createFolder: (name) => {
@@ -17,7 +18,7 @@ const apiHandler = {
   },
   downloadFile: (file) => {
     const extra = {}
-    if (file.preview?.render === 'arraybuffer') {
+    if (file.preview?.downloadType === 'arraybuffer') {
       extra.responseType = 'arraybuffer'
     }
 
@@ -91,24 +92,6 @@ const apiHandler = {
       }
     })
 
-    function getType (extension) {
-      if (['png', 'jpg', 'jpeg', 'webp'].includes(extension)) {
-        return { type: 'image', render: 'arraybuffer' }
-      } else if (['mp3'].includes(extension)) {
-        return { type: 'audio', render: 'arraybuffer' }
-      } else if (['mp4', 'ogg'].includes(extension)) {
-        return { type: 'video', render: 'arraybuffer' }
-      } else if (['pdf'].includes(extension)) {
-        return { type: 'pdf', render: 'arraybuffer' }
-      } else if (['txt'].includes(extension)) {
-        return { type: 'text', render: 'text' }
-      } else if (['md'].includes(extension)) {
-        return { type: 'markdown', render: 'text' }
-      } else if (['csv'].includes(extension)) {
-        return { type: 'csv', render: 'text' }
-      }
-    }
-
     let files = []
     if (response.data.Contents) {
       files = response.data.Contents.filter(function (obj) {
@@ -123,7 +106,7 @@ const apiHandler = {
           name,
           path: store.state.currentFolder,
           extension,
-          preview: getType(extension)
+          preview: preview.getType(extension)
         }
       })
     }

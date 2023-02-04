@@ -1,6 +1,6 @@
 import { createStore } from 'vuex'
 import axios from 'axios'
-import repo from '@/repo'
+import repo from '@/api'
 
 export default createStore({
   state: {
@@ -12,13 +12,17 @@ export default createStore({
     buckets: [],
     toastMessage: null,
     toastSpin: false,
-    uploadingFiles: {}
+    uploadingFiles: {},
+    mobileSidebar: false
   },
   getters: {},
   mutations: {
     loadObjects (state, payload) {
       state.files = payload.files
       state.folders = payload.folders
+    },
+    toggleMobileSidebar (state) {
+      state.mobileSidebar = !state.mobileSidebar
     },
     changeBucket (state, payload) {
       state.activeBucket = payload

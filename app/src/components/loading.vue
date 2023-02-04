@@ -9,7 +9,7 @@
 
 <style scoped lang="scss">
 .toast-loading {
-  position: absolute;
+  position: fixed;
   bottom: 2em;
   left: 2em;
   color: white;

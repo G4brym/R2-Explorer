@@ -48,7 +48,7 @@
 import utils from '../utils'
 import FilePreview from '@/components/FilePreview'
 import ContextMenu from '@/components/contextMenu'
-import repo from '@/repo'
+import repo from '@/api'
 
 export default {
   methods: {
@@ -68,7 +68,7 @@ export default {
         this.$refs.menu.closeMenu()
 
         let data
-        if (file.preview.render === 'arraybuffer') {
+        if (file.preview.downloadType === 'arraybuffer') {
           const blob = new Blob([response.data])
           data = URL.createObjectURL(blob)
         } else {
