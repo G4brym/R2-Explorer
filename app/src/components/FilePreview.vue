@@ -12,6 +12,9 @@
           </div>
         </div>
         <h4 class="text-center">Loading File</h4>
+        <div class="progress mb-2">
+          <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" :aria-valuenow="downloadProgress || 0" aria-valuemin="0" aria-valuemax="100" :style="{ 'width': `${downloadProgress || 0}%` }"></div>
+        </div>
       </template>
       <template v-else>
         <template v-if="type === 'pdf'">
@@ -64,6 +67,7 @@
 import PdfViewer from '@/components/PdfViewer'
 import modal from './modal'
 import { parseMarkdown } from '@/parsers/markdown'
+import repo from '@/api'
 
 export default {
   components: {
@@ -72,21 +76,49 @@ export default {
   },
   data: function () {
     return {
+      downloadProgress: 0,
+      abortControl: undefined,
       type: undefined,
       filename: undefined,
       fileData: undefined
     }
   },
   methods: {
-    openPreview (file) {
-      this.type = file.preview?.type
-      this.fileData = file.data
-      this.filename = file.name
+    openFile (file) {
+      this.abortControl = new AbortController()
+
+      this.type = file.preview.type
+      repo.downloadFile(file, (progressEvent) => {
+        this.downloadProgress = (progressEvent.loaded * 100) / progressEvent.total
+      }, this.abortControl).then((response) => {
+        let data
+        if (file.preview.downloadType === 'arraybuffer') {
+          const blob = new Blob([response.data])
+          data = URL.createObjectURL(blob)
+        } else {
+          data = response.data
+        }
+
+        const prevFile = {
+          ...file,
+          data
+        }
+
+        this.type = prevFile.preview?.type
+        this.fileData = prevFile.data
+        this.filename = prevFile.name
+      })
     },
     close () {
+      if (this.abortControl) {
+        this.abortControl.abort()
+      }
+
       this.type = undefined
       this.fileData = undefined
       this.filename = undefined
+      this.abortControl = undefined
+      this.downloadProgress = 0
     },
     markdownParser (text) {
       return parseMarkdown(text)

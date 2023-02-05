@@ -16,10 +16,16 @@ const apiHandler = {
       path
     })
   },
-  downloadFile: (file) => {
+  downloadFile: (file, onDownloadProgress, abortControl) => {
     const extra = {}
     if (file.preview?.downloadType === 'arraybuffer') {
       extra.responseType = 'arraybuffer'
+    }
+    if (abortControl) {
+      extra.signal = abortControl.signal
+    }
+    if (onDownloadProgress) {
+      extra.onDownloadProgress = onDownloadProgress
     }
 
     const filePath = btoa(unescape(encodeURIComponent(`${store.state.currentFolder}${file.name}`)))
@@ -106,7 +112,8 @@ const apiHandler = {
           name,
           path: store.state.currentFolder,
           extension,
-          preview: preview.getType(extension)
+          preview: preview.getType(extension),
+          isFile: true
         }
       })
     }
@@ -120,7 +127,8 @@ const apiHandler = {
           ...obj,
           name: split[split.length - 2],
           path: store.state.currentFolder,
-          Key: obj.Prefix
+          Key: obj.Prefix,
+          isFolder: true
         }
       })
     }

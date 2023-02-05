@@ -63,23 +63,7 @@ export default {
       return utils.bytesToSize(time)
     },
     openFile (file) {
-      this.$refs.preview.type = file.preview.type
-      repo.downloadFile(file).then((response) => {
-        this.$refs.menu.closeMenu()
-
-        let data
-        if (file.preview.downloadType === 'arraybuffer') {
-          const blob = new Blob([response.data])
-          data = URL.createObjectURL(blob)
-        } else {
-          data = response.data
-        }
-
-        this.$refs.preview.openPreview({
-          ...file,
-          data
-        })
-      })
+      this.$refs.preview.openFile(file)
     }
   },
   components: {

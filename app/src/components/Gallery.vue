@@ -7,12 +7,12 @@
       </div>
     </form>
     <div class="mt-2 mt-md-0">
-      <folder-tree @navigate="navigate" />
+      <folder-tree />
     </div>
   </div>
 
   <div class="mt-3">
-    <folders @navigate="navigate" />
+    <folders />
   </div>
   <!-- end .mt-3-->
 
@@ -26,11 +26,6 @@ import Folders from '@/components/Folders'
 import Files from '@/components/Files'
 import FolderTree from '@/components/FolderTree'
 export default {
-  components: { FolderTree, Files, Folders },
-  methods: {
-    navigate (folder) {
-      this.$store.dispatch('navigate', folder)
-    }
-  }
+  components: { FolderTree, Files, Folders }
 }
 </script>

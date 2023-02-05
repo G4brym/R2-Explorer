@@ -11,14 +11,17 @@
     <!--    <li class="pointer" @click="notImplemented">-->
     <!--      <i class="bi bi-share-fill me-1"></i>Get Sharable Link-->
     <!--    </li>-->
-    <li class="pointer" @click="renameFile"><i class="bi bi-pencil-fill me-1"></i>Rename</li>
-    <li class="pointer" @click="downloadFile">
-      <i class="bi bi-cloud-download-fill me-1"></i>Download
-<!--      <a class="d-block w-100" :href="downloadUrl" download>-->
-<!--        <i class="bi bi-cloud-download-fill me-1"></i>Download-->
-<!--      </a>-->
-    </li>
-    <li class="pointer" @click="deleteFile"><i class="bi bi-trash-fill me-1"></i>Remove</li>
+    <template v-if="this.file?.isFile">
+      <li class="pointer" @click="renameFile">
+        <i class="bi bi-pencil-fill me-1"></i>Rename
+      </li>
+      <li class="pointer" @click="downloadFile">
+        <i class="bi bi-cloud-download-fill me-1"></i>Download
+      </li>
+      <li class="pointer" @click="deleteFile">
+        <i class="bi bi-trash-fill me-1"></i>Remove
+      </li>
+    </template>
   </ul>
 </template>
 
@@ -66,9 +69,9 @@ export default {
       this.closeMenu()
     },
     openMenu: function (e, obj) {
-      this.viewMenu = true
       this.file = obj
-      this.canPreview = obj.preview !== undefined
+      this.viewMenu = true
+      this.canPreview = obj.preview !== undefined || obj.isFolder === true
       this.name = obj.name
 
       let prefix = ''
@@ -138,6 +141,7 @@ export default {
     },
     openFile () {
       this.$emit('openFile', this.file)
+      this.closeMenu()
     },
     notImplemented () {
       this.$store.dispatch('makeToast', {

@@ -5,7 +5,7 @@
     <div class="col-xl-3 col-lg-6" v-for="folder in $store.state.folders" :key="folder.Prefix">
       <div
         class="card m-1 shadow-none border folder"
-        @click="$emit('navigate', folder.Prefix)"
+        @click="openFolder(folder)"
         @contextmenu.prevent="openMenu($event, folder)"
       >
         <div class="p-2">
@@ -31,11 +31,12 @@
   </div>
   <!-- end row-->
 
-  <context-menu ref="menu" />
+  <context-menu ref="menu" @openFile="openFolder"/>
 </template>
 
 <script>
 import ContextMenu from '@/components/contextMenu'
+import repo from '@/api'
 
 export default {
   emits: ['navigate'],
@@ -45,6 +46,9 @@ export default {
   methods: {
     openMenu (event, folder) {
       this.$refs.menu.openMenu(event, folder, false, false, false)
+    },
+    openFolder (folder) {
+      this.$store.dispatch('navigate', folder.Prefix)
     }
   }
 }
