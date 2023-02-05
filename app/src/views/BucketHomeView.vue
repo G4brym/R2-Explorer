@@ -103,3 +103,11 @@ export default {
   }
 }
 </script>
+
+<style scoped lang="scss">
+@media (max-width: 992px) {
+  .card-body {
+    padding: 0;
+  }
+}
+</style>

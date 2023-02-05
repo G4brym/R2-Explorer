@@ -1,5 +1,5 @@
 <template>
-  <h5 class="mb-3" v-if="$store.state.files.length > 0">Files</h5>
+  <h5 class="mb-3 mobile-adjust" v-if="$store.state.files.length > 0">Files</h5>
 
   <div class="table-responsive table-files">
     <table class="table table-centered mb-0">
@@ -7,7 +7,7 @@
       <tr>
         <th class="border-0">Name</th>
         <th class="border-0">Last Modified</th>
-        <th class="border-0">Size</th>
+        <th class="border-0 d-none d-lg-table-cell">Size</th>
       </tr>
       </thead>
       <tbody>
@@ -21,7 +21,7 @@
             ></span>
           </td>
           <td>{{ timeAgo(file.LastModified) }} ago</td>
-          <td>{{ bytesToSize(file.Size) }}</td>
+          <td class="d-none d-lg-table-cell">{{ bytesToSize(file.Size) }}</td>
         </tr>
       </template>
 
@@ -96,5 +96,10 @@ export default {
     white-space: nowrap;
   }
   td.col-name {width: 70%;}
+}
+@media (max-width: 992px) {
+  .mobile-adjust {
+    padding: 0 1rem;
+  }
 }
 </style>

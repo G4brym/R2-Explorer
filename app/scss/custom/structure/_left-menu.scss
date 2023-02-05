@@ -406,7 +406,7 @@ body[data-leftbar-size='condensed'] {
 @include media-breakpoint-down(lg) {
   body {
     overflow-x: hidden;
-    padding-bottom: 80px;
+    //padding-bottom: 80px;
   }
 
   .left-side-menu {
@@ -423,7 +423,7 @@ body[data-leftbar-size='condensed'] {
   .content-page,
   body[data-leftbar-size='condensed'] .content-page {
     margin-left: 0 !important;
-    padding: 0 10px;
+    padding: 0;
   }
 
   //Footer

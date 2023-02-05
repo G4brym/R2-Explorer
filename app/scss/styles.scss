@@ -73,3 +73,9 @@
 .pointer {
   cursor: pointer;
 }
+
+@media (max-width: 992px) {
+  .mobile-wrap {
+    padding: 0 !important;
+  }
+}

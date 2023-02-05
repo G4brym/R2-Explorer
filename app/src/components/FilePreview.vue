@@ -6,11 +6,6 @@
 
     <template v-slot:body>
       <template v-if="fileData === undefined">
-        <div class="text-center">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
         <h4 class="text-center">Loading File</h4>
         <div class="progress mb-2">
           <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" :aria-valuenow="downloadProgress || 0" aria-valuemin="0" aria-valuemax="100" :style="{ 'width': `${downloadProgress || 0}%` }"></div>
