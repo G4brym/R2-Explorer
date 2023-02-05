@@ -1,17 +1,17 @@
 @import 'pdfvuer/dist/pdfvuer.css';
 
 .content-page {
-  margin-left: unset;
-  min-height: calc(100vh - 70px - 60px);
-  padding: 0 15px;
+  //margin-left: unset;
+  //min-height: calc(100vh - 70px - 60px);
+  //padding: 0 15px;
 
-  > .content {
-    height: 100%;
-
-    > .container-fluid {
-      height: 100%;
-    }
-  }
+  //> .content {
+  //  height: 100%;
+  //
+  //  > .container-fluid {
+  //    height: 100%;
+  //  }
+  //}
 }
 
 .footer {
@@ -72,4 +72,10 @@
 
 .pointer {
   cursor: pointer;
+}
+
+@media (max-width: 992px) {
+  .mobile-wrap {
+    padding: 0 !important;
+  }
 }

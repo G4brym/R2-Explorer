@@ -1,5 +1,5 @@
 <template>
-  <h5 class="mb-3" v-if="$store.state.files.length > 0">Files</h5>
+  <h5 class="mb-3 mobile-adjust" v-if="$store.state.files.length > 0">Files</h5>
 
   <div class="table-responsive table-files">
     <table class="table table-centered mb-0">
@@ -7,7 +7,7 @@
       <tr>
         <th class="border-0">Name</th>
         <th class="border-0">Last Modified</th>
-        <th class="border-0">Size</th>
+        <th class="border-0 d-none d-lg-table-cell">Size</th>
       </tr>
       </thead>
       <tbody>
@@ -21,7 +21,7 @@
             ></span>
           </td>
           <td>{{ timeAgo(file.LastModified) }} ago</td>
-          <td>{{ bytesToSize(file.Size) }}</td>
+          <td class="d-none d-lg-table-cell">{{ bytesToSize(file.Size) }}</td>
         </tr>
       </template>
 
@@ -48,7 +48,7 @@
 import utils from '../utils'
 import FilePreview from '@/components/FilePreview'
 import ContextMenu from '@/components/contextMenu'
-import repo from '@/repo'
+import repo from '@/api'
 
 export default {
   methods: {
@@ -63,23 +63,7 @@ export default {
       return utils.bytesToSize(time)
     },
     openFile (file) {
-      this.$refs.preview.type = file.preview.type
-      repo.downloadFile(file).then((response) => {
-        this.$refs.menu.closeMenu()
-
-        let data
-        if (file.preview.render === 'arraybuffer') {
-          const blob = new Blob([response.data])
-          data = URL.createObjectURL(blob)
-        } else {
-          data = response.data
-        }
-
-        this.$refs.preview.openPreview({
-          ...file,
-          data
-        })
-      })
+      this.$refs.preview.openFile(file)
     }
   },
   components: {
@@ -112,5 +96,10 @@ export default {
     white-space: nowrap;
   }
   td.col-name {width: 70%;}
+}
+@media (max-width: 992px) {
+  .mobile-adjust {
+    padding: 0 1rem;
+  }
 }
 </style>

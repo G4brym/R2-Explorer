@@ -1,5 +1,6 @@
 import axios from 'axios'
 import store from './store'
+import preview from '@/preview'
 
 const apiHandler = {
   createFolder: (name) => {
@@ -15,10 +16,16 @@ const apiHandler = {
       path
     })
   },
-  downloadFile: (file) => {
+  downloadFile: (file, onDownloadProgress, abortControl) => {
     const extra = {}
-    if (file.preview?.render === 'arraybuffer') {
+    if (file.preview?.downloadType === 'arraybuffer') {
       extra.responseType = 'arraybuffer'
+    }
+    if (abortControl) {
+      extra.signal = abortControl.signal
+    }
+    if (onDownloadProgress) {
+      extra.onDownloadProgress = onDownloadProgress
     }
 
     const filePath = btoa(unescape(encodeURIComponent(`${store.state.currentFolder}${file.name}`)))
@@ -91,24 +98,6 @@ const apiHandler = {
       }
     })
 
-    function getType (extension) {
-      if (['png', 'jpg', 'jpeg', 'webp'].includes(extension)) {
-        return { type: 'image', render: 'arraybuffer' }
-      } else if (['mp3'].includes(extension)) {
-        return { type: 'audio', render: 'arraybuffer' }
-      } else if (['mp4', 'ogg'].includes(extension)) {
-        return { type: 'video', render: 'arraybuffer' }
-      } else if (['pdf'].includes(extension)) {
-        return { type: 'pdf', render: 'arraybuffer' }
-      } else if (['txt'].includes(extension)) {
-        return { type: 'text', render: 'text' }
-      } else if (['md'].includes(extension)) {
-        return { type: 'markdown', render: 'text' }
-      } else if (['csv'].includes(extension)) {
-        return { type: 'csv', render: 'text' }
-      }
-    }
-
     let files = []
     if (response.data.Contents) {
       files = response.data.Contents.filter(function (obj) {
@@ -123,7 +112,8 @@ const apiHandler = {
           name,
           path: store.state.currentFolder,
           extension,
-          preview: getType(extension)
+          preview: preview.getType(extension),
+          isFile: true
         }
       })
     }
@@ -137,7 +127,8 @@ const apiHandler = {
           ...obj,
           name: split[split.length - 2],
           path: store.state.currentFolder,
-          Key: obj.Prefix
+          Key: obj.Prefix,
+          isFolder: true
         }
       })
     }

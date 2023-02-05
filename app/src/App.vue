@@ -1,11 +1,11 @@
 <template>
   <div id="wrapper">
     <!-- Topbar Start -->
-    <TopbarView />
+    <TopbarView/>
     <!-- end Topbar -->
 
     <!-- ========== Left Sidebar Start ========== -->
-    <!--    <SidebarView />-->
+    <SidebarView/>
     <!-- Left Sidebar End -->
 
     <!-- ============================================================== -->
@@ -15,31 +15,25 @@
     <div class="content-page">
       <div class="content">
         <!-- Start Content-->
-        <div class="container-fluid">
-          <router-view />
+        <div class="container-fluid mobile-wrap">
+          <router-view/>
         </div>
         <!-- container -->
       </div>
       <!-- content -->
 
-      <!-- Footer Start -->
-      <FooterView />
-      <!-- end Footer -->
     </div>
   </div>
 </template>
 
 <script>
 import TopbarView from '@/components/base/TopbarView'
-// import SidebarView from '@/components/base/SidebarView'
-import FooterView from '@/components/base/FooterView'
+import SidebarView from '@/components/base/SidebarView'
+
 export default {
-  components: { TopbarView, FooterView }
+  components: { TopbarView, SidebarView }
 }
 </script>
 
-<style>
-.content-page {
-  margin-top: 0 !important;
-}
+<style scoped lang="scss">
 </style>
