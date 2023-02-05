@@ -11,6 +11,16 @@ const routes = [
     path: '/:bucket',
     name: 'bucket-home',
     component: BucketHomeView
+  },
+  {
+    path: '/:bucket/:folder',
+    name: 'bucket-folder',
+    component: BucketHomeView
+  },
+  {
+    path: '/:bucket/:folder/:file',
+    name: 'bucket-file',
+    component: BucketHomeView
   }
 ]
 

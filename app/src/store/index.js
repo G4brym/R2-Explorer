@@ -21,13 +21,12 @@ export default createStore({
       state.files = payload.files
       state.folders = payload.folders
     },
-    toggleMobileSidebar (state) {
-      state.mobileSidebar = !state.mobileSidebar
+    toggleMobileSidebar (state, payload) {
+      state.mobileSidebar = payload || !state.mobileSidebar
     },
     changeBucket (state, payload) {
       state.activeBucket = payload
       state.currentFolder = ''
-      this.dispatch('refreshObjects')
     },
     goTo (state, folder) {
       state.currentFolder = folder
@@ -78,6 +77,10 @@ export default createStore({
       }
       context.commit('goTo', folder)
       context.dispatch('refreshObjects')
+    },
+    navigateToHash (context, folder) {
+      folder = decodeURIComponent(escape(atob(folder)))
+      context.dispatch('navigate', folder)
     },
     addUploadingFiles (context, filenames) {
       context.commit('addUploadingFiles', filenames)

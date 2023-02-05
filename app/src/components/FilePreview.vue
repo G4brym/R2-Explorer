@@ -63,6 +63,7 @@ import PdfViewer from '@/components/PdfViewer'
 import modal from './modal'
 import { parseMarkdown } from '@/parsers/markdown'
 import repo from '@/api'
+import utils from '@/utils'
 
 export default {
   components: {
@@ -80,6 +81,13 @@ export default {
   },
   methods: {
     openFile (file) {
+      if (utils.bytesToMegabytes(file.Size) > 200) {
+        this.$store.dispatch('makeToast', {
+          message: 'File is too big to preview', timeout: 5000
+        })
+
+        return
+      }
       this.abortControl = new AbortController()
 
       this.type = file.preview.type

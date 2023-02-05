@@ -3,10 +3,10 @@
 
   <div class="row mx-n1 g-0">
     <div class="col-xl-3 col-lg-6" v-for="folder in $store.state.folders" :key="folder.Prefix">
-      <div
+      <router-link
         class="card m-1 shadow-none border folder"
-        @click="openFolder(folder)"
         @contextmenu.prevent="openMenu($event, folder)"
+        :to="{ name: 'bucket-folder', params: { bucket: $route.params.bucket, folder: folder.hash }}"
       >
         <div class="p-2">
           <div class="row align-items-center">
@@ -24,7 +24,7 @@
           <!-- end row -->
         </div>
         <!-- end .p-2-->
-      </div>
+      </router-link>
       <!-- end col -->
     </div>
     <!-- end col-->
@@ -36,7 +36,6 @@
 
 <script>
 import ContextMenu from '@/components/contextMenu'
-import repo from '@/api'
 
 export default {
   emits: ['navigate'],
@@ -50,6 +49,20 @@ export default {
     openFolder (folder) {
       this.$store.dispatch('navigate', folder.Prefix)
     }
+  },
+  created () {
+    this.$watch(
+      () => this.$route.params.folder,
+      (newFolder, oldFolder) => {
+        if (newFolder !== oldFolder) {
+          if (newFolder) {
+            this.$store.dispatch('navigateToHash', newFolder)
+          } else {
+            this.$store.dispatch('navigate', '')
+          }
+        }
+      }
+    )
   }
 }
 </script>

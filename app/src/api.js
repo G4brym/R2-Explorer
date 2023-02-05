@@ -128,7 +128,8 @@ const apiHandler = {
           name: split[split.length - 2],
           path: store.state.currentFolder,
           Key: obj.Prefix,
-          isFolder: true
+          isFolder: true,
+          hash: btoa(unescape(encodeURIComponent(obj.Prefix)))
         }
       })
     }
