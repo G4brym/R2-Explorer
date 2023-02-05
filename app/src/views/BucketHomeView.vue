@@ -32,6 +32,7 @@ export default {
   methods: {
     changeBucket (bucket) {
       this.$store.commit('changeBucket', bucket.Name)
+      this.$store.dispatch('refreshObjects')
     },
     newFolder () {
       const self = this
@@ -70,6 +71,11 @@ export default {
 
     if (this.$route.params.bucket) {
       this.$store.commit('changeBucket', this.$route.params.bucket)
+      if (this.$route.params.folder) {
+        this.$store.dispatch('navigate', decodeURIComponent(escape(atob(this.$route.params.folder))))
+      } else {
+        this.$store.dispatch('refreshObjects')
+      }
     } else if (!this.$route.params.bucket && this.$store.state.buckets.length > 0) {
       this.$router.push({ name: 'bucket-home', params: { bucket: this.$store.state.buckets[0].Name } })
     }
@@ -79,6 +85,8 @@ export default {
       (bucket, previousbucket) => {
         if (bucket !== previousbucket) {
           this.$store.commit('changeBucket', bucket)
+          this.$store.dispatch('refreshObjects')
+          this.$store.commit('toggleMobileSidebar', false)
         }
       }
     )

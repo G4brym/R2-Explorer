@@ -26,7 +26,7 @@
             >
               <i class="bi bi-plus-circle-fill me-1"></i> New
             </button>
-            <div class="dropdown-menu font-16">
+            <div class="dropdown-menu font-16 w-100">
               <a class="dropdown-item pointer" @click="EventBus().$emit('newFolder')">
                 <i class="bi bi-folder-plus me-1"></i> New Folder
               </a>

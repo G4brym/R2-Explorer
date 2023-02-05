@@ -1,11 +1,12 @@
 <template>
   <ol class="breadcrumb m-0 folder-tree">
     <li class="breadcrumb-item">
-      <a v-text="this.$store.state.activeBucket" @click="$store.dispatch('navigate', '')"></a>
+      <router-link v-if="$route.params.bucket" v-text="$store.state.activeBucket" :to="{ name: 'bucket-home', params: { bucket: $route.params.bucket }}"></router-link>
     </li>
     <template v-for="(folder, index) in tree" :key="index">
       <li class="breadcrumb-item" :class="{ active: index === tree.length - 1 }">
-        <a v-text="folder.name" @click="$store.dispatch('navigate', folder.path)"></a>
+        <router-link v-text="folder.name"
+                     :to="{ name: 'bucket-folder', params: { bucket: $route.params.bucket, folder: folder.hash }}"></router-link>
       </li>
     </template>
   </ol>
@@ -27,7 +28,8 @@ export default {
         folderTree += obj + '/'
         return {
           name: obj,
-          path: folderTree
+          path: folderTree,
+          hash: btoa(unescape(encodeURIComponent(folderTree)))
         }
       })
     }
