@@ -27,14 +27,14 @@
               <i class="bi bi-plus-circle-fill me-1"></i> New
             </button>
             <div class="dropdown-menu font-16">
-              <a class="dropdown-item pointer" @click="$emit('newFolder')">
+              <a class="dropdown-item pointer" @click="EventBus().$emit('newFolder')">
                 <i class="bi bi-folder-plus me-1"></i> New Folder
               </a>
               <div class="dropdown-divider"></div>
-              <a class="dropdown-item pointer" @click="$emit('openFilesUploader')">
+              <a class="dropdown-item pointer" @click="EventBus().$emit('openFilesUploader')">
                 <i class="bi bi-file-earmark-arrow-up me-1"></i> Upload Files
               </a>
-              <a class="dropdown-item pointer" @click="$emit('openFoldersUploader')">
+              <a class="dropdown-item pointer" @click="EventBus().$emit('openFoldersUploader')">
                 <i class="bi bi-folder2-open me-1"></i> Upload Folders
               </a>
             </div>
@@ -83,8 +83,14 @@
 
 <script>
 import axios from 'axios'
+import EventBus from '@/EventBus.js'
 
 export default {
+  methods: {
+    EventBus () {
+      return EventBus
+    }
+  },
   data: function () {
     return {
       updateAvailable: false,

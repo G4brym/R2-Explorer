@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col-12">
       <div class="card h-100">
+
         <drag-and-drop ref="uploader">
           <div class="card-body">
             <gallery v-if="$store.state.files && $store.state.folders"/>
@@ -10,11 +11,8 @@
         </drag-and-drop>
 
       </div>
-      <!-- end card -->
     </div>
-    <!-- end Col -->
   </div>
-  <!-- End row -->
 
   <loading />
   <UploadingPopup />
@@ -25,12 +23,12 @@ import Swal from 'sweetalert2'
 import Gallery from '@/components/Gallery'
 import DragAndDrop from '@/components/DragAndDrop'
 import repo from '@/api'
-import SidebarView from '@/components/base/SidebarView'
 import Loading from '@/components/loading'
 import UploadingPopup from '@/components/uploadingPopup.vue'
+import EventBus from '@/EventBus'
 
 export default {
-  components: { UploadingPopup, Loading, SidebarView, DragAndDrop, Gallery },
+  components: { UploadingPopup, Loading, DragAndDrop, Gallery },
   methods: {
     changeBucket (bucket) {
       this.$store.commit('changeBucket', bucket.Name)
@@ -84,6 +82,24 @@ export default {
         }
       }
     )
+  },
+  mounted () {
+    const self = this
+
+    EventBus.$on('newFolder', () => {
+      self.newFolder()
+    })
+    EventBus.$on('openFilesUploader', () => {
+      self.$refs.uploader.openFilesUploader()
+    })
+    EventBus.$on('openFoldersUploader', () => {
+      self.$refs.uploader.openFoldersUploader()
+    })
+  },
+  beforeUnmount () {
+    EventBus.$off('newFolder')
+    EventBus.$off('openFilesUploader')
+    EventBus.$off('openFoldersUploader')
   }
 }
 </script>
