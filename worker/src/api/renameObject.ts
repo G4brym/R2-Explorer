@@ -14,7 +14,7 @@ export async function renameObject(request: any, env: any, context: any) {
 
   const object = await bucket.get(`${path}${oldName}`)
 
-  await bucket.put(`${path}${newName}`, object.body)
+  const updated = await bucket.put(`${path}${newName}`, object.body)
 
   await bucket.delete(`${path}${oldName}`)
 
@@ -22,7 +22,7 @@ export async function renameObject(request: any, env: any, context: any) {
   object.writeHttpMetadata(headers)
   headers.set('etag', object.httpEtag)
 
-  return new Response(object.body, {
+  return new Response(updated.body, {
     headers,
   })
 }
