@@ -21,6 +21,7 @@ please [open an new issue](https://github.com/G4brym/R2-Explorer/issues/new) for
 - Delete files
 - Right click in file for extra options
 - Multipart upload for big files
+- Cloudflare Access validation using jwt
 
 
 ## FAQ
@@ -86,7 +87,6 @@ wrangler publish
 
 ## TODO
 
-- Integration with cloudflare access
 - allow bucket names with spaces
 - Search files
 - Rename folders

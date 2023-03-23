@@ -12,6 +12,9 @@
             <i class="bi bi-list"></i>
           </button>
         </div>
+        <div class="user" v-if="$store.state.user?.email">
+          <span v-text="$store.state.user?.email"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -46,6 +49,17 @@
 
   .toggle {
     display: block;
+  }
+}
+
+.user {
+  margin-right: 36px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+
+  span {
+    color: white;
   }
 }
 </style>
