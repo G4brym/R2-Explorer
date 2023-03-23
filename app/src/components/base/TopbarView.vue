@@ -38,6 +38,17 @@
   padding: 0
 }
 
+.user {
+  margin-right: 36px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+
+  span {
+    color: white;
+  }
+}
+
 @media (max-width: 992px) {
   .logo-box {
     width: 100% !important;
@@ -47,19 +58,12 @@
     flex-direction: row-reverse;
   }
 
+  .user {
+    display: none;
+  }
+
   .toggle {
     display: block;
-  }
-}
-
-.user {
-  margin-right: 36px;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-
-  span {
-    color: white;
   }
 }
 </style>
