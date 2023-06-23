@@ -12,6 +12,9 @@
             <i class="bi bi-list"></i>
           </button>
         </div>
+        <div class="user" v-if="$store.state.user?.email">
+          <span v-text="$store.state.user?.email"></span>
+        </div>
       </div>
     </div>
   </div>
@@ -35,6 +38,17 @@
   padding: 0
 }
 
+.user {
+  margin-right: 36px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+
+  span {
+    color: white;
+  }
+}
+
 @media (max-width: 992px) {
   .logo-box {
     width: 100% !important;
@@ -42,6 +56,10 @@
 
   .topbar-wrapper {
     flex-direction: row-reverse;
+  }
+
+  .user {
+    display: none;
   }
 
   .toggle {

@@ -13,7 +13,7 @@ export default createStore({
     toastMessage: null,
     toastSpin: false,
     uploadingFiles: {},
-    mobileSidebar: false
+    mobileSidebar: false,
   },
   getters: {},
   mutations: {

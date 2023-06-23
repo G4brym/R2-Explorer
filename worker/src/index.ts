@@ -1,3 +1,9 @@
+// @ts-ignore
+import html from 'explorer:index.html'
+// @ts-ignore
+import app from 'explorer:js/app.js'
+// @ts-ignore
+import favicon from 'explorer:favicon.svg'
 import { Router } from 'itty-router'
 import { listBuckets } from './api/listBuckets'
 import { listContents } from './api/listContents'
@@ -6,20 +12,13 @@ import { createFolder } from './api/createFolder'
 import { deleteObject } from './api/deleteObject'
 import { renameObject } from './api/renameObject'
 import { downloadFile } from './api/downloadFile'
-// @ts-ignore
-import html from 'explorer:index.html'
-// @ts-ignore
-import app from 'explorer:js/app.js'
-// @ts-ignore
-import favicon from 'explorer:favicon.svg'
 import {partUpload} from "./api/multipart/partUpload";
 import {createUpload} from "./api/multipart/createUpload";
 import {completeUpload} from "./api/multipart/completeUpload";
+import {R2ExplorerConfig} from "./interfaces";
+import {authenticateUser} from "./access";
 
-export interface R2ExplorerConfig {
-  readonly?: boolean
-  cors?: boolean
-}
+
 
 export function R2Explorer(config?: R2ExplorerConfig) {
   config = config || {}
@@ -27,11 +26,17 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
   const router = Router()
 
+  // This route must be the first defined
+  if(config.cfAccessTeamName) {
+    router.all('*', authenticateUser)
+  }
+
+
   router.get('/js/app.js', () => {
     return new Response(atob(app), {
       status: 200,
       headers: {
-        'content-type': 'text/js;charset=UTF-8',
+        'content-type': 'text/javascript;charset=UTF-8',
       },
     })
   })

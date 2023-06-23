@@ -2,11 +2,13 @@
 
 A Google Drive Interface for your Cloudflare R2 Buckets!
 
-This project is deployed/self-hosted in your own Cloudflare Account as a Worker, and no credential/token is required to start using it.
+This project is deployed/self-hosted in your own Cloudflare Account as a Worker, and no credential/token is required to
+start using it.
 
 You can see an live example, in `read-only` mode, in your browser at https://r2-explorer.massadas.com/
 
-This project is still in development, and there are definitely going to be some weird issues sometimes, but when you find something
+This project is still in development, and there are definitely going to be some weird issues sometimes, but when you
+find something
 please [open an new issue](https://github.com/G4brym/R2-Explorer/issues/new) for it to get solved.
 
 ## Features
@@ -21,22 +23,34 @@ please [open an new issue](https://github.com/G4brym/R2-Explorer/issues/new) for
 - Delete files
 - Right click in file for extra options
 - Multipart upload for big files
+- Cloudflare Access validation using jwt
+
+## Configurations
+
+These options are defined in the `index.js` file, in the `R2Explorer({ readonly: false, ... })`.
+
+| Name               | Type(s)                  | Description                                                           | Examples                                                  |
+|--------------------|--------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------|
+| `readonly`         | `boolean` or `undefined` | Controls the write access globally, default: `true`                   | `true`                                                    |
+| `cors`             | `boolean` or `undefined` | Enables or disables CORS access to the internal API, default: `false` | `true`                                                    |
+| `cfAccessTeamName` | `string`  or `undefined` | When set enforces Cloudflare Access in all requests                   | `radar`  (taken from https://radar.cloudflareaccess.com/) |
 
 
 ## FAQ
 
 Q. Is there any Authentication for r2-explorer?
 
-A. No. If you want authenticated access, you must setup [Cloudflare Access](https://www.cloudflare.com/products/zero-trust/access/) in your account.
+A. No. If you want authenticated access, you must
+setup [Cloudflare Access](https://www.cloudflare.com/products/zero-trust/access/) in your account.
 Access is free up to 50 users.
 
 ___
 
 Q. Can i upload files bigger than 100MB?
 
-A. Yes! R2-Explorer now support's [Multipart Upload](https://developers.cloudflare.com/r2/data-access/workers-api/workers-multipart-usage/),
+A. Yes! R2-Explorer now
+support's [Multipart Upload](https://developers.cloudflare.com/r2/data-access/workers-api/workers-multipart-usage/),
 that splits the files you are uploading in about 95MB chunks for uploading within the Cloudflare 100MB uploading limit.
-
 
 ## Getting Started
 
@@ -73,7 +87,9 @@ wrangler publish
 ```
 
 ## Upgrading your installation
-In order to update to the latest version you just need to install the latest r2-explorer package from npm and re-deploy your application
+
+In order to update to the latest version you just need to install the latest r2-explorer package from npm and re-deploy
+your application
 
 ```bash
 npm install r2-explorer@latest --save
@@ -83,10 +99,8 @@ npm install r2-explorer@latest --save
 wrangler publish
 ```
 
-
 ## TODO
 
-- Integration with cloudflare access
 - allow bucket names with spaces
 - Search files
 - Rename folders
@@ -100,7 +114,8 @@ wrangler publish
 
 ## Known issues
 
-- Rename files with special characters is not possible with current [sdk issue here](https://github.com/aws/aws-sdk-js/issues/1949)
+- Rename files with special characters is not possible with
+  current [sdk issue here](https://github.com/aws/aws-sdk-js/issues/1949)
 
 ## Images
 
