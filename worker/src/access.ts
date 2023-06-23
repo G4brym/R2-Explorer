@@ -6,6 +6,10 @@ import {JsonResponse} from "./api/core";
 let builtJWTKeys: Record<string, CryptoKey> = {}
 let JWTExpiration = 0
 
+function getAccessHost(teamName: string): string {
+  return `https://${teamName}.cloudflareaccess.com`
+}
+
 
 export async function authenticateUser(request: any, env: any, context: Context) {
   let decodedJwt: any = false
@@ -25,7 +29,7 @@ export async function authenticateUser(request: any, env: any, context: Context)
 }
 
 async function getPublicKeys(config: R2ExplorerConfig): Promise<Record<string, CryptoKey>> {
-  let jwtUrl = `https://${config.cfAccessTeamName}.cloudflareaccess.com/cdn-cgi/access/certs`
+  let jwtUrl = `${getAccessHost(config.cfAccessTeamName)}/cdn-cgi/access/certs`
 
   const result = await fetch(jwtUrl, {
     method: 'GET',
@@ -84,6 +88,11 @@ export async function isValidJwt(request, config: R2ExplorerConfig) {
   const currentDate = new Date(Date.now())
   if (expiryDate <= currentDate) {
     console.log('expired token')
+    return false
+  }
+
+  if (token.payload?.iss !== getAccessHost(config.cfAccessTeamName)) {
+    console.log('invalid access signer')
     return false
   }
 
