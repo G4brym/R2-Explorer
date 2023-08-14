@@ -1,0 +1,14 @@
+name = "my-r2-explorer"
+compatibility_date = "2023-05-12"
+main = "index.ts"
+workers_dev = true
+
+[[r2_buckets]]
+binding = 'teste'
+bucket_name = 'teste'
+preview_bucket_name = 'teste'
+
+[[r2_buckets]]
+binding = 'r2-explorer-example-2'
+bucket_name = 'r2-explorer-example-2'
+preview_bucket_name = 'r2-explorer-example-2'

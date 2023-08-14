@@ -1,0 +1,122 @@
+@import 'pdfvuer/dist/pdfvuer.css';
+
+.content-page {
+  //margin-left: unset;
+  //min-height: calc(100vh - 70px - 60px);
+  //padding: 0 15px;
+
+  > .content {
+    min-height: calc(100vh - 70px);
+
+    > .container-fluid {
+      height: 100%;
+
+      > .row {
+        height: 100%;
+      }
+    }
+  }
+}
+
+.footer {
+  left: 0;
+  height: 60px;
+}
+
+.folder {
+  cursor: pointer;
+}
+
+.folder-tree {
+  li > a {
+    cursor: pointer;
+  }
+}
+
+.upload-box {
+  .box {
+    display: none;
+  }
+
+  .drop-files {
+    align-items: center;
+    justify-content: center;
+    z-index: -1;
+    display: flex;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    flex-direction: column;
+  }
+
+  &.active {
+    outline: 2px dashed black;
+    border-radius: 5px;
+    height: 100%;
+
+    .box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 50px;
+      border-radius: 5px;
+      background: rgb(255 255 255 / 85%);
+    }
+
+    .drop-files {
+      background: rgb(0 0 0 / 10%);
+      z-index: 10;
+    }
+
+  }
+
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+@media (max-width: 992px) {
+  .mobile-wrap {
+    padding: 0 !important;
+  }
+}
+
+.btn-app {
+    color: #000000;
+    border-bottom: 4px solid #ffffff;
+
+  &:hover {
+    border-bottom: 4px solid #6658dd;
+  }
+}
+.btn-app.active {
+    border-bottom: 4px solid #6658dd;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #38414A;
+  border-color: #38414A transparent #38414A transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
