@@ -11,6 +11,7 @@ start using it.
 
 ## Features
 
+- [Email Explorer](https://r2explorer.dev/guides/setup-email-explorer/) (using Cloudflare Email Routing)
 - Very quick bucket/folder navigation
 - pdf, image, txt, markdown, csv, etc in-browser preview
 - Drag-and-Drop upload
@@ -53,35 +54,16 @@ wrangler publish
 - Image thumbnail's using Cloudflare workers
 - Tooltip when hovering a file with absolute time in "x days time ago" format
 - Automatically load more files, when the bottom is reached (current limit is 1000 files)
-- set file navigation in the url to allow direct share of a specific file
-- only support previews to files under 100mb
 
 ## Known issues
 
 - Rename files with special characters is not possible with
   current [sdk issue here](https://github.com/aws/aws-sdk-js/issues/1949)
 
-## Images
-
-Home Page
-![Home](https://github.com/G4brym/R2-Explorer/raw/main/.assets/home.png)
-
-Image Previewer
-![Home](https://github.com/G4brym/R2-Explorer/raw/main/.assets/image-preview.png)
-
-Pdf Previewer
-![Home](https://github.com/G4brym/R2-Explorer/raw/main/.assets/pdf-preview.png)
-
-New Folder
-![Home](https://github.com/G4brym/R2-Explorer/raw/main/.assets/new-folder.png)
-
-Uploading Files
-![Home](https://github.com/G4brym/R2-Explorer/raw/main/.assets/uploading-files.png)
-
 
 ## Development
 
-Publish Dashboard into beta branch
+Publish Dashboard into dev branch
 ```
 cd packages/dashboard/
 npm run build
