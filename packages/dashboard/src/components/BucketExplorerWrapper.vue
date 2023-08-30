@@ -49,10 +49,14 @@ export default {
       this.$store.commit('changeBucket', this.$route.params.bucket)
       if (this.$route.params.folder) {
 
-        if (this.$store.state.activeTab === 'email') {
-          await this.$store.dispatch('navigate', this.$route.params.folder)
+        if (this.$route.params.folder !== 'IA==') {  // IA== is empty space
+          if (this.$store.state.activeTab === 'email') {
+            await this.$store.dispatch('navigate', this.$route.params.folder)
+          } else {
+            await this.$store.dispatch('navigate', decodeURIComponent(escape(atob(this.$route.params.folder))))
+          }
         } else {
-          await this.$store.dispatch('navigate', decodeURIComponent(escape(atob(this.$route.params.folder))))
+          this.$store.dispatch('refreshObjects')
         }
 
         if (this.$route.params.file) {

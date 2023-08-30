@@ -27,3 +27,11 @@ node config/preparePublish.js
 npm run build
 npm publish --access public
 ```
+
+
+## Deploy demo instance
+
+```bash
+cd package/r2-explorer-demo
+wrangler deploy
+```

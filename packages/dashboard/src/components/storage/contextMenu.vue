@@ -27,8 +27,7 @@
 
 <script>
 import Swal from 'sweetalert2'
-import repo from '@/api'
-import axios from "axios";
+import repo, {encodeKey} from '@/api'
 
 export default {
   data: function () {
@@ -75,7 +74,7 @@ export default {
       this.canPreview = obj.preview !== undefined || obj.isFolder === true
       this.name = obj.name
 
-      this.downloadUrl = `${self.$store.state.serverUrl}/api/buckets/${this.$store.state.activeBucket}/${btoa(unescape(encodeURIComponent(`${this.$store.state.currentFolder}${obj.name}`)))}`
+      this.downloadUrl = `${this.$store.state.serverUrl}/api/buckets/${this.$store.state.activeBucket}/${encodeKey(obj.name, this.$store.state.currentFolder)}`
 
       this.$nextTick(
         function () {
