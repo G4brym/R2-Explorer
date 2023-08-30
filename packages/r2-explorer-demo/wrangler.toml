@@ -1,0 +1,16 @@
+name = "r2-explorer-demo"
+compatibility_date = "2023-05-12"
+main = "src/index.ts"
+
+workers_dev = false
+route = { pattern = "demo.r2explorer.dev/api/*", zone_name = "r2explorer.dev" }
+
+[[r2_buckets]]
+binding = 'example-1'
+bucket_name = 'r2-explorer-example-1'
+preview_bucket_name = 'r2-explorer-example-1'
+
+[[r2_buckets]]
+binding = 'example-2'
+bucket_name = 'r2-explorer-example-2'
+preview_bucket_name = 'r2-explorer-example-2'

@@ -1,0 +1,14 @@
+{
+  "name": "r2-explorer-demo",
+  "version": "0.0.1",
+  "private": true,
+  "devDependencies": {
+    "wrangler": "^3.6.0"
+  },
+  "scripts": {
+    "publish": "wrangler publish"
+  },
+  "dependencies": {
+    "r2-explorer": "^1.0.0"
+  }
+}
