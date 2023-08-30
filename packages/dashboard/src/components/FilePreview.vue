@@ -105,7 +105,7 @@ export default {
           name: 'storage-file',
           params: {
             bucket: this.$route.params.bucket,
-            folder: this.$route.params.folder || '',
+            folder: this.$route.params.folder || 'IA==',  // IA== is a space
             file: file.hash
           }
         })
@@ -143,7 +143,7 @@ export default {
           name: 'storage-folder',
           params: {
             bucket: this.$route.params.bucket,
-            folder: this.$route.params.folder || '',
+            folder: this.$route.params.folder || 'IA==',  // IA== is a space
           }
         })
       }

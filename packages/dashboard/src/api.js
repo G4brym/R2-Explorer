@@ -2,7 +2,7 @@ import axios from 'axios'
 import store from './store'
 import preview from '@/preview'
 
-function encodeKey(key, path = null) {
+export function encodeKey(key, path = null) {
   if (path) {
     return btoa(unescape(encodeURIComponent(`${path}${key}`)))
   }

@@ -55,7 +55,7 @@ export default {
       () => this.$route.params.folder,
       (newFolder, oldFolder) => {
         if (newFolder !== oldFolder && this.$store.state.activeTab === 'storage') {
-          if (newFolder) {
+          if (newFolder && newFolder !== 'IA==') {  // IA== is space bar, meaning root folder
             this.$store.dispatch('navigateToHash', newFolder)
           } else {
             this.$store.dispatch('navigate', '')
