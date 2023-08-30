@@ -24,3 +24,9 @@ pnpm-debug.log*
 
 # local tests
 my-r2-explorer
+
+worker/bin
+worker/README.md
+worker/LICENSE
+
+worker/dev/.wrangler

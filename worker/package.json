@@ -2,27 +2,47 @@
   "name": "r2-explorer",
   "version": "0.0.1",
   "description": "A Google Drive Interface for your Cloudflare R2 Buckets",
-  "main": "dist/umd/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "bin",
+    "dist"
+  ],
   "scripts": {
     "postinstallDisabled": "husky install",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
-    "build": "npm run build:umd",
-    "build:umd": "node tools/cleanup umd && rollup --config config/rollup.config.js",
+    "build": "node tools/cleanup umd && rollup --config rollup.config.js",
     "clean": "node tools/cleanup",
     "package": "npm run build && npm pack",
     "test": "jest --no-cache --runInBand",
     "test:cov": "jest --coverage --no-cache --runInBand",
     "addscope": "node tools/packagejson name @g4brym/r2-explorer",
     "prettify": "prettier . --write --ignore-unknown",
-    "prepareDisabled": "husky install"
+    "prepareDisabled": "husky install",
+    "watch": "npm-watch build"
+  },
+  "watch": {
+    "build": {
+      "patterns": [
+        "src"
+      ],
+      "extensions": "js,ts",
+      "legacyWatch": true,
+      "runOnChangeOnly": false
+    }
   },
   "publishConfig": {
     "access": "public"
   },
-  "files": [
-    "dist"
-  ],
   "keywords": [
     "cloudflare",
     "worker",
@@ -45,7 +65,7 @@
   ],
   "author": "Gabriel Massadas",
   "license": "MIT",
-  "homepage": "https://github.com/G4brym/R2-Explorer",
+  "homepage": "https://r2explorer.dev",
   "repository": {
     "type": "git",
     "url": "git@github.com:G4brym/R2-Explorer.git"
@@ -54,30 +74,28 @@
     "url": "https://github.com/G4brym/R2-Explorer/issues"
   },
   "devDependencies": {
-    "@commitlint/cli": "^13.1.0",
-    "@commitlint/config-conventional": "^13.1.0",
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-json": "^5.0.1",
-    "@rollup/plugin-node-resolve": "^11.1.0",
-    "@types/jest": "^27.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.31.1",
-    "@typescript-eslint/parser": "^4.31.1",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "husky": "^7.0.2",
-    "jest": "^28.1.2",
-    "pinst": "^2.1.6",
-    "prettier": "^2.4.0",
+    "@cloudflare/workers-types": "^4.20230518.0",
+    "@rollup/plugin-terser": "^0.4.3",
+    "@rollup/plugin-typescript": "^11.1.2",
+    "@types/node": "^18.11.18",
+    "@types/service-worker-mock": "^2.0.1",
+    "eslint": "^8.18.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-typescript": "^3.0.0",
+    "husky": "^8.0.0",
+    "npm-watch": "^0.11.0",
+    "prettier": "^2.7.1",
     "rollup": "^2.36.1",
-    "rollup-plugin-ts": "^3.0.2",
-    "ts-jest": "^28.0.5",
-    "ts-loader": "^9.2.5",
-    "typescript": "^4.4.3",
-    "wrangler": "^3.1.1"
+    "rollup-plugin-bundle-size": "^1.0.3",
+    "rollup-plugin-copy": "^3.4.0",
+    "service-worker-mock": "^2.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4",
+    "wrangler": "^3.6.0"
   },
   "dependencies": {
-    "itty-router": "^2.6.1"
+    "@cloudflare/itty-router-openapi": "https://prerelease-registry.devprod.cloudflare.dev/itty-router-openapi/runs/5881739194/npm-package-itty-router-openapi-83",
+    "postal-mime": "^1.0.16"
   },
   "bin": {
     "r2-explorer": "bin/r2-explorer.js"

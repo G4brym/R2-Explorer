@@ -1,118 +1,59 @@
-// @ts-ignore
-import html from 'explorer:index.html'
-// @ts-ignore
-import app from 'explorer:js/app.js'
-// @ts-ignore
-import favicon from 'explorer:favicon.svg'
-import { Router } from 'itty-router'
-import { listBuckets } from './api/listBuckets'
-import { listContents } from './api/listContents'
-import { uploadFiles } from './api/uploadFiles'
-import { createFolder } from './api/createFolder'
-import { deleteObject } from './api/deleteObject'
-import { renameObject } from './api/renameObject'
-import { downloadFile } from './api/downloadFile'
-import {partUpload} from "./api/multipart/partUpload";
-import {createUpload} from "./api/multipart/createUpload";
-import {completeUpload} from "./api/multipart/completeUpload";
+import {createCors} from 'itty-router'
 import {R2ExplorerConfig} from "./interfaces";
-import {authenticateUser} from "./access";
-
-
+import {OpenAPIRouter} from "@cloudflare/itty-router-openapi";
+import {bucketsRouter} from "./buckets/router";
+import {authenticateUser} from "./authentication/api/access";
+import {dashboardProxy} from "./dashbord";
+import {receiveEmail} from "./emails/receiveEmail";
+import {serverRouter} from "./server/router";
+import {config as settings} from "./settings"
 
 export function R2Explorer(config?: R2ExplorerConfig) {
   config = config || {}
   if (config.readonly !== false) config.readonly = true
 
-  const router = Router()
+  const router = OpenAPIRouter({
+    schema: {
+      info: {
+        title: 'R2 Explorer API',
+        version: settings.version,
+      },
+    }
+  })
+  const {preflight, corsify} = createCors()
 
   // This route must be the first defined
-  if(config.cfAccessTeamName) {
+  if (config.cfAccessTeamName) {
     router.all('*', authenticateUser)
   }
 
-
-  router.get('/js/app.js', () => {
-    return new Response(atob(app), {
-      status: 200,
-      headers: {
-        'content-type': 'text/javascript;charset=UTF-8',
-      },
-    })
-  })
-
-  router.get('/favicon.svg', () => {
-    return new Response(atob(favicon), {
-      status: 200,
-      headers: {
-        'content-type': 'image/svg+xml',
-      },
-    })
-  })
-
-  router.get('/api/buckets', listBuckets)
-  router.get('/api/buckets/:disk', listContents)
-  router.post('/api/buckets/:disk/rename', renameObject)
-  router.post('/api/buckets/:disk/folder', createFolder)
-  router.post('/api/buckets/:disk/upload', uploadFiles)
-  router.post('/api/buckets/:disk/multipart/create', createUpload)
-  router.post('/api/buckets/:disk/multipart/upload', partUpload)
-  router.post('/api/buckets/:disk/multipart/complete', completeUpload)
-  router.post('/api/buckets/:disk/delete', deleteObject)
-  router.get('/api/buckets/:disk/:file', downloadFile)
-
-  router.get('/api/*', (request: any, env: any, context: any) => {
-    return new Response(JSON.stringify({ msg: '404, not found!' }), {
-      headers: {
-        'content-type': 'application/json;charset=UTF-8',
-      },
-      status: 404,
-    })
-  })
-
   if (config.cors === true) {
-    router.options('/api/*', (request, env, context) => {
-      return new Response(JSON.stringify({ msg: 'ready' }), {
-        headers: {
-          'content-type': 'application/json;charset=UTF-8',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': '*',
-        },
-        status: 200,
-      })
-    })
+    router.all('*', preflight)
   }
 
-  router.get('*', () => {
-    return new Response(atob(html), {
-      status: 200,
-      headers: {
-        'content-type': 'text/html;charset=UTF-8',
-      },
-    })
-  })
+  router.all('/api/server/*', serverRouter)
+  router.all('/api/buckets/*', bucketsRouter)
 
-  router.all('*', () => new Response('404, not found!', { status: 404 }))
+  router.original.get('*', dashboardProxy)
 
-  return (request, env, context) => {
-    return router.handle(request, env, { ...context, config: config }).then((response) => {
+  router.all('*', () => Response.json({msg: '404, not found!'}, {status: 404}))
+
+  return {
+    async email(event, env, context) {
+      await receiveEmail(event, env, {
+        executionContext: context, config: config
+      })
+    },
+    async fetch(request, env, context) {
+      let resp = await router.handle(request, env, {
+        executionContext: context, config: config
+      })
+
       if (config.cors === true) {
-        // can modify response here before final return, e.g. CORS headers
-        Object.entries({
-          'access-control-allow-origin': '*',
-          'access-control-allow-headers': '*',
-          'access-control-allow-methods': '*',
-          'timing-allow-origin': '*',
-        }).forEach((entry) => {
-          const [key, value] = entry
-
-          if (!response.headers.has(key)) {
-            response.headers.set(key, value)
-          }
-        })
+        resp = corsify(resp)
       }
 
-      return response
-    })
-  }
+      return resp
+    }
+  };
 }

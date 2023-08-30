@@ -13,16 +13,16 @@ jobs:
       - name: Setup .npmrc file to publish to npm
         uses: actions/setup-node@v1
         with:
-          node-version: '14.x'
+          node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - name: Set RELEASE_VERSION
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Apply new version
         run: node worker/config/preparePublish.js
       - name: Install dashboard modules
-        run: cd app && npm install
+        run: cd packages/dashboard && npm install
       - name: Build dashboard
-        run: cd app && npm run build
+        run: cd packages/dashboard && npm run build
       - name: Install worker modules
         run: cd worker && npm install
       - name: Build worker
