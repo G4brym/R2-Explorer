@@ -1,13 +1,13 @@
 {
 	"name": "<TBD>",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"private": true,
 	"scripts": {
 		"deploy": "wrangler deploy",
 		"start": "wrangler dev"
 	},
 	"dependencies": {
-		"r2-explorer": "^0.6.0"
+		"r2-explorer": "^1.0.0"
 	},
 	"devDependencies": {
 		"wrangler": "^3.0.0"

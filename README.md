@@ -1,28 +1,34 @@
 # R2-Explorer
 
-A Google Drive Interface for your Cloudflare R2 Buckets!
+<p align="center">
+    <em>A Google Drive Interface for your Cloudflare R2 Buckets!</em>
+</p>
 
-This project is deployed/self-hosted in your own Cloudflare Account as a Worker, and no credential/token is required to
-start using it.
+<p>
+  This project is deployed/self-hosted in your own Cloudflare Account as a Worker, and no credential/token is required to
+  start using it.
+</p>
 
-- Documentation: [r2explorer.dev](https://r2explorer.dev)
-- Live Demo: [demo.r2explorer.dev](https://demo.r2explorer.dev)
+---
 
+**Documentation**: <a href="https://r2explorer.dev" target="_blank">https://r2explorer.dev</a>
+
+**Live Demo**: <a href="https://demo.r2explorer.dev" target="_blank">https://demo.r2explorer.dev</a>
+
+---
 
 ## Features
 
 - [Email Explorer](https://r2explorer.dev/guides/setup-email-explorer/) (using Cloudflare Email Routing)
+- [Cloudflare Access Authentication](https://r2explorer.dev/getting-started/security/)
 - Very quick bucket/folder navigation
 - pdf, image, txt, markdown, csv, etc in-browser preview
 - Drag-and-Drop upload
 - Multiple files and folder uploads
 - Create folders
-- Rename files
-- Download files
-- Delete files
+- Upload/Rename/Download/Delete files
 - Right click in file for extra options
 - Multipart upload for big files
-- Cloudflare Access validation using jwt
 
 ## Getting Started
 
@@ -60,13 +66,3 @@ wrangler publish
 
 - Rename files with special characters is not possible with
   current [sdk issue here](https://github.com/aws/aws-sdk-js/issues/1949)
-
-
-## Development
-
-Publish Dashboard into dev branch
-```
-cd packages/dashboard/
-npm run build
-wrangler pages publish --branch dev --project-name r2-explorer-dashboard dist/
-```

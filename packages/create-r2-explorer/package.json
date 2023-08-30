@@ -1,6 +1,6 @@
 {
 	"name": "create-r2-explorer",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "A CLI for creating and deploying new R2 Explorer applications to Cloudflare.",
 	"keywords": [
 		"cloudflare",

@@ -13,6 +13,12 @@ for the [R2 storage](https://developers.cloudflare.com/r2/pricing/).
 3. Run `wrangler login` to login to your Cloudflare account in wrangler
 4. Run `wrangler deploy` to publish to Cloudflare Workers
 
+### Optional Steps
+
+1. Read only mode is enabled by default, disable it in `src/index.ts`.
+2. Learn how to secure your R2 Explorer in the official [documentation here](https://r2explorer.dev/getting-started/security/).
+
+
 ## Updating the instance
 
 Install latest version
