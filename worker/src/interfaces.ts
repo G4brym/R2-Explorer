@@ -12,6 +12,7 @@ export interface R2ExplorerConfig {
       targetBucket: string
     },
     showHiddenFiles?: string
+    cacheAssets?: boolean
     // basicAuth?: BasicAuth | BasicAuth[]  // TODO
 }
 

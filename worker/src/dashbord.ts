@@ -1,4 +1,6 @@
-export async function dashboardProxy(request: any, env: any, context: any) {
+import {Context} from "./interfaces";
+
+export async function dashboardProxy(request: any, env: any, context: Context) {
   // Initialize the default cache
   //@ts-ignore
   const cache = caches.default
@@ -10,10 +12,14 @@ export async function dashboardProxy(request: any, env: any, context: any) {
     path = "/"
   }
 
-  // use .match() to see if we have a cache hit, if so return the caches response early
-  let result = await cache.match(request)
-  if (result) {
-    return result
+  let result
+
+  if (context.config.cacheAssets !== false) {
+    // use .match() to see if we have a cache hit, if so return the caches response early
+    result = await cache.match(request)
+    if (result) {
+      return result
+    }
   }
 
   let dashboardUrl = 'https://demo.r2explorer.dev'
@@ -41,7 +47,7 @@ export async function dashboardProxy(request: any, env: any, context: any) {
     },
   })
 
-  if (response.status !== 200) {
+  if (response.status === 200 && context.config.cacheAssets !== false) {
     // before returning the response we put a clone of our response object into the cache so it can be resolved later
     context.executionContext.waitUntil(cache.put(request, result.clone()))
   }

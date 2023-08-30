@@ -18,7 +18,7 @@ require('bootstrap/js/dist/modal')
 
 let url = window.location.origin
 if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'https://my-r2-explorer.g4brym.workers.dev'
+  axios.defaults.baseURL = 'http://localhost:8787'
 }
 
 store.commit('setServerUrl', url)

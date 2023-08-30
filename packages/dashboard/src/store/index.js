@@ -60,10 +60,7 @@ export default createStore({
       }
     },
     loadServerConfigs (state, data) {
-      state.user = {
-        username: "test@example.com"
-      }
-      // state.user = data.user
+      state.user = data.user
       state.config = data.config
       state.serverVersion = data.version
     },

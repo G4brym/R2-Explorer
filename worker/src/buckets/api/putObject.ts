@@ -12,6 +12,7 @@ export class PutObject extends OpenAPIRoute {
       bucket: Path(String),
       key: Query(z.string().optional().describe('base64 encoded file key')),
       customMetadata: Query(z.string().optional().describe('base64 encoded json string')),
+      httpMetadata: Query(z.string().optional().describe('base64 encoded json string')),
     },
   }
 
@@ -26,11 +27,17 @@ export class PutObject extends OpenAPIRoute {
     const bucket = env[data.params.bucket]
 
     let key = decodeURIComponent(escape(atob(data.query.key)))
+
     let customMetadata = undefined
     if (data.query.customMetadata) {
-      customMetadata = decodeURIComponent(escape(atob(data.query.key)))
+      customMetadata = JSON.parse(decodeURIComponent(escape(atob(data.query.customMetadata))))
     }
 
-    return await bucket.put(key, request.body, {customMetadata: customMetadata})
+    let httpMetadata = undefined
+    if (data.query.httpMetadata) {
+      httpMetadata = JSON.parse(decodeURIComponent(escape(atob(data.query.httpMetadata))))
+    }
+
+    return await bucket.put(key, request.body, {customMetadata: customMetadata, httpMetadata: httpMetadata})
   }
 }

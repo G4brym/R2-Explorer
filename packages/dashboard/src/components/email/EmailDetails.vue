@@ -96,8 +96,9 @@ export default {
     for (const file of this.$store.state.files) {
       if (file.hash === this.$route.params.file) {
         apiHandler.downloadFile(file).then(response => {
+          const filename = file.key.split('.json')[0]
           for (const att of response.data.attachments) {
-            att.downloadUrl = `${self.$store.state.serverUrl}/api/buckets/${self.$store.state.activeBucket}/${btoa(unescape(encodeURIComponent(`${file.key}/${att.filename}`)))}`
+            att.downloadUrl = `${self.$store.state.serverUrl}/api/buckets/${self.$store.state.activeBucket}/${btoa(unescape(encodeURIComponent(`${filename}/${att.filename}`)))}`
           }
           self.file = response.data
         })

@@ -3,11 +3,11 @@ import {Context} from "../../interfaces";
 import {OpenAPIRouteSchema} from "@cloudflare/itty-router-openapi/dist/src/types";
 import {z} from "zod";
 
-export class RenameObject extends OpenAPIRoute {
+export class MoveObject extends OpenAPIRoute {
   static schema: OpenAPIRouteSchema = {
-    operationId: 'post-bucket-rename-object',
+    operationId: 'post-bucket-move-object',
     tags: ['Buckets'],
-    summary: 'Rename object',
+    summary: 'Move object',
     parameters: {
       bucket: Path(String),
     },
@@ -30,7 +30,7 @@ export class RenameObject extends OpenAPIRoute {
     const newKey = decodeURIComponent(escape(atob(data.body.newKey)))
 
     const object = await bucket.get(oldKey)
-    const resp = await bucket.put(newKey, object.body, {customMetadata: object.customMetadata})
+    const resp = await bucket.put(newKey, object.body, {customMetadata: object.customMetadata, httpMetadata: object.httpMetadata})
 
     await bucket.delete(oldKey)
 

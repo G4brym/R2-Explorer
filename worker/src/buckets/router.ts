@@ -1,7 +1,7 @@
 import {config} from "../settings";
 import {ListBuckets} from "./api/listBuckets";
 import {ListObjects} from "./api/listObjects";
-import {RenameObject} from "./api/renameObject";
+import {MoveObject} from "./api/moveObject";
 import {CreateFolder} from "./api/createFolder";
 import {PutObject} from "./api/putObject";
 import {DeleteObject} from "./api/deleteObject";
@@ -22,7 +22,7 @@ export const bucketsRouter = OpenAPIRouter({
 
 bucketsRouter.get('', ListBuckets)
 bucketsRouter.get('/:bucket', ListObjects)
-bucketsRouter.post('/:bucket/rename', RenameObject)
+bucketsRouter.post('/:bucket/move', MoveObject)
 bucketsRouter.post('/:bucket/folder', CreateFolder)
 bucketsRouter.post('/:bucket/upload', PutObject)
 bucketsRouter.post('/:bucket/multipart/create', CreateUpload)

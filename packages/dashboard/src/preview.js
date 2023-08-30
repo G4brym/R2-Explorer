@@ -33,6 +33,16 @@ const PreviewConfigs = [
     extensions: ['csv'],
     type: 'csv',
     downloadType: 'text'
+  },
+  {
+    extensions: ['json'],
+    type: 'json',
+    downloadType: 'text'
+  },
+  {
+    extensions: ['html'],
+    type: 'html',
+    downloadType: 'text'
   }
 ]
 

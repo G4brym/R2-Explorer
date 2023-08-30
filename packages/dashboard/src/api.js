@@ -51,7 +51,7 @@ const apiHandler = {
     )
   },
   renameObject: (oldName, newName) => {
-    return axios.post(`/api/buckets/${store.state.activeBucket}/rename`, {
+    return axios.post(`/api/buckets/${store.state.activeBucket}/move`, {
       oldKey: encodeKey(oldName, store.state.currentFolder),
       newKey: encodeKey(newName, store.state.currentFolder),
     })
@@ -59,7 +59,10 @@ const apiHandler = {
   multipartCreate: (file, folder) => {
     return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/create`, null, {
       params: {
-        key: encodeKey(file.name, folder)
+        key: encodeKey(file.name, folder),
+        httpMetadata: encodeKey(JSON.stringify({
+          contentType: file.type
+        }))
       }
     })
   },
@@ -86,8 +89,16 @@ const apiHandler = {
   },
   uploadObjects: (file, folder, callback) => {
     folder = folder || store.state.currentFolder
+    console.log(file)
+    console.log(file.type)
 
-    return axios.post(`/api/buckets/${store.state.activeBucket}/upload?key=${encodeKey(file.name, folder)}`, file, {
+    return axios.post(`/api/buckets/${store.state.activeBucket}/upload`, file, {
+      params: {
+        key: encodeKey(file.name, folder),
+        httpMetadata: encodeKey(JSON.stringify({
+          contentType: file.type
+        }))
+      },
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -97,11 +108,10 @@ const apiHandler = {
   listObjects: async () => {
     const prefix = getCurrentFolder()
 
-    const response = await axios.get(`/api/buckets/${store.state.activeBucket}`, {
+    const response = await axios.get(`/api/buckets/${store.state.activeBucket}?include=customMetadata&include=httpMetadata`, {
       params: {
         delimiter: '/',
         prefix: encodeKey(prefix),
-        include: 'customMetadata'
       }
     })
 

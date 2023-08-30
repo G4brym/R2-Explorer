@@ -12,6 +12,7 @@ export class CreateUpload extends OpenAPIRoute {
       bucket: Path(String),
       key: Query(z.string().optional().describe('base64 encoded file key')),
       customMetadata: Query(z.string().optional().describe('base64 encoded json string')),
+      httpMetadata: Query(z.string().optional().describe('base64 encoded json string')),
     }
   }
 
@@ -26,12 +27,18 @@ export class CreateUpload extends OpenAPIRoute {
     const bucket = env[data.params.bucket]
 
     const key = decodeURIComponent(escape(atob(data.query.key)))
+
     let customMetadata = undefined
     if (data.query.customMetadata) {
-      customMetadata = decodeURIComponent(escape(atob(data.query.key)))
+      customMetadata = JSON.parse(decodeURIComponent(escape(atob(data.query.customMetadata))))
     }
 
-    const multipartUpload = await bucket.createMultipartUpload(key, {customMetadata: customMetadata});
+    let httpMetadata = undefined
+    if (data.query.httpMetadata) {
+      httpMetadata = JSON.parse(decodeURIComponent(escape(atob(data.query.httpMetadata))))
+    }
+
+    const multipartUpload = await bucket.createMultipartUpload(key, {customMetadata: customMetadata, httpMetadata: httpMetadata});
 
     return {
       uploadId: multipartUpload.uploadId,

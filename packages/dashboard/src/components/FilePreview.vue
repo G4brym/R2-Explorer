@@ -44,6 +44,14 @@
           <div v-html="fileData.replaceAll('\n', '<br>')"></div>
         </template>
 
+        <template v-else-if="type === 'json'">
+          <pre v-html="JSON.stringify(fileData, null, 2)"></pre>
+        </template>
+
+        <template v-else-if="type === 'html'">
+          <pre v-html="fileData"></pre>
+        </template>
+
         <template v-else-if="type === 'markdown'">
           <div class="markdown" v-html="markdownParser(fileData)"></div>
         </template>

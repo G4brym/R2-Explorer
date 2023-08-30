@@ -35,7 +35,7 @@
             <div class="text-center">
               <p class="fs-3">This bucket don't have any emails yet!</p>
               <p class="fs-5">Learn how to setup the Email Explorer in the official documentation</p>
-              <a href="https://r2explorer.dev/guides/setup-email-explorer/" class="fs-5">https://r2explorer.dev</a>
+              <a target="_blank" href="https://r2explorer.dev/guides/setup-email-explorer/" class="fs-5">https://r2explorer.dev</a>
             </div>
           </td>
         </tr>
@@ -70,7 +70,6 @@ export default {
     this.$watch(
       () => this.$route.params.folder,
       (newFolder) => {
-        console.log(newFolder)
         if (this.$store.state.activeTab === 'email') {
           this.$store.dispatch('refreshObjects')
         }
