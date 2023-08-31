@@ -18,7 +18,7 @@ require('bootstrap/js/dist/modal')
 
 let url = window.location.origin
 if (process.env.NODE_ENV === 'development') {
-  axios.defaults.baseURL = 'http://localhost:8787'
+  axios.defaults.baseURL = process.env.VUE_APP_SERVER_URL || 'http://localhost:8787'
 }
 
 store.commit('setServerUrl', url)

@@ -60,6 +60,10 @@
           <div class="markdown" v-html="csvParser(fileData)"></div>
         </template>
 
+        <template v-else-if="type === 'logs'">
+          <log-gz :filedata="fileData" />
+        </template>
+
         <template v-else>
           <h4 class="text-center">Unsupported file type</h4>
         </template>
@@ -74,9 +78,11 @@ import modal from './modal'
 import {parseMarkdown} from '@/parsers/markdown'
 import repo from '@/api'
 import utils from '@/utils'
+import LogGz from "@/components/preview/logGz.vue";
 
 export default {
   components: {
+    LogGz,
     PdfViewer,
     modal
   },
@@ -116,9 +122,11 @@ export default {
         this.downloadProgress = (progressEvent.loaded * 100) / progressEvent.total
       }, this.abortControl).then((response) => {
         let data
-        if (file.preview.downloadType === 'arraybuffer') {
+        if (file.preview.downloadType === 'objectUrl') {
           const blob = new Blob([response.data])
           data = URL.createObjectURL(blob)
+        } else if (file.preview.downloadType === 'blob') {
+          data = response.data
         } else {
           data = response.data
         }

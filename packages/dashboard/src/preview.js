@@ -2,22 +2,22 @@ const PreviewConfigs = [
   {
     extensions: ['png', 'jpg', 'jpeg', 'webp'],
     type: 'image',
-    downloadType: 'arraybuffer'
+    downloadType: 'objectUrl'
   },
   {
     extensions: ['mp3'],
     type: 'audio',
-    downloadType: 'arraybuffer'
+    downloadType: 'objectUrl'
   },
   {
     extensions: ['mp4', 'ogg'],
     type: 'video',
-    downloadType: 'arraybuffer'
+    downloadType: 'objectUrl'
   },
   {
     extensions: ['pdf'],
     type: 'pdf',
-    downloadType: 'arraybuffer'
+    downloadType: 'objectUrl'
   },
   {
     extensions: ['txt'],
@@ -43,14 +43,21 @@ const PreviewConfigs = [
     extensions: ['html'],
     type: 'html',
     downloadType: 'text'
+  },
+  {
+    extensions: ['log.gz'],
+    type: 'logs',
+    downloadType: 'blob'
   }
 ]
 
 export default {
-  getType: (extension) => {
+  getType: (filename) => {
     for (const config of PreviewConfigs) {
-      if (config.extensions.includes(extension)) {
-        return { type: config.type, downloadType: config.downloadType }
+      for (const extension of config.extensions) {
+        if (filename.endsWith(extension)) {
+          return { type: config.type, downloadType: config.downloadType }
+        }
       }
     }
   }

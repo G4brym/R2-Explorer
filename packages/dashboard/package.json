@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
+    "fflate": "^0.8.0",
     "pdfvuer": "^2.0.1",
     "sweetalert2": "^11.4.8",
     "util": "^0.12.4",

@@ -33,7 +33,7 @@ const apiHandler = {
   },
   downloadFile: (file, onDownloadProgress, abortControl) => {
     const extra = {}
-    if (file.preview?.downloadType === 'arraybuffer') {
+    if (file.preview?.downloadType === 'objectUrl' || file.preview?.downloadType === 'blob') {
       extra.responseType = 'arraybuffer'
     }
     if (abortControl) {
@@ -129,7 +129,7 @@ const apiHandler = {
           name,
           path: store.state.currentFolder,
           extension,
-          preview: preview.getType(extension),
+          preview: preview.getType(name),
           isFile: true,
           hash: encodeKey(name)
         }
