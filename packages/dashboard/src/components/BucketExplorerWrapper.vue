@@ -56,7 +56,7 @@ export default {
             await this.$store.dispatch('navigate', decodeURIComponent(escape(atob(this.$route.params.folder))))
           }
         } else {
-          this.$store.dispatch('refreshObjects')
+          await this.$store.dispatch('refreshObjects')
         }
 
         if (this.$route.params.file) {

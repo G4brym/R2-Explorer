@@ -8,6 +8,14 @@ npm run build
 wrangler pages publish --branch dev --project-name r2-explorer-dashboard dist/
 ```
 
+## Build and publish Dashboard into Production
+
+```bash
+cd packages/dashboard/
+npm run build
+wrangler pages publish --branch main --project-name r2-explorer-dashboard dist/
+```
+
 ## Publish create-r2-explorer package
 
 Increase version in `packages/create-r2-explorer/package.json`
