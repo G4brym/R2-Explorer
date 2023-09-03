@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <div class="overflow-auto" v-html="file.html"></div>
+    <div class="overflow-auto" v-html="file.html || file.text"></div>
 
     <hr/>
 
@@ -101,6 +101,12 @@ export default {
             att.downloadUrl = `${self.$store.state.serverUrl}/api/buckets/${self.$store.state.activeBucket}/${btoa(unescape(encodeURIComponent(`${filename}/${att.filename}`)))}`
           }
           self.file = response.data
+
+          if (self.$store.state.serverVersionInt > 100)
+          apiHandler.updateMetadata(file, {
+            ...file.customMetadata,
+            read: true,
+          })
         })
       }
     }

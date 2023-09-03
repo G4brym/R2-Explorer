@@ -12,6 +12,9 @@
     <!--      <i class="bi bi-share-fill me-1"></i>Get Sharable Link-->
     <!--    </li>-->
     <template v-if="this.file?.isFile">
+      <li class="pointer" @click="shareFile">
+        <i class="bi bi-share-fill me-1"></i>Get Sharable Link
+      </li>
       <li class="pointer" @click="renameFile">
         <i class="bi bi-pencil-fill me-1"></i>Rename
       </li>
@@ -85,7 +88,28 @@ export default {
       )
       // e.preventDefault()
     },
-    deleteFile () {
+    async shareFile() {
+      const url = window.location.origin + this.$router.resolve({
+        name: 'storage-file',
+        params: {
+          bucket: this.$route.params.bucket,
+          folder: this.$route.params.folder || 'IA==',  // IA== is a space
+          file: this.file.hash
+        }
+      }).href
+
+      try {
+        await navigator.clipboard.writeText(url);
+        store.dispatch('makeToast', {
+          message: 'Link to file copied to clipboard!', timeout: 5000
+        })
+        this.closeMenu()
+      } catch (err) {
+        console.error('Failed to copy: ', err);
+      }
+
+    },
+    deleteFile() {
       const self = this
 
       Swal.fire({
@@ -109,7 +133,7 @@ export default {
         self.closeMenu()
       })
     },
-    renameFile () {
+    renameFile() {
       const self = this
 
       Swal.fire({
@@ -135,7 +159,7 @@ export default {
         self.closeMenu()
       })
     },
-    openFile () {
+    openFile() {
       this.$emit('openFile', this.file)
       this.closeMenu()
     },

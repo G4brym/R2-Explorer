@@ -19,6 +19,7 @@ export default createStore({
     uploadingFiles: {},
     mobileSidebar: false,
     serverVersion: null,
+    serverVersionInt: 0,
     activeTab: 'storage',
     serverUrl: null,
   },
@@ -32,7 +33,11 @@ export default createStore({
       state.folders = payload.folders
     },
     toggleMobileSidebar (state, payload) {
-      state.mobileSidebar = payload || !state.mobileSidebar
+      if (payload !== true && payload !== false) {
+        state.mobileSidebar = !state.mobileSidebar
+      } else {
+        state.mobileSidebar = payload
+      }
     },
     changeBucket (state, payload) {
       state.activeBucket = payload
@@ -63,6 +68,7 @@ export default createStore({
       state.user = data.user
       state.config = data.config
       state.serverVersion = data.version
+      state.serverVersionInt = parseInt(data.version.replace('v', '').replaceAll('.', ''))
     },
     changeToastMessage (state, { message, spin }) {
       state.toastMessage = message
