@@ -10,7 +10,7 @@ function getAccessHost(teamName: string): string {
 }
 
 
-export async function authenticateUser(request: any, env: any, context: Context) {
+export async function validateAccessJwt(request: any, env: any, context: Context) {
   let decodedJwt: any = false
   try {
     decodedJwt = await isValidJwt(request, context.config)
