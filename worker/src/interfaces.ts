@@ -13,7 +13,7 @@ export interface R2ExplorerConfig {
     },
     showHiddenFiles?: string
     cacheAssets?: boolean
-    // basicAuth?: BasicAuth | BasicAuth[]  // TODO
+    basicAuth?: BasicAuth | BasicAuth[]
 }
 
 export interface Context {

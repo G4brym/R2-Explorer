@@ -82,45 +82,49 @@
 </template>
 
 <script>
-import axios from 'axios'
-import EventBus from '@/EventBus.js'
+import axios from "axios";
+import EventBus from "@/EventBus.js";
 
 export default {
   methods: {
-    EventBus () {
-      return EventBus
+    EventBus() {
+      return EventBus;
     }
   },
-  data: function () {
+  data: function() {
     return {
       updateAvailable: false,
-      updateUrl: 'https://github.com/G4brym/R2-Explorer',
-      currentVersion: 'v0.0.1'
-    }
+      updateUrl: "https://github.com/G4brym/R2-Explorer"
+    };
   },
-  created () {
-    const self = this
+  created() {
+    const self = this;
 
-    function normalizeVersion (version) {
-      return version.replace('v', '')
+    function normalizeVersion(version) {
+      return version.replace("v", "");
     }
 
-    function compareVersions (currectVersion, latestVersion) {
-      return latestVersion.localeCompare(currectVersion, undefined, { numeric: true, sensitivity: 'base' }) === 1
+    function compareVersions(currectVersion, latestVersion) {
+      return latestVersion.localeCompare(currectVersion, undefined, { numeric: true, sensitivity: "base" }) === 1;
     }
 
-    axios.get('https://r2-explorer-api.massadas.com/api/releases/latest/').then((response) => {
-      this.updateAvailable = compareVersions(
-        normalizeVersion(self.currentVersion),
-        normalizeVersion(response.data?.latest_version?.version)
-      )
+    axios.get("https://r2-explorer-api.massadas.com/api/releases/latest/").then((response) => {
+      this.$watch(
+        () => self.$store.state.serverVersion,
+        (serverVersion) => {
+            self.updateAvailable = compareVersions(
+              normalizeVersion(serverVersion),
+              normalizeVersion(response.data?.latest_version?.version)
+            );
 
-      if (this.updateAvailable && response.data?.latest_version?.url) {
-        this.updateUrl = response.data?.latest_version?.url
-      }
-    })
+            if (self.updateAvailable && response.data?.latest_version?.url) {
+              self.updateUrl = response.data?.latest_version?.url;
+            }
+        }
+      );
+    });
   }
-}
+};
 </script>
 
 <style scoped lang="scss">

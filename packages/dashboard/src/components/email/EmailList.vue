@@ -10,7 +10,7 @@
       <tbody>
       <template v-if="$store.state.files.length > 0">
         <tr class="pointer" v-for="file in $store.state.files" :key="file.key"
-            :class="{'unread': file.customMetadata.read !== true}"
+            :class="{'unread': file.customMetadata.read !== 'true'}"
             @click="$router.push({name: 'email-file', params: {bucket: this.$route.params.bucket, folder: 'inbox',
           file: file.hash}})"
         >

@@ -10,9 +10,11 @@ export class PutMetadata extends OpenAPIRoute {
     summary: 'Update object metadata',
     parameters: {
       bucket: Path(String),
-      key: Query(z.string().describe('base64 encoded file key')),
-      customMetadata: Query(z.string().describe('base64 encoded json string')),
+      key: Path(z.string().describe('base64 encoded file key')),
     },
+    requestBody: {
+      customMetadata: z.record(z.string(), z.any())
+    }
   }
 
   async handle(
@@ -25,10 +27,9 @@ export class PutMetadata extends OpenAPIRoute {
 
     const bucket = env[data.params.bucket]
 
-    const key = decodeURIComponent(escape(atob(data.query.key)))
-    const customMetadata = decodeURIComponent(escape(atob(data.query.key)))
+    const key = decodeURIComponent(escape(atob(data.params.key)))
 
     const object = await bucket.get(key)
-    return await bucket.put(key, object.body, {customMetadata: customMetadata})
+    return await bucket.put(key, object.body, {customMetadata: data.body.customMetadata})
   }
 }
