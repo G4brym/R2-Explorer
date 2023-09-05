@@ -20,20 +20,22 @@
         </small>
     </div>
 
-    <br/>
 
-    <template v-if="emailData.text">
-      <div class="overflow-auto" v-html="emailData.text.replaceAll('\n', '<br>')"></div>
-    </template>
-
-    <template v-else>
-      <div class="overflow-auto">[Empty text]</div>
-    </template>
-
-    <hr/>
+    <h5 class="mb-3" v-if="!emailData.html && !emailData.text">This email has no HTML or text content</h5>
 
     <template v-if="emailData.html">
-      <h5 class="mb-3">This email contains HTML content</h5>
+      <br/>
+      <div class="overflow-auto" v-html="emailData.htmlAsText.replaceAll('\n', '<br>')"></div>
+      <hr/>
+    </template>
+
+    <template v-if="emailData.text">
+      <details :open="emailData.html ? undefined : 'open'">
+        <summary>Text</summary>
+        <br/>
+        <div class="overflow-auto" v-html="emailData.text.replaceAll('\n', '<br>')"></div>
+      </details>
+      <hr/>
     </template>
 
     <template v-if="emailData.attachments?.length > 0">
@@ -42,6 +44,7 @@
         <small class="text-muted">{{ attachment.filename }}</small>
       </div>
     </template>
+
   </template>
 
   <template v-else>
@@ -49,11 +52,12 @@
       <div class="lds-dual-ring"></div>
     </div>
   </template>
-
 </template>
+
 
 <script>
 const PostalMime = require('postal-mime');
+const { convert } = require('html-to-text');
 
 export default {
   props: ['filedata'],
@@ -69,6 +73,9 @@ export default {
         const parsedEmail = await parser.parse(this.filedata);
 
         this.emailData = parsedEmail;
+        if (parsedEmail.html) {
+          this.emailData.htmlAsText = convert(parsedEmail.html, {});
+        }
       } catch (error) {
         console.error('Error parsing email data:', error);
       }

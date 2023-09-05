@@ -11,6 +11,7 @@
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
     "fflate": "^0.8.0",
+    "html-to-text": "^9.0.5",
     "pdfvuer": "^2.0.1",
     "postal-mime": "^1.0.16",
     "sweetalert2": "^11.4.8",
