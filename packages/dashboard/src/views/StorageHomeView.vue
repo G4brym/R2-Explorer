@@ -1,16 +1,18 @@
 <template>
-  <bucket-explorer-wrapper>
+  <base-layout>
+    <bucket-explorer-wrapper>
 
-    <drag-and-drop ref="uploader">
-      <div class="card-body">
-        <gallery v-if="$store.state.files && $store.state.folders"/>
-        <div class="clearfix"></div>
-      </div>
-    </drag-and-drop>
-    <loading/>
-    <UploadingPopup/>
+      <drag-and-drop ref="uploader">
+        <div class="card-body">
+          <gallery v-if="$store.state.files && $store.state.folders"/>
+          <div class="clearfix"></div>
+        </div>
+      </drag-and-drop>
+      <loading/>
+      <UploadingPopup/>
 
-  </bucket-explorer-wrapper>
+    </bucket-explorer-wrapper>
+  </base-layout>
 </template>
 
 <script>
@@ -22,9 +24,10 @@ import Loading from '@/components/loading'
 import UploadingPopup from '@/components/storage/uploadingPopup.vue'
 import EventBus from '@/EventBus'
 import BucketExplorerWrapper from "@/components/BucketExplorerWrapper.vue";
+import BaseLayout from "@/components/base/BaseLayout.vue";
 
 export default {
-  components: {BucketExplorerWrapper, UploadingPopup, Loading, DragAndDrop, Gallery},
+  components: { BaseLayout, BucketExplorerWrapper, UploadingPopup, Loading, DragAndDrop, Gallery},
   methods: {
     newFolder() {
       const self = this

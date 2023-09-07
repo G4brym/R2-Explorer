@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import StorageHomeView from '@/views/StorageHomeView'
 import EmailHomeView from "@/views/EmailHomeView.vue";
 import EmailDetailsView from "@/views/EmailDetailsView.vue";
+import LoginView from "@/views/auth/LoginView.vue";
 
 const routes = [
   {
@@ -38,6 +39,11 @@ const routes = [
     path: '/email/:bucket/:folder/:file',
     name: 'email-file',
     component: EmailDetailsView
+  },
+  {
+    path: '/auth/login',
+    name: 'login',
+    component: LoginView
   },
 ]
 
