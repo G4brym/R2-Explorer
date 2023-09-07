@@ -95,7 +95,7 @@
     "wrangler": "^3.6.0"
   },
   "dependencies": {
-    "@cloudflare/itty-router-openapi": "https://prerelease-registry.devprod.cloudflare.dev/itty-router-openapi/runs/5881739194/npm-package-itty-router-openapi-83",
+    "@cloudflare/itty-router-openapi": "^1.0.1",
     "postal-mime": "^1.0.16"
   },
   "bin": {

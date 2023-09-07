@@ -38,11 +38,6 @@ export class CreateUpload extends OpenAPIRoute {
       httpMetadata = JSON.parse(decodeURIComponent(escape(atob(data.query.httpMetadata))))
     }
 
-    const multipartUpload = await bucket.createMultipartUpload(key, {customMetadata: customMetadata, httpMetadata: httpMetadata});
-
-    return {
-      uploadId: multipartUpload.uploadId,
-      key: multipartUpload.key,
-    }
+    return await bucket.createMultipartUpload(key, {customMetadata: customMetadata, httpMetadata: httpMetadata});
   }
 }
