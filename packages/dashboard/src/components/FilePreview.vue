@@ -64,6 +64,10 @@
           <log-gz :filedata="fileData" />
         </template>
 
+        <template v-else-if="type === 'email'">
+          <email-viewer :filedata="fileData" />
+        </template>
+
         <template v-else>
           <h4 class="text-center">Unsupported file type</h4>
         </template>
@@ -79,11 +83,13 @@ import {parseMarkdown} from '@/parsers/markdown'
 import repo from '@/api'
 import utils from '@/utils'
 import LogGz from "@/components/preview/logGz.vue";
+import EmailViewer from '@/components/preview/EmailViewer.vue'
 
 export default {
   components: {
     LogGz,
     PdfViewer,
+    EmailViewer,
     modal
   },
   data: function () {

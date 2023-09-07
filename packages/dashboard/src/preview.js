@@ -48,6 +48,11 @@ const PreviewConfigs = [
     extensions: ['log.gz'],
     type: 'logs',
     downloadType: 'blob'
+  },
+  {
+    extensions: ['eml'],
+    type: 'email',
+    downloadType: 'text'
   }
 ]
 
