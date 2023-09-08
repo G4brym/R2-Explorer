@@ -20,6 +20,7 @@
 ## Features
 
 - [Email Explorer](https://r2explorer.dev/guides/setup-email-explorer/) (using Cloudflare Email Routing)
+- [Basic Auth](https://r2explorer.dev/getting-started/security/#basic-auth)
 - [Cloudflare Access Authentication](https://r2explorer.dev/getting-started/security/)
 - Very quick bucket/folder navigation
 - pdf, image, txt, markdown, csv, etc in-browser preview
