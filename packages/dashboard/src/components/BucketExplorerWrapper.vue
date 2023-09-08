@@ -72,7 +72,7 @@ export default {
     this.$watch(
       () => this.$route.params.bucket,
       (bucket, previousBucket) => {
-        if (bucket !== previousBucket) {
+        if (bucket && bucket !== previousBucket) {
           this.$store.commit('changeBucket', bucket)
           this.$store.dispatch('refreshObjects')
           this.$store.commit('toggleMobileSidebar', false)

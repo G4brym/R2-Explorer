@@ -65,7 +65,7 @@ export default createStore({
     loadUserDisks(state, data) {
       state.buckets = data.buckets;
 
-      if (state.activeBucket === null && data.buckets.length > 0) {
+      if ((state.activeBucket === null && data.buckets.length > 0) || router.currentRoute.value.href.startsWith('/auth')) {
         const targetView = (location.pathname.startsWith('/email')) ? 'email-home' : 'storage-home'
 
         router.push({ name: targetView, params: { bucket: data.buckets[0].name } });
