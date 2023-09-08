@@ -4,8 +4,14 @@ export default R2Explorer({
   readonly: false,
   cors: true,
   dashboardUrl: "https://dev.r2-explorer-dashboard.pages.dev/",
-  basicAuth: {
+  basicAuth: [{
     username: 'teste',
     password: 'abc'
-  }
+  },{
+    username: 'teste33',
+    password: 'abcdd'
+  },{
+    username: 'teste55',
+    password: 'abchh'
+  }]
 });
