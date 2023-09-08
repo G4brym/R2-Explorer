@@ -16,9 +16,12 @@ export class GetInfo extends OpenAPIRoute {
     context: Context,
     data: any
   ) {
+    const serverConfig = {...context.config}
+    delete serverConfig.basicAuth
+
     return {
       version: config.version,
-      config: context.config,
+      config: serverConfig,
       user: {
         username: context.username
       }

@@ -1,27 +1,30 @@
 <template>
-  <bucket-explorer-wrapper>
+  <base-layout>
+    <bucket-explorer-wrapper>
 
-    <div class="card-body">
+      <div class="card-body">
 
-      <email-side-bar/>
+        <email-side-bar/>
 
-      <div>
-        <email-list/>
+        <div>
+          <email-list/>
+        </div>
+
+        <div class="clearfix"></div>
       </div>
 
-      <div class="clearfix"></div>
-    </div>
-
-  </bucket-explorer-wrapper>
+    </bucket-explorer-wrapper>
+  </base-layout>
 </template>
 
 <script>
 import BucketExplorerWrapper from "@/components/BucketExplorerWrapper.vue";
 import EmailSideBar from "@/components/email/EmailSideBar.vue";
 import EmailList from "@/components/email/EmailList.vue";
+import BaseLayout from "@/components/base/BaseLayout.vue";
 
 export default {
-  components: {EmailList, EmailSideBar, BucketExplorerWrapper},
+  components: { BaseLayout, EmailList, EmailSideBar, BucketExplorerWrapper},
   created() {
     this.$store.commit('changeTab', 'email')
 

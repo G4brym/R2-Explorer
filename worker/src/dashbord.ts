@@ -36,7 +36,7 @@ export async function dashboardProxy(request: any, env: any, context: Context) {
       `${dashboardUrl}${path}`
     )
 
-  result = new Response(await response.text(), {
+  result = new Response(await response.body, {
     status: response.status,
     headers: {
       'Content-Type': response.headers.get('Content-Type'),

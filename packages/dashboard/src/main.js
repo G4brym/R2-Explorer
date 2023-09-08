@@ -12,6 +12,7 @@ import VueToast from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
 import 'sweetalert2/src/sweetalert2.scss'
 import axios from 'axios'
+import './registerServiceWorker'
 
 require('bootstrap/js/dist/dropdown')
 require('bootstrap/js/dist/modal')
@@ -23,13 +24,7 @@ if (process.env.NODE_ENV === 'development') {
 
 store.commit('setServerUrl', url)
 
-const app = createApp({
-  extends: App,
-  created: function () {
-    this.$store.dispatch('loadServerConfigs')
-    this.$store.dispatch('loadUserDisks')
-  }
-})
+const app = createApp(App)
 
 app.use(store)
 app.use(router)

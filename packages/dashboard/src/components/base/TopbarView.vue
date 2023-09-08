@@ -36,7 +36,7 @@
                  data-popper-placement="bottom-end">
 
               <!-- item-->
-              <a href="/cdn-cgi/access/logout" class="dropdown-item notify-item">
+              <a href="#" @click="logout" class="dropdown-item notify-item">
                 <i class="bi bi-box-arrow-right"></i>
                 <span>Logout</span>
               </a>
@@ -130,5 +130,17 @@
   }
 }
 </style>
-<script setup lang="ts">
+<script>
+export default {
+  methods: {
+    logout () {
+      if (this.$store.state.loginMethod === "basic") {
+        localStorage.removeItem('basicAuth')
+        location.reload();
+      } else {
+        window.location.href = "/cdn-cgi/access/logout"
+      }
+    }
+  }
+}
 </script>
