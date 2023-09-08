@@ -34,7 +34,7 @@ export function R2Explorer(config?: R2ExplorerConfig) {
   const { preflight, corsify } = createCors();
 
   if (config.cors === true) {
-    router.all("*", preflight);
+    router.all("/api*", preflight);
   }
 
   // Check Access JWT first
@@ -52,7 +52,7 @@ export function R2Explorer(config?: R2ExplorerConfig) {
         scheme: "basic"
       }
     );
-    router.all("*", validateBasicAuth);
+    router.all("/api*", validateBasicAuth);
   }
 
   router.all("/api/server/*", serverRouter);

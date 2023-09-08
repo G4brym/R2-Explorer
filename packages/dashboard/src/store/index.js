@@ -42,7 +42,11 @@ export default createStore({
     },
     changeBucket(state, payload) {
       state.activeBucket = payload;
-      state.currentFolder = "";
+      if (this.state.activeTab === "email") {
+        state.currentFolder = "inbox";
+      } else {
+        state.currentFolder = "";
+      }
     },
     changeTab(state, payload) {
       if (payload === state.activeTab) {
@@ -62,7 +66,9 @@ export default createStore({
       state.buckets = data.buckets;
 
       if (state.activeBucket === null && data.buckets.length > 0) {
-        router.push({ name: "storage-home", params: { bucket: data.buckets[0].name } });
+        const targetView = (location.pathname.startsWith('/email')) ? 'email-home' : 'storage-home'
+
+        router.push({ name: targetView, params: { bucket: data.buckets[0].name } });
       }
     },
     loadServerConfigs(state, data) {
@@ -164,7 +170,7 @@ export default createStore({
       axios.get("/api/server/config").then((response) => {
         commit("loadServerConfigs", response.data);
       }).catch(function(error) {
-        if (error.response.status === 401) {
+        if (error.response?.status === 401) {
           router.push({ name: "login"});
         }
       });

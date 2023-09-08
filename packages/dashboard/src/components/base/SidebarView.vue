@@ -45,7 +45,15 @@
 
         <template v-for="bucket in $store.state.buckets" :key="bucket.name">
           <li>
-            <router-link
+            <router-link v-if="$store.state.activeTab === 'email'"
+              :class="{ 'text-black': $store.state.activeBucket === bucket.name }"
+              class="list-group-item border-0"
+              :to="{ name: `email-folder`, params: { bucket: bucket.name, folder: 'inbox' }}"
+            >
+              <i class="bi bi-archive me-2"></i>
+              <span>{{ bucket.name }}</span>
+            </router-link>
+            <router-link v-else
               :class="{ 'text-black': $store.state.activeBucket === bucket.name }"
               class="list-group-item border-0"
               :to="{ name: `${$store.state.activeTab}-home`, params: { bucket: bucket.name }}"
@@ -108,7 +116,7 @@ export default {
       return latestVersion.localeCompare(currectVersion, undefined, { numeric: true, sensitivity: "base" }) === 1;
     }
 
-    axios.get("https://r2-explorer-api.massadas.com/api/releases/latest/").then((response) => {
+    axios.get("https://api.r2explorer.dev/api/releases/latest/").then((response) => {
       this.$watch(
         () => self.$store.state.serverVersion,
         (serverVersion) => {

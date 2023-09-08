@@ -52,6 +52,7 @@ export default {
         if (this.$route.params.folder !== 'IA==') {  // IA== is empty space
           if (this.$store.state.activeTab === 'email') {
             await this.$store.dispatch('navigate', this.$route.params.folder)
+            await this.$store.dispatch('refreshObjects')
           } else {
             await this.$store.dispatch('navigate', decodeURIComponent(escape(atob(this.$route.params.folder))))
           }
