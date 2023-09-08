@@ -77,7 +77,6 @@ const apiHandler = {
     })
   },
   multipartComplete: (file, folder, parts, uploadId) => {
-    const key = apiHandler.getKey(folder, file.name)
     return axios.post(`/api/buckets/${store.state.activeBucket}/multipart/complete`, {
       key: encodeKey(file.name, folder),
       uploadId,
