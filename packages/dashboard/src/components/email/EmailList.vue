@@ -6,9 +6,9 @@
   </div>
 
   <div class="table-files">
-    <table class="table table-centered mb-0 d-block w-100">
-      <tbody class="d-flex flex-column">
-      <template v-if="$store.state.files.length > 0">
+    <template v-if="$store.state.files.length > 0">
+      <table class="table table-centered mb-0 d-block w-100">
+        <tbody class="d-flex flex-column">
         <tr class="pointer email-row" v-for="file in $store.state.files" :key="file.key"
             :class="{'unread': file.customMetadata.read !== 'true', 'read': file.customMetadata.read === 'true'}"
             @click="$router.push({name: 'email-file', params: {bucket: this.$route.params.bucket, folder: 'inbox',
@@ -29,9 +29,13 @@
             {{ getEmailDate(file.uploaded) }}
           </td>
         </tr>
-      </template>
+        </tbody>
+      </table>
+    </template>
 
-      <template v-else>
+    <template v-else>
+      <table class="table table-centered mb-0">
+        <tbody class="">
         <tr>
           <td colspan="100%">
             <div class="text-center">
@@ -41,9 +45,9 @@
             </div>
           </td>
         </tr>
-      </template>
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </template>
   </div>
 
   <!--        <div class="row mt-3">-->
@@ -95,6 +99,7 @@ export default {
   background-color: #f3f7f9;
   z-index: 0
 }
+
 .unread {
   font-weight: 600;
   color: black;

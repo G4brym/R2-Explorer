@@ -22,7 +22,7 @@ $variable-prefix: 'ct-';
 @import './dark-mode';
 @import './custom-variables';
 @import '../node_modules/bootstrap/scss/bootstrap';
-@import '../node_modules/bootstrap-icons/font/bootstrap-icons.css';
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css');
 
 //Components
 @import './custom/components/accordions';

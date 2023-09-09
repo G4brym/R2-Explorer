@@ -12,3 +12,8 @@ preview_bucket_name = 'teste'
 binding = 'r2-explorer-example-2'
 bucket_name = 'r2-explorer-example-2'
 preview_bucket_name = 'r2-explorer-example-2'
+
+[[r2_buckets]]
+binding = 'drive'
+bucket_name = 'drive'
+preview_bucket_name = 'drive'
