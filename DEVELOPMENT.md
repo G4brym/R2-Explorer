@@ -40,6 +40,6 @@ npm publish --access public
 ## Deploy demo instance
 
 ```bash
-cd package/r2-explorer-demo
+cd packages/r2-explorer-demo/
 wrangler deploy
 ```

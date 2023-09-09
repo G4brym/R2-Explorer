@@ -100,14 +100,13 @@ export default {
 
       try {
         await navigator.clipboard.writeText(url);
-        store.dispatch('makeToast', {
+        this.$store.dispatch('makeToast', {
           message: 'Link to file copied to clipboard!', timeout: 5000
         })
         this.closeMenu()
       } catch (err) {
         console.error('Failed to copy: ', err);
       }
-
     },
     deleteFile() {
       const self = this
