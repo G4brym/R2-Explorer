@@ -24,11 +24,12 @@
       </div>
 
       <div class="overflow-auto d-block email-wrapper">
-        <iframe frameborder="0" scrolling="no" class="w-100 d-block" @load="contentFinishedLoading" ref="renderWindow"
-                :srcdoc="file.html || file.text"
+        <iframe v-if="file.html" frameborder="0" scrolling="no" class="w-100 d-block" @load="contentFinishedLoading" ref="renderWindow"
+                :srcdoc="file.html"
                 sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin"
                 csp="script-src 'none'"
         />
+        <div v-else v-html="file.text.replaceAll('\n', '<br>')"></div>
       </div>
 
       <template v-if="file.attachments.length > 0">
@@ -138,7 +139,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
 @media (max-width: 992px) {
   .email-wrapper {
     margin: 0 -1.5rem
