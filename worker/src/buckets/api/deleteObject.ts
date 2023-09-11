@@ -27,6 +27,8 @@ export class DeleteObject extends OpenAPIRoute {
     const bucket = env[data.params.bucket]
     const key = decodeURIComponent(escape(atob(data.body.key)))
 
-    return await bucket.delete(key)
+    await bucket.delete(key)
+
+    return {}
   }
 }
