@@ -1,5 +1,7 @@
 [![Commit rate](https://img.shields.io/github/commit-activity/m/G4brym/R2-Explorer?label=Commits&style=social)](https://github.com/G4brym/R2-Explorer/commits/main) [![Issues](https://img.shields.io/github/issues/G4brym/R2-Explorer?style=social)](https://github.com/G4brym/R2-Explorer/issues) [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=social)](LICENSE)
 
+Read this in other languages: [Español](READMEes.md), [Português](READMEpt.md), [Français](READMEfr.md)
+
 # R2-Explorer
 
 <p align="center">
