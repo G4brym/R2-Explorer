@@ -40,6 +40,7 @@ Ejecuta este comando para configurar un proyecto de ejemplo
 
 ```bash
 npm create r2-explorer@latest
+```
 
 ## Actualizar tu instalación
 
