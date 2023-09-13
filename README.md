@@ -1,3 +1,5 @@
+[![Commit rate](https://img.shields.io/github/commit-activity/m/G4brym/R2-Explorer?label=Commits&style=social)](https://github.com/G4brym/R2-Explorer/commits/main)
+
 # R2-Explorer
 
 <p align="center">
