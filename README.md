@@ -1,4 +1,4 @@
-[![Commit rate](https://img.shields.io/github/commit-activity/m/G4brym/R2-Explorer?label=Commits&style=social)](https://github.com/G4brym/R2-Explorer/commits/main)
+[![Commit rate](https://img.shields.io/github/commit-activity/m/G4brym/R2-Explorer?label=Commits&style=social)](https://github.com/G4brym/R2-Explorer/commits/main) [![Issues](https://img.shields.io/github/issues/G4brym/R2-Explorer?style=flat&style=social)](https://github.com/G4brym/R2-Explorer/issues)
 
 # R2-Explorer
 
