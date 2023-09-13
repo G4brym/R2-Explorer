@@ -1,6 +1,6 @@
 [![Tasa de Commits](https://img.shields.io/github/commit-activity/m/G4brym/R2-Explorer?label=Commits&style=social)](https://github.com/G4brym/R2-Explorer/commits/main) [![Problemas](https://img.shields.io/github/issues/G4brym/R2-Explorer?style=social)](https://github.com/G4brym/R2-Explorer/issues) [![Licencia de Software](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=social)](LICENSE)
 
-Leer esto en otros idiomas: [Español](READMEes.md), [Português](READMEpt.md), [Français](READMEfr.md)
+Leer esto en otros idiomas: [English](README.md), [Português](READMEpt.md), [Français](READMEfr.md)
 
 # R2-Explorer
 
