@@ -62,7 +62,6 @@ wrangler publish
 - Eliminar carpetas
 - Miniaturas de imágenes usando workers de Cloudflare
 - Información sobre herramientas al pasar el ratón por encima de un archivo con el formato "hace x días"
-- Cargar automáticamente más archivos cuando se alcance la parte inferior (el límite actual es de 1000 archivos)
 - Agrupar íconos de bootstrap en lugar de importarlos
 
 ## Problemas conocidos

@@ -64,7 +64,6 @@ wrangler publish
 - Delete folders
 - Image thumbnail's using Cloudflare workers
 - Tooltip when hovering a file with absolute time in "x days time ago" format
-- Automatically load more files, when the bottom is reached (current limit is 1000 files)
 - bundle bootstrap icons instead of importing
 
 ## Known issues
