@@ -10,7 +10,7 @@ export class CreateUpload extends OpenAPIRoute {
     summary: 'Create upload',
     parameters: {
       bucket: Path(String),
-      key: Query(z.string().optional().describe('base64 encoded file key')),
+      key: Query(z.string().describe('base64 encoded file key')),
       customMetadata: Query(z.string().optional().describe('base64 encoded json string')),
       httpMetadata: Query(z.string().optional().describe('base64 encoded json string')),
     }

@@ -12,7 +12,7 @@ export class CreateFolder extends OpenAPIRoute {
       bucket: Path(String),
     },
     requestBody: {
-      key: z.string().optional().describe('base64 encoded file key'),
+      key: z.string().describe('base64 encoded file key'),
     }
   }
 

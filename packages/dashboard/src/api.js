@@ -119,6 +119,7 @@ const apiHandler = {
       params: {
         delimiter: '/',
         prefix: encodeKey(prefix)
+        // limit: 1000  TODO: only use this parameter on 1.0.3 or above
       }
     })
 

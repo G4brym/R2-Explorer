@@ -10,7 +10,7 @@ export class HeadObject extends OpenAPIRoute {
     summary: 'Get Object',
     parameters: {
       bucket: Path(String),
-      key: Query(z.string().optional().describe('base64 encoded file key')),
+      key: Query(z.string().describe('base64 encoded file key')),
     },
   }
 

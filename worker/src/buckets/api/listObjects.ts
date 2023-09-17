@@ -1,4 +1,4 @@
-import {OpenAPIRoute, Path, Query} from "@cloudflare/itty-router-openapi";
+import { OpenAPIRoute, Path, Query } from "@cloudflare/itty-router-openapi";
 import {Context} from "../../interfaces";
 import {OpenAPIRouteSchema} from "@cloudflare/itty-router-openapi/dist/src/types";
 import {z} from 'zod'
@@ -10,7 +10,7 @@ export class ListObjects extends OpenAPIRoute {
     summary: 'List objects',
     parameters: {
       bucket: Path(String),
-      limit: Query(z.number().optional()),
+      limit: Query(Number, {required: false}),
       prefix: Query(z.string().optional().describe('base64 encoded prefix'),),
       cursor: Query(z.string().optional()),
       delimiter: Query(z.string().optional()),
