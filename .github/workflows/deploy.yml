@@ -25,6 +25,8 @@ jobs:
           R2EXPLORER_DOMAIN: ${{ vars.R2EXPLORER_DOMAIN }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: node packages/github-action/prepareDeploy.js
+      - name: Get latest version
+        run: cd packages/github-action && npm install && npm install --save r2-explorer@latest
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:
