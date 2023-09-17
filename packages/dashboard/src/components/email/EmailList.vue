@@ -64,33 +64,48 @@
   <!-- end row-->
 </template>
 <script>
-import utils from "@/utils";
+import utils from '@/utils'
 
 export default {
-  methods: {
-    timeAgo(time) {
-      return utils.timeSince(new Date(time));
-    },
-    getEmailDate(time) {
-      const date = new Date(time);
-
-      const mm = date.getMonth() + 1; // getMonth() is zero-based
-      const dd = date.getDate();
-
-      return `${dd}/${(mm > 9 ? "" : "0") + mm}`;
+  data: function () {
+    return {
+      timeInterval: null
     }
   },
-  created() {
+  methods: {
+    timeAgo (time) {
+      return utils.timeSince(new Date(time))
+    },
+    getEmailDate (time) {
+      const date = new Date(time)
+
+      const mm = date.getMonth() + 1 // getMonth() is zero-based
+      const dd = date.getDate()
+
+      return `${dd}/${(mm > 9 ? '' : '0') + mm}`
+    }
+  },
+  unmounted () {
+    clearInterval(this.timeInterval)
+    this.timeInterval = null
+  },
+  created () {
+    const self = this
+
+    this.timeInterval = setInterval(() => {
+      self.$store.dispatch('refreshObjects')
+    }, 300000) // 5 minutes
+
     this.$watch(
       () => this.$route.params.folder,
       (newFolder) => {
-        if (this.$store.state.activeTab === "email") {
-          this.$store.dispatch("refreshObjects");
+        if (this.$store.state.activeTab === 'email') {
+          this.$store.dispatch('refreshObjects')
         }
       }
-    );
+    )
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>
