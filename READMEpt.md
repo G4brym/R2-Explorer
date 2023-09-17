@@ -61,7 +61,6 @@ wrangler publish
 - Excluir pastas
 - Miniaturas de imagens usando workers do Cloudflare
 - Informações de ferramentas ao passar o mouse sobre um arquivo no formato "há x dias"
-- Carregar automaticamente mais arquivos quando chegar ao final (o limite atual é de 1000 arquivos)
 - Agrupar ícones do Bootstrap em vez de importá-los
 
 ## Problemas Conhecidos

@@ -62,7 +62,6 @@ wrangler publish
 - Supprimer des dossiers
 - Miniatures d'images avec les travailleurs Cloudflare
 - Info-bulle lors du survol d'un fichier avec le format "il y a x jours"
-- Chargement automatique de plus de fichiers lorsque le bas de la liste est atteint (la limite actuelle est de 1000 fichiers)
 - Regrouper les icônes Bootstrap au lieu de les importer
 
 ## Problèmes connus

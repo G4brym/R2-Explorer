@@ -115,58 +115,77 @@ const apiHandler = {
   listObjects: async () => {
     const prefix = getCurrentFolder()
 
-    const response = await axios.get(`/api/buckets/${store.state.activeBucket}?include=customMetadata&include=httpMetadata`, {
-      params: {
-        delimiter: '/',
-        prefix: encodeKey(prefix)
-        // limit: 1000  TODO: only use this parameter on 1.0.3 or above
+    let filesConc = []
+    let foldersConc = []
+
+    let truncated = true
+    let cursor = null
+
+    while (truncated) {
+      const response = await axios.get(`/api/buckets/${store.state.activeBucket}?include=customMetadata&include=httpMetadata`, {
+        params: {
+          delimiter: '/',
+          prefix: encodeKey(prefix),
+          cursor: cursor
+        }
+      })
+
+      truncated = response.data.truncated
+      cursor = response.data.cursor
+
+      let files = []
+      if (response.data.objects) {
+        files = response.data.objects.filter(function (obj) {
+          return !obj.key.endsWith('/')
+        })
+        files = files.map(function (obj) {
+          const name = obj.key.replace(prefix, '')
+          const extension = name.split('.').pop()
+
+          return {
+            ...obj,
+            name,
+            path: store.state.currentFolder,
+            extension,
+            preview: preview.getType(name),
+            isFile: true,
+            hash: encodeKey(name)
+          }
+        }).filter(obj => {
+          return !(store.state.config?.showHiddenFiles !== true && obj.name.startsWith('.'))
+        })
+
+        for (const f of files) {
+          filesConc.push(f)
+        }
       }
-    })
 
-    let files = []
-    if (response.data.objects) {
-      files = response.data.objects.filter(function (obj) {
-        return !obj.key.endsWith('/')
-      })
-      files = files.map(function (obj) {
-        const name = obj.key.replace(prefix, '')
-        const extension = name.split('.').pop()
+      let folders = []
+      if (response.data.delimitedPrefixes) {
+        folders = response.data.delimitedPrefixes.map(function (obj) {
+          const split = obj.split('/')
+          const name = split[split.length - 2]
 
-        return {
-          ...obj,
-          name,
-          path: store.state.currentFolder,
-          extension,
-          preview: preview.getType(name),
-          isFile: true,
-          hash: encodeKey(name)
+          return {
+            name,
+            path: store.state.currentFolder,
+            key: obj,
+            isFolder: true,
+            hash: encodeKey(obj)
+          }
+        }).filter(obj => {
+          return !(store.state.config?.showHiddenFiles !== true && obj.name.startsWith('.'))
+        })
+
+        for (const f of folders) {
+          foldersConc.push(f)
         }
-      }).filter(obj => {
-        return !(store.state.config?.showHiddenFiles !== true && obj.name.startsWith('.'))
-      })
-    }
-
-    let folders = []
-    if (response.data.delimitedPrefixes) {
-      folders = response.data.delimitedPrefixes.map(function (obj) {
-        const split = obj.split('/')
-        const name = split[split.length - 2]
-
-        return {
-          name,
-          path: store.state.currentFolder,
-          key: obj,
-          isFolder: true,
-          hash: encodeKey(obj)
-        }
-      }).filter(obj => {
-        return !(store.state.config?.showHiddenFiles !== true && obj.name.startsWith('.'))
-      })
+      }
     }
 
     return {
-      files: files.reverse(),
-      folders
+      files: filesConc.reverse(),
+      folders: foldersConc
     }
   }
 }
