@@ -24,7 +24,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: '16.x'
+          node-version: '20.x'
       - name: Set RELEASE_VERSION
         run: echo "RELEASE_VERSION=0.0.1" >> $GITHUB_ENV
       - name: Apply new version

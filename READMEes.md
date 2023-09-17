@@ -63,7 +63,3 @@ wrangler publish
 - Miniaturas de imágenes usando workers de Cloudflare
 - Información sobre herramientas al pasar el ratón por encima de un archivo con el formato "hace x días"
 - Agrupar íconos de bootstrap en lugar de importarlos
-
-## Problemas conocidos
-
-- No es posible renombrar archivos con caracteres especiales en la [versión actual del sdk](https://github.com/aws/aws-sdk-js/issues/1949)

@@ -65,8 +65,4 @@ wrangler publish
 - Image thumbnail's using Cloudflare workers
 - Tooltip when hovering a file with absolute time in "x days time ago" format
 - bundle bootstrap icons instead of importing
-
-## Known issues
-
-- Rename files with special characters is not possible with
-  current [sdk issue here](https://github.com/aws/aws-sdk-js/issues/1949)
+- support for responding to emails

@@ -63,7 +63,3 @@ wrangler publish
 - Miniatures d'images avec les travailleurs Cloudflare
 - Info-bulle lors du survol d'un fichier avec le format "il y a x jours"
 - Regrouper les icônes Bootstrap au lieu de les importer
-
-## Problèmes connus
-
-- Il n'est pas possible de renommer des fichiers avec des caractères spéciaux avec [l'actuel problème SDK](https://github.com/aws/aws-sdk-js/issues/1949)
