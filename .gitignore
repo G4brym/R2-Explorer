@@ -30,3 +30,6 @@ worker/README.md
 worker/LICENSE
 
 worker/dev/.wrangler
+
+packages/github-action/wrangler.toml
+packages/github-action/src

@@ -47,7 +47,7 @@ workers_dev = true
 }
 
 for (const bucket of R2EXPLORER_BUCKETS.split("\n")) {
-  const split = bucket.split(":");
+  const split = bucket.trim().split(":");
   if (split.length !== 2) {
     console.error("R2EXPLORER_BUCKETS is not set correctly!");
     console.error(`"${split}" is not in the correct format`);
@@ -63,10 +63,19 @@ preview_bucket_name = '${split[1]}'
 
 }
 
-fs.writeFileSync("wrangler.toml", wranglerConfig);
+console.log(wranglerConfig)
+fs.writeFileSync(__dirname + "/wrangler.toml", wranglerConfig);
 
+if (!fs.existsSync(__dirname + "/src/")){
+    fs.mkdirSync(__dirname + "/src/");
+}
 
-fs.writeFileSync("src/index.ts", `
+console.log(`
+import { R2Explorer } from "r2-explorer";
+
+export default R2Explorer(${R2EXPLORER_CONFIG});
+`)
+fs.writeFileSync(__dirname + "/src/index.ts", `
 import { R2Explorer } from "r2-explorer";
 
 export default R2Explorer(${R2EXPLORER_CONFIG});
