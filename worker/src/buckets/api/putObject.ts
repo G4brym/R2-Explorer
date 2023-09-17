@@ -1,4 +1,4 @@
-import {OpenAPIRoute, Path, Query} from "@cloudflare/itty-router-openapi";
+import { OpenAPIRoute, Path, Query, RequestBody } from "@cloudflare/itty-router-openapi";
 import {Context} from "../../interfaces";
 import {OpenAPIRouteSchema} from "@cloudflare/itty-router-openapi/dist/src/types";
 import {z} from 'zod'
@@ -8,9 +8,19 @@ export class PutObject extends OpenAPIRoute {
     operationId: 'post-bucket-upload-object',
     tags: ['Buckets'],
     summary: 'Upload object',
+    requestBody: new RequestBody({
+        content: {
+            'application/octet-stream': {
+                schema: {
+                    type: 'string',
+                    format: 'binary',
+                },
+            },
+        },
+    }),
     parameters: {
       bucket: Path(String),
-      key: Query(z.string().optional().describe('base64 encoded file key')),
+      key: Query(z.string().describe('base64 encoded file key')),
       customMetadata: Query(z.string().optional().describe('base64 encoded json string')),
       httpMetadata: Query(z.string().optional().describe('base64 encoded json string')),
     },

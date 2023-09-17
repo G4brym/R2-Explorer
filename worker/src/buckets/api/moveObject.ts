@@ -12,8 +12,8 @@ export class MoveObject extends OpenAPIRoute {
       bucket: Path(String),
     },
     requestBody: {
-      oldKey: z.string().optional().describe('base64 encoded file key'),
-      newKey: z.string().optional().describe('base64 encoded file key'),
+      oldKey: z.string().describe('base64 encoded file key'),
+      newKey: z.string().describe('base64 encoded file key'),
     }
   }
 

@@ -13,7 +13,7 @@ export class CompleteUpload extends OpenAPIRoute {
     },
     requestBody: {
       uploadId: String,
-      key: z.string().optional().describe('base64 encoded file key'),
+      key: z.string().describe('base64 encoded file key'),
       parts: [{
         etag: String,
         partNumber: Int
