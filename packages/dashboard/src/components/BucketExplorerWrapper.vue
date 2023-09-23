@@ -29,27 +29,29 @@
 </template>
 
 <script>
-import FolderTree from "@/components/FolderTree.vue";
-import EventBus from "@/EventBus";
+import FolderTree from '@/components/FolderTree.vue'
+import EventBus from '@/EventBus'
+import router from '@/router'
 
 export default {
-  components: {FolderTree},
+  components: { FolderTree },
   methods: {
-    changeToStorage() {
+    changeToStorage () {
       this.$store.commit('changeTab', 'storage')
-      this.$router.push({name: 'storage-home', params: {bucket: this.$route.params.bucket}})
+      this.$router.push({ name: 'storage-home', params: { bucket: this.$route.params.bucket } })
+      localStorage.setItem('lastOpenTab', JSON.stringify({ name: 'storage-home', params: { bucket: this.$route.params.bucket } }))
     },
-    changeToEmail() {
+    changeToEmail () {
       this.$store.commit('changeTab', 'email')
-      this.$router.push({name: 'email-folder', params: {bucket: this.$route.params.bucket, folder: 'inbox'}})
+      this.$router.push({ name: 'email-folder', params: { bucket: this.$route.params.bucket, folder: 'inbox' } })
+      localStorage.setItem('lastOpenTab', JSON.stringify({ name: 'email-home', params: { bucket: this.$route.params.bucket } }))
     }
   },
-  async created() {
+  async created () {
     if (this.$route.params.bucket) {
       this.$store.commit('changeBucket', this.$route.params.bucket)
       if (this.$route.params.folder) {
-
-        if (this.$route.params.folder !== 'IA==') {  // IA== is empty space
+        if (this.$route.params.folder !== 'IA==') { // IA== is empty space
           if (this.$store.state.activeTab === 'email') {
             await this.$store.dispatch('navigate', this.$route.params.folder)
             await this.$store.dispatch('refreshObjects')
@@ -63,7 +65,6 @@ export default {
         if (this.$route.params.file) {
           EventBus.$emit('openFile', decodeURIComponent(escape(atob(this.$route.params.file))))
         }
-
       } else {
         this.$store.dispatch('refreshObjects')
       }
@@ -76,10 +77,22 @@ export default {
           this.$store.commit('changeBucket', bucket)
           this.$store.dispatch('refreshObjects')
           this.$store.commit('toggleMobileSidebar', false)
+
+          const lastOpenTab = localStorage.getItem('lastOpenTab')
+          if (lastOpenTab) {
+            const parsed = JSON.parse(lastOpenTab)
+            localStorage.setItem('lastOpenTab', JSON.stringify({
+              ...parsed,
+              params: {
+                ...parsed.params,
+                bucket
+              }
+            }))
+          }
         }
       }
     )
-  },
+  }
 }
 </script>
 

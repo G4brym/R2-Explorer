@@ -50,7 +50,7 @@ export default {
       this.$store.dispatch('navigate', folder.Prefix)
     }
   },
-  created () {
+  mounted () {
     this.$watch(
       () => this.$route.params.folder,
       (newFolder, oldFolder) => {
