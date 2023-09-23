@@ -51,6 +51,7 @@ export async function receiveEmail(event, env, ctx: Context) {
       to_name: (parsedEmail.to.length > 0) ? parsedEmail.to[0].name : null,
       has_attachments: parsedEmail.attachments.length > 0,
       read: false,
+      timestamp: Date.now()
     }
   })
 

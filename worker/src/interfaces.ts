@@ -11,7 +11,7 @@ export interface R2ExplorerConfig {
     emailRouting?: {
       targetBucket: string
     },
-    showHiddenFiles?: string
+    showHiddenFiles?: boolean
     cacheAssets?: boolean
     basicAuth?: BasicAuth | BasicAuth[]
 }

@@ -23,6 +23,7 @@ Read this in other languages: [Español](READMEes.md), [Português](READMEpt.md)
 
 ## Features
 
+- PWA support (install this app on your phone)
 - [Email Explorer](https://r2explorer.dev/guides/setup-email-explorer/) (using Cloudflare Email Routing)
 - [Basic Auth](https://r2explorer.dev/getting-started/security/#basic-auth)
 - [Cloudflare Access Authentication](https://r2explorer.dev/getting-started/security/)
