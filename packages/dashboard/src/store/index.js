@@ -184,11 +184,21 @@ export default createStore({
       }
     },
     loadServerConfigs ({ commit }) {
-      axios.get('/api/server/config').then((response) => {
+      axios.get('/api/server/config', {
+        validateStatus: function (status) {
+          return status >= 200 && status < 300
+        }
+      }).then((response) => {
         commit('loadServerConfigs', response.data)
       }).catch(function (error) {
+        console.log(error)
         if (error.response?.status === 401) {
           router.push({ name: 'login' })
+        } else if (error.response.status === 302) {
+          const nextUrl = error.response.headers.Location
+          if (nextUrl) {
+            window.location.replace(nextUrl)
+          }
         }
       })
     },
