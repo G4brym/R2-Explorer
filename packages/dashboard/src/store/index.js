@@ -183,7 +183,7 @@ export default createStore({
         context.state.loginMethod = 'basic'
       }
     },
-    loadServerConfigs ({ commit }) {
+    fetchServerConfigs ({ commit }) {
       axios.get('/api/server/config', {
         validateStatus: function (status) {
           return status >= 200 && status < 300

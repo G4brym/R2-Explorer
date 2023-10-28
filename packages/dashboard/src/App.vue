@@ -17,7 +17,7 @@ export default {
   components: { BaseLayout },
   async created() {
     await this.$store.dispatch("checkBasicAuthStorage");
-    this.$store.dispatch("loadServerConfigs");
+    this.$store.dispatch("fetchServerConfigs");
     this.$store.dispatch("loadUserDisks");
   }
 };
