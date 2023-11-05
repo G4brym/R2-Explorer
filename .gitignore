@@ -33,3 +33,5 @@ worker/dev/.wrangler
 
 packages/github-action/wrangler.toml
 packages/github-action/src
+
+packages/dashboard-v2/.env
