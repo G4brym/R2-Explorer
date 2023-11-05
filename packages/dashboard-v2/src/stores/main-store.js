@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { api } from "boot/axios";
-import router from "src/router";
 
 export const useMainStore = defineStore('main', {
   state: () => ({
@@ -26,7 +25,6 @@ export const useMainStore = defineStore('main', {
           }
         })
 
-        console.log(response.data.config)
         this.configurations = response.data.config;
 
       } catch (error) {
@@ -41,8 +39,8 @@ export const useMainStore = defineStore('main', {
         if (handleError) {
           // console.log(error)
           if (error.response?.status === 401) {
-            router.push({ name: 'login' })
-          } else if (error.response.status === 302) {
+            await this.router.push({ name: 'login' })
+            return
           }
 
         } else {

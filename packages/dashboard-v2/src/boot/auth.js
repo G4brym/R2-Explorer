@@ -10,6 +10,6 @@ export default boot(async () => {
 
   if (authResp === false) {  // No auth token stored, try to fetch without auth or redirect
     const mainStore = useMainStore()
-    await mainStore.loadServerConfigs()
+    await mainStore.loadServerConfigs(true)
   }
 });
