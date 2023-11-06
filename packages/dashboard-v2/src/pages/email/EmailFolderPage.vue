@@ -12,10 +12,9 @@
         :flat="true"
         @row-click="rowClick">
 
-        <template v-slot:body-cell-name="prop">
-          <td class="flex" style="align-items: center">
-            <q-icon :name="prop.row.icon" size="sm" :color="prop.row.color" class="q-mr-xs" />
-            {{prop.row.name}}
+        <template v-slot:body-cell-has_attachments="prop">
+          <td>
+            <q-icon v-if="prop.row.has_attachments" name="attachment" size="sm" color="black" />
           </td>
         </template>
 
@@ -62,10 +61,10 @@
 import { defineComponent } from "vue";
 import { api } from "boot/axios";
 import { useMainStore } from "stores/main-store";
-import { bytesToSize, decode, encode, timeSince } from "../../appUtils";
+import { encode, timeSince } from "../../appUtils";
 
 export default defineComponent({
-  name: 'EmailIndexPage',
+  name: 'EmailFolderPage',
   data: function () {
     return {
       loading: false,
@@ -75,19 +74,21 @@ export default defineComponent({
           name: 'sender',
           required: true,
           field: 'sender',
+          align: 'left',
           sortable: false
         },
         {
-          name: 'title',
+          name: 'subject',
           required: true,
-          field: 'title',
+          field: 'subject',
+          align: 'left',
           sortable: false
         },
         {
-          name: 'attachments',
+          name: 'has_attachments',
           required: true,
           align: 'left',
-          field: 'attachments',
+          field: 'has_attachments',
           sortable: false,
         },
         {
@@ -104,53 +105,15 @@ export default defineComponent({
     selectedBucket: function () {
       return this.$route.params.bucket
     },
-    selectedFolder: function () {
-      // TODO check if is root folder
-      if (this.$route.params.folder) {
-        return decode(this.$route.params.folder)
-      }
-      return ''
-    },
-    breadcrumbs: function () {
-      if (this.selectedFolder) {
-        return [{
-          name: "Home",
-          path: '/'
-        }, ...this.selectedFolder.split('/')
-          .filter((obj) => obj !== '')
-          .map((item, index, arr) => {
-            return {
-              name: item,
-              path: arr.slice(0, index + 1).join('/').replace('Home/', '') + '/'
-            }
-          })
-        ]
-      } else {
-        return [{
-          name: "Home",
-          path: '/'
-        }]
-      }
-    }
   },
   watch: {
     selectedBucket(newVal) {
       this.fetchFiles()
     },
-    selectedFolder(newVal) {
-      this.fetchFiles()
-    },
   },
   methods: {
-    breadcrumbsClick: function(obj) {
-      this.$router.push({ name: `files-folder`, params: { bucket: this.selectedBucket, folder: encode(obj.path) }})
-    },
     rowClick: function(evt, row, index) {
-      if (row.type === 'folder') {
-        this.$router.push({ name: `files-folder`, params: { bucket: this.selectedBucket, folder: encode(row.key) }})
-      } else {
-        console.log(row)
-      }
+      console.log(row)
     },
     fetchFiles: async function () {
       const self = this
@@ -158,13 +121,12 @@ export default defineComponent({
       let truncated = true
       let cursor = null
       let contentFiles = []
-      let contentFolders = []
 
       while (truncated) {
         const response = await api.get(`/buckets/${this.selectedBucket}?include=customMetadata&include=httpMetadata`, {
           params: {
             delimiter: '/',
-            prefix: this.selectedFolder && this.selectedFolder !== '/' ? encode(this.selectedFolder) : '',
+            prefix: encode('.r2-explorer/emails/inbox/'),
             cursor: cursor
           }
         })
@@ -180,61 +142,27 @@ export default defineComponent({
 
             return {
               ...obj,
-              name: obj.key.replace(self.selectedFolder, ''),
+              sender: obj.customMetadata.from_name || obj.customMetadata.from_address,
+              subject: obj.customMetadata.subject,
+              has_attachments: obj.customMetadata.has_attachments === 'true',
+              read: obj.customMetadata.read,
               lastModified: timeSince(date),
               timestamp: date.getTime(),
-              size: bytesToSize(obj.size),
-              sizeRaw: obj.size,
-              type: 'file',
-              icon: 'article',
-              color: 'grey',
             }
-          }).filter(obj => {
-            // Remove hidden files
-            return !(this.mainStore.configuration.showHiddenFiles !== true && obj.name.startsWith('.'))
           })
 
           for (const f of files) {
             contentFiles.push(f)
           }
         }
-
-        if (response.data.delimitedPrefixes) {
-          const folders = response.data.delimitedPrefixes.map(function (obj) {
-            return {
-              name: obj.replace(self.selectedFolder, ''),
-              key: obj,
-              lastModified: '--',
-              timestamp: 0,
-              size: '--',
-              sizeRaw: 0,
-              type: 'folder',
-              icon: 'folder',
-              color: 'orange',
-            }
-          }).filter(obj => {
-            // Remove hidden files
-            return !(this.mainStore.configuration.showHiddenFiles !== true && obj.name.startsWith('.'))
-          })
-          console.log(folders)
-          for (const f of folders) {
-            contentFolders.push(f)
-          }
-        }
       }
 
-      this.rows = [
-        ...contentFolders,
-        ...contentFiles
-      ]
+      this.rows = contentFiles
       this.loading = false
     }
   },
   created() {
     this.fetchFiles()
-  },
-  mounted() {
-    this.$refs.table.sort('name')
   },
   setup () {
     return {

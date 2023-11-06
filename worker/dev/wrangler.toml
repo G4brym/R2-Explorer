@@ -18,7 +18,7 @@ binding = 'r2-explorer-example-1'
 bucket_name = 'r2-explorer-example-1'
 preview_bucket_name = 'r2-explorer-example-1'
 
-[[r2_buckets]]
-binding = 'drive'
-bucket_name = 'drive'
-preview_bucket_name = 'drive'
+#[[r2_buckets]]
+#binding = 'drive'
+#bucket_name = 'drive'
+#preview_bucket_name = 'drive'

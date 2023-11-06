@@ -222,6 +222,7 @@ export default defineComponent({
           }).filter(obj => {
             // Remove hidden files
             console.log(this.mainStore.configuration)
+            console.log(this.mainStore.configuration.showHiddenFiles)
             return !(this.mainStore.configuration.showHiddenFiles !== true && obj.name.startsWith('.'))
           })
 

@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
       } catch (e) {
         // Auth token expired
         delete api.defaults.headers.common['Authorization'];
-        this.router.replace({ name: 'login', query: { next: this.router.currentRoute.fullPath } });
+        await this.router.replace({ name: 'login', query: { next: this.router.currentRoute.fullPath } });
         return
       }
 
