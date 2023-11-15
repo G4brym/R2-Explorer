@@ -76,7 +76,6 @@ export default {
       })
     },
     inputFolders (event) {
-      console.log(event.target)
       const folders = {}
       for (const file of event.target.files) {
         const lastIndex = file.webkitRelativePath.lastIndexOf('/')
@@ -89,7 +88,6 @@ export default {
         folders[path].push(file)
       }
 
-      console.log(folders)
       this.uploadFiles(folders)
     },
     async uploadFiles (folders) {
