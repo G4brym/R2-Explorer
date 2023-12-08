@@ -3,7 +3,12 @@ import { api } from "boot/axios";
 
 export const useMainStore = defineStore('main', {
   state: () => ({
-    configuration: {},
+    // Config
+    readonly: true,
+    dashboardUrl: '',
+    showHiddenFiles: false,
+
+    // Frontend data
     buckets: [],
   }),
   getters: {
@@ -25,9 +30,12 @@ export const useMainStore = defineStore('main', {
           }
         })
 
-        this.configurations = response.data.config;
+        this.readonly = response.data.config.readonly;
+        this.dashboardUrl = response.data.config.dashboardUrl;
+        this.showHiddenFiles = response.data.config.showHiddenFiles;
 
       } catch (error) {
+        console.log(error)
         if (error.response.status === 302) {
           // Handle cloudflare access login page
           const nextUrl = error.response.headers.Location

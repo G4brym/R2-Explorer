@@ -10,10 +10,10 @@
         <small class="float-end">{{ emailData.date }}</small>
         <small class="text-muted">From: {{ emailData.from?.name }} &lt;{{ emailData.from?.address }}&gt;</small>
       </div>
-      
+
     </div>
     <div class="w-100">
-        <small class="text-muted">To: 
+        <small class="text-muted">To:
           <template v-for="recipient of emailData.to">
             {{ recipient.name }} &lt;{{ recipient.address }}&gt;&semi;
           </template>
@@ -56,8 +56,8 @@
 
 
 <script>
-const PostalMime = require('postal-mime');
-const { convert } = require('html-to-text');
+import PostalMime from "postal-mime";
+import { convert } from "html-to-text";
 
 export default {
   props: ['filedata'],

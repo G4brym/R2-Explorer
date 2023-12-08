@@ -17,11 +17,11 @@
 </template>
 
 <script>
-import pdfvuer from 'pdfvuer'
+import pdf from 'components/preview/PdfVuer.vue'
 
 export default {
   components: {
-    pdf: pdfvuer
+    pdf
   },
   props: ['pdfUrl'],
   data () {

@@ -215,6 +215,7 @@ export default defineComponent({
 
             return {
               ...obj,
+              hash: encode(obj.key),
               name: obj.key.replace(self.selectedFolder, ''),
               lastModified: timeSince(date),
               timestamp: date.getTime(),
@@ -226,9 +227,7 @@ export default defineComponent({
             }
           }).filter(obj => {
             // Remove hidden files
-            console.log(this.mainStore.configuration)
-            console.log(this.mainStore.configuration.showHiddenFiles)
-            return !(this.mainStore.configuration.showHiddenFiles !== true && obj.name.startsWith('.'))
+            return !(this.mainStore.showHiddenFiles !== true && obj.name.startsWith('.'))
           })
 
           for (const f of files) {
@@ -240,6 +239,7 @@ export default defineComponent({
           const folders = response.data.delimitedPrefixes.map(function (obj) {
             return {
               name: obj.replace(self.selectedFolder, ''),
+              hash: encode(obj.key),
               key: obj,
               lastModified: '--',
               timestamp: 0,
@@ -251,7 +251,7 @@ export default defineComponent({
             }
           }).filter(obj => {
             // Remove hidden files
-            return !(this.mainStore.configuration.showHiddenFiles !== true && obj.name.startsWith('.'))
+            return !(this.mainStore.showHiddenFiles !== true && obj.name.startsWith('.'))
           })
 
           for (const f of folders) {

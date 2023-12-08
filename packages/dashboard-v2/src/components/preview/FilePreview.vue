@@ -1,31 +1,36 @@
 <template>
   <q-dialog
-    :v-model="type !== undefined"
+    v-model="open"
     full-width
     full-height
-    @close="close"
   >
     <q-card>
       <q-card-section>
         <div class="text-h6">{{ filename }}</div>
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
+      <q-card-section style="height: 80vh" class="scroll">
         <template v-if="fileData === undefined">
-          <h4 class="text-center">Loading File</h4>
-          <div class="progress mb-2">
-            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar"
-                 :aria-valuenow="downloadProgress || 0" aria-valuemin="0" aria-valuemax="100"
-                 :style="{ 'width': `${downloadProgress || 0}%` }"></div>
+
+          <div class="text-center q-my-lg">
+            <q-spinner
+              color="primary"
+              size="3em"
+            />
           </div>
+
+          <div class="text-center q-my-lg">
+            <q-linear-progress stripe size="10px" :value="downloadProgress" />
+          </div>
+
         </template>
         <template v-else>
           <template v-if="type === 'pdf'">
-            <pdf-viewer :pdfUrl="fileData"/>
+            <pdf-viewer :pdfUrl="fileData" />
           </template>
 
           <template v-else-if="type === 'image'">
-            <img :src="fileData" class="preview-image"/>
+            <img :src="fileData" class="preview-image" />
           </template>
 
           <template v-else-if="type === 'audio'">
@@ -92,120 +97,219 @@ import PdfViewer from "components/preview/PdfViewer.vue";
 import LogGz from "components/preview/logGz.vue";
 import EmailViewer from "components/preview/EmailViewer.vue";
 import { parseMarkdown } from "src/parsers/markdown";
+import { bytesToMegabytes, downloadFile, ROOT_FOLDER } from "src/appUtils";
+import { useQuasar } from "quasar";
 
 export default {
   components: {
     LogGz,
     PdfViewer,
-    EmailViewer,
+    EmailViewer
   },
-  data: function () {
+  data: function() {
     return {
+      open:false,
+
       downloadProgress: 0,
       abortControl: undefined,
       type: undefined,
       filename: undefined,
-      fileData: undefined
-    }
+      fileData: undefined,
+
+      previewConfig: [
+        {
+          extensions: ["png", "jpg", "jpeg", "webp"],
+          type: "image",
+          downloadType: "objectUrl"
+        },
+        {
+          extensions: ["mp3"],
+          type: "audio",
+          downloadType: "objectUrl"
+        },
+        {
+          extensions: ["mp4", "ogg"],
+          type: "video",
+          downloadType: "objectUrl"
+        },
+        {
+          extensions: ["pdf"],
+          type: "pdf",
+          downloadType: "objectUrl"
+        },
+        {
+          extensions: ["txt"],
+          type: "text",
+          downloadType: "text"
+        },
+        {
+          extensions: ["md"],
+          type: "markdown",
+          downloadType: "text"
+        },
+        {
+          extensions: ["csv"],
+          type: "csv",
+          downloadType: "text"
+        },
+        {
+          extensions: ["json"],
+          type: "json",
+          downloadType: "text"
+        },
+        {
+          extensions: ["html"],
+          type: "html",
+          downloadType: "text"
+        },
+        {
+          extensions: ["log.gz"],
+          type: "logs",
+          downloadType: "blob"
+        },
+        {
+          extensions: ["eml"],
+          type: "email",
+          downloadType: "text"
+        }
+      ]
+    };
   },
   methods: {
-    openFile(file) {
-      if (utils.bytesToMegabytes(file.size) > 200) {
-        this.$store.dispatch('makeToast', {
-          message: 'File is too big to preview', timeout: 5000
-        })
-
-        return
-      }
-      this.abortControl = new AbortController()
-
-      if (this.$route.params.file === undefined) {
-        this.$router.push({
-          name: 'storage-file',
-          params: {
-            bucket: this.$route.params.bucket,
-            folder: this.$route.params.folder || 'IA==',  // IA== is a space
-            file: file.hash
+    getType(filename) {
+      for (const config of this.previewConfig) {
+        for (const extension of config.extensions) {
+          if (filename.endsWith(extension)) {
+            return { type: config.type, downloadType: config.downloadType };
           }
-        })
+        }
+      }
+    },
+    async openFile(file) {
+      if (bytesToMegabytes(file.size) > 200) {
+        this.q.notify({
+          message: "File is too big to preview.",
+          color: "orange"
+        });
+
+        return;
       }
 
-      this.type = file.preview.type
-      repo.downloadFile(file, (progressEvent) => {
-        this.downloadProgress = (progressEvent.loaded * 100) / progressEvent.total
-      }, this.abortControl).then((response) => {
-        let data
-        if (file.preview.downloadType === 'objectUrl') {
-          const blob = new Blob([response.data])
-          data = URL.createObjectURL(blob)
-        } else if (file.preview.downloadType === 'blob') {
-          data = response.data
-        } else {
-          data = response.data
-        }
+      const previewConfig = this.getType(file.name);
+      // if (previewConfig === undefined) {
+      //   this.q.notify({
+      //     message: "File preview is not supported.",
+      //     color: "orange"
+      //   });
+      //
+      //   return;
+      // }
 
-        const prevFile = {
-          ...file,
-          data
-        }
+      this.abortControl = new AbortController();
 
-        this.type = prevFile.preview?.type
-        this.fileData = prevFile.data
-        this.filename = prevFile.name
-      })
+      this.$router.push({
+        name: "files-file",
+        params: {
+          bucket: this.$route.params.bucket,
+          folder: this.$route.params.folder || "IA==",  // IA== is a space
+          file: file.hash
+        }
+      });
+
+      // This needs to be set before download to open the modal
+      this.type = previewConfig.type;
+      this.filename = file.name;
+      this.open = true;
+
+      const response = await downloadFile(this.$route.params.bucket, file, (progressEvent) => {
+        this.downloadProgress = progressEvent.loaded / progressEvent.total;
+      });
+
+      let data;
+      if (previewConfig.downloadType === "objectUrl") {
+        const blob = new Blob([response.data]);
+        data = URL.createObjectURL(blob);
+      } else if (previewConfig.downloadType === "blob") {
+        data = response.data;
+      } else {
+        data = response.data;
+      }
+
+      this.fileData = data;
     },
     close() {
+      console.log('call')
       if (this.abortControl) {
-        this.abortControl.abort()
+        this.abortControl.abort();
       }
 
       if (this.$route.params.file) {
-        this.$router.push({
-          name: 'storage-folder',
-          params: {
-            bucket: this.$route.params.bucket,
-            folder: this.$route.params.folder || 'IA==',  // IA== is a space
-          }
-        })
+        if (this.$route.params.folder === ROOT_FOLDER) {
+
+          // File was in root folder, mount files home
+          this.$router.push({
+            name: "files-home",
+            params: {
+              bucket: this.$route.params.bucket
+            }
+          });
+
+        } else {
+
+          // File was in folder, mount that folder
+          this.$router.push({
+            name: "files-folder",
+            params: {
+              bucket: this.$route.params.bucket,
+              folder: this.$route.params.folder
+            }
+          });
+
+        }
       }
 
-      this.type = undefined
-      this.fileData = undefined
-      this.filename = undefined
-      this.abortControl = undefined
-      this.downloadProgress = 0
+      this.type = undefined;
+      this.fileData = undefined;
+      this.filename = undefined;
+      this.abortControl = undefined;
+      this.downloadProgress = 0;
     },
     markdownParser(text) {
-      return parseMarkdown(text)
+      return parseMarkdown(text);
     },
-    csvParser: function (text) {
-      let result = ''
-      const rows = text.split('\n')
+    csvParser: function(text) {
+      let result = "";
+      const rows = text.split("\n");
       if (rows.length === 0) {
-        return '<h2>Empty csv</h2>'
+        return "<h2>Empty csv</h2>";
       }
 
       for (const [index, row] of rows.entries()) {
-        let line = ''
+        let line = "";
         const columns = row.split(/(\s*"[^"]+"\s*|\s*[^,]+|,)(?=,|$)/g).filter(item => {
-          return item !== '' && item !== ','
-        })
+          return item !== "" && item !== ",";
+        });
 
         for (const col of columns) {
           if (index === 0) {
-            line += `<th>${col.replaceAll('"', '')}</th>`
+            line += `<th>${col.replaceAll("\"", "")}</th>`;
           } else {
-            line += `<td>${col.replaceAll('"', '')}</td>`
+            line += `<td>${col.replaceAll("\"", "")}</td>`;
           }
         }
 
-        result += `<tr>${line}</tr>`
+        result += `<tr>${line}</tr>`;
       }
 
-      return `<table class="table">${result}</table>`
+      return `<table class="table">${result}</table>`;
     }
+  },
+  setup() {
+    return {
+      q: useQuasar()
+    };
   }
-}
+};
 </script>
 
 <style lang="scss">

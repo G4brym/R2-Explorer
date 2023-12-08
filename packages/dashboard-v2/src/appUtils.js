@@ -1,3 +1,7 @@
+import { api } from "boot/axios";
+
+export const ROOT_FOLDER = "IA=="  // IA== is a space
+
 export const timeSince = (date) => {
   const seconds = Math.floor((new Date() - date) / 1000);
 
@@ -42,10 +46,32 @@ export const bytesToSize = (bytes) => {
   return Math.round(bytes / Math.pow(1024, i), 2) + " " + sizes[i];
 };
 
+export const bytesToMegabytes = (bytes) => {
+  return Math.round(bytes / Math.pow(1024, 2));
+};
+
+export const downloadFile = (bucket, file, onDownloadProgress, abortControl) => {
+    const extra = {};
+    if (file.preview?.downloadType === "objectUrl" || file.preview?.downloadType === "blob") {
+      extra.responseType = "arraybuffer";
+    }
+    if (abortControl) {
+      extra.signal = abortControl.signal;
+    }
+    if (onDownloadProgress) {
+      extra.onDownloadProgress = onDownloadProgress;
+    }
+
+    return api.get(
+      `/buckets/${bucket}/${encode(file.key)}`,
+      extra
+    );
+  }
+
 export const encode = (key) => {
-  return btoa(unescape(encodeURIComponent(key)))
-}
+  return btoa(unescape(encodeURIComponent(key)));
+};
 
 export const decode = (key) => {
-  return decodeURIComponent(escape(atob(key)))
-}
+  return decodeURIComponent(escape(atob(key)));
+};
