@@ -12,7 +12,6 @@ import VueToast from 'vue-toast-notification'
 import 'vue-toast-notification/dist/theme-sugar.css'
 import 'sweetalert2/src/sweetalert2.scss'
 import axios from 'axios'
-import './registerServiceWorker'
 
 require('bootstrap/js/dist/dropdown')
 require('bootstrap/js/dist/modal')
