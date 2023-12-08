@@ -12,9 +12,9 @@ export class PutMetadata extends OpenAPIRoute {
       bucket: Path(String),
       key: Path(z.string().describe('base64 encoded file key')),
     },
-    requestBody: {
+    requestBody: z.object({
       customMetadata: z.record(z.string(), z.any())
-    }
+    }).openapi("Object metadata")
   }
 
   async handle(

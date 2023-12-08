@@ -60,6 +60,8 @@
       </q-table>
     </div>
   </q-page>
+
+  <file-preview ref="preview"/>
 </template>
 
 <script>
@@ -67,9 +69,11 @@ import { defineComponent } from "vue";
 import { api } from "boot/axios";
 import { useMainStore } from "stores/main-store";
 import { bytesToSize, decode, encode, timeSince } from "../../appUtils";
+import FilePreview from "components/preview/FilePreview.vue";
 
 export default defineComponent({
   name: 'FilesIndexPage',
+  components: { FilePreview },
   data: function () {
     return {
       loading: false,
@@ -180,6 +184,7 @@ export default defineComponent({
         this.$router.push({ name: `files-folder`, params: { bucket: this.selectedBucket, folder: encode(row.key) }})
       } else {
         console.log(row)
+        this.$refs.preview.openFile(row)
       }
     },
     fetchFiles: async function () {
