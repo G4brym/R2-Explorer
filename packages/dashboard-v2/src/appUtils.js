@@ -50,9 +50,9 @@ export const bytesToMegabytes = (bytes) => {
   return Math.round(bytes / Math.pow(1024, 2));
 };
 
-export const downloadFile = (bucket, file, onDownloadProgress, abortControl) => {
+export const downloadFile = (bucket, file, previewConfig, onDownloadProgress, abortControl) => {
     const extra = {};
-    if (file.preview?.downloadType === "objectUrl" || file.preview?.downloadType === "blob") {
+    if (previewConfig.downloadType === "objectUrl" || previewConfig.downloadType === "blob") {
       extra.responseType = "arraybuffer";
     }
     if (abortControl) {

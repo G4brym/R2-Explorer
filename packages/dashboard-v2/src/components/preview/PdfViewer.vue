@@ -40,7 +40,7 @@ export default {
     getPdf () {
       const self = this
 
-      self.pdfdata = pdfvuer.createLoadingTask(this.pdfUrl)
+      self.pdfdata = pdf.createLoadingTask(this.pdfUrl)
       self.pdfdata.then((pdf) => {
         self.numPages = pdf.numPages
       })

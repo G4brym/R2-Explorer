@@ -3,14 +3,17 @@
     v-model="open"
     full-width
     full-height
+    @hide="close"
   >
     <q-card>
-      <q-card-section>
+      <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">{{ filename }}</div>
+        <q-space />
+        <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
-      <q-card-section style="height: 80vh" class="scroll">
-        <template v-if="fileData === undefined">
+      <q-card-section class="scroll">
+        <template v-if="fileData === undefined && type">
 
           <div class="text-center q-my-lg">
             <q-spinner
@@ -84,10 +87,6 @@
           </template>
         </template>
       </q-card-section>
-
-      <q-card-actions align="right" class="bg-white text-teal">
-        <q-btn flat label="OK" v-close-popup />
-      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
@@ -207,42 +206,45 @@ export default {
 
       this.abortControl = new AbortController();
 
-      this.$router.push({
+      await this.$router.push({
         name: "files-file",
         params: {
           bucket: this.$route.params.bucket,
-          folder: this.$route.params.folder || "IA==",  // IA== is a space
+          folder: this.$route.params.folder || ROOT_FOLDER,
           file: file.hash
         }
       });
 
       // This needs to be set before download to open the modal
-      this.type = previewConfig.type;
       this.filename = file.name;
       this.open = true;
+      if (previewConfig) {
+        this.type = previewConfig.type;
 
-      const response = await downloadFile(this.$route.params.bucket, file, (progressEvent) => {
-        this.downloadProgress = progressEvent.loaded / progressEvent.total;
-      });
+        const response = await downloadFile(this.$route.params.bucket, file, previewConfig, (progressEvent) => {
+          this.downloadProgress = progressEvent.loaded / progressEvent.total;
+        }, this.abortControl);
 
-      let data;
-      if (previewConfig.downloadType === "objectUrl") {
-        const blob = new Blob([response.data]);
-        data = URL.createObjectURL(blob);
-      } else if (previewConfig.downloadType === "blob") {
-        data = response.data;
-      } else {
-        data = response.data;
+        let data;
+        if (previewConfig.downloadType === "objectUrl") {
+          const blob = new Blob([response.data]);
+          data = URL.createObjectURL(blob);
+        } else if (previewConfig.downloadType === "blob") {
+          data = response.data;
+        } else {
+          data = response.data;
+        }
+
+        this.fileData = data;
       }
 
-      this.fileData = data;
     },
     close() {
-      console.log('call')
       if (this.abortControl) {
         this.abortControl.abort();
       }
 
+      // console.log('call')
       if (this.$route.params.file) {
         if (this.$route.params.folder === ROOT_FOLDER) {
 

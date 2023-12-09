@@ -14,7 +14,7 @@
         :rows-per-page-options="[0]"
         column-sort-order="da"
         :flat="true"
-        @row-click="rowClick">
+      @rowClick="rowClick">
 
         <template v-slot:body-cell-name="prop">
           <td class="flex" style="align-items: center">
@@ -28,30 +28,13 @@
             <q-btn round flat icon="more_vert" size="sm">
               <q-menu>
                 <q-list style="min-width: 100px">
-                  <q-item clickable v-close-popup>
-                    <q-item-section>New tab</q-item-section>
+                  <q-item clickable v-close-popup> <!-- @click="rowClick(prop.row)" -->
+                    <q-item-section>Open</q-item-section>
                   </q-item>
                   <q-item clickable v-close-popup>
                     <q-item-section>New incognito tab</q-item-section>
                   </q-item>
                   <q-separator />
-                  <q-item clickable v-close-popup>
-                    <q-item-section>Recent tabs</q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup>
-                    <q-item-section>History</q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup>
-                    <q-item-section>Downloads</q-item-section>
-                  </q-item>
-                  <q-separator />
-                  <q-item clickable v-close-popup>
-                    <q-item-section>Settings</q-item-section>
-                  </q-item>
-                  <q-separator />
-                  <q-item clickable v-close-popup>
-                    <q-item-section>Help &amp; Feedback</q-item-section>
-                  </q-item>
                 </q-list>
               </q-menu>
             </q-btn>
@@ -68,7 +51,7 @@
 import { defineComponent } from "vue";
 import { api } from "boot/axios";
 import { useMainStore } from "stores/main-store";
-import { bytesToSize, decode, encode, timeSince } from "../../appUtils";
+import { bytesToSize, decode, encode, ROOT_FOLDER, timeSince } from "../../appUtils";
 import FilePreview from "components/preview/FilePreview.vue";
 
 export default defineComponent({
@@ -140,7 +123,7 @@ export default defineComponent({
     },
     selectedFolder: function () {
       // TODO check if is root folder
-      if (this.$route.params.folder) {
+      if (this.$route.params.folder && this.$route.params.folder !== ROOT_FOLDER) {
         return decode(this.$route.params.folder)
       }
       return ''
@@ -179,11 +162,11 @@ export default defineComponent({
     breadcrumbsClick: function(obj) {
       this.$router.push({ name: `files-folder`, params: { bucket: this.selectedBucket, folder: encode(obj.path) }})
     },
-    rowClick: function(evt, row, index) {
+    rowClick: function(evt, row) {
       if (row.type === 'folder') {
         this.$router.push({ name: `files-folder`, params: { bucket: this.selectedBucket, folder: encode(row.key) }})
       } else {
-        console.log(row)
+        // console.log(row)
         this.$refs.preview.openFile(row)
       }
     },
