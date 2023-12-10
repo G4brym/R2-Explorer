@@ -96,7 +96,7 @@ import PdfViewer from "components/preview/PdfViewer.vue";
 import LogGz from "components/preview/logGz.vue";
 import EmailViewer from "components/preview/EmailViewer.vue";
 import { parseMarkdown } from "src/parsers/markdown";
-import { bytesToMegabytes, downloadFile, ROOT_FOLDER } from "src/appUtils";
+import { bytesToMegabytes, apiHandler, ROOT_FOLDER } from "src/appUtils";
 import { useQuasar } from "quasar";
 
 export default {
@@ -221,7 +221,7 @@ export default {
       if (previewConfig) {
         this.type = previewConfig.type;
 
-        const response = await downloadFile(this.$route.params.bucket, file, previewConfig, (progressEvent) => {
+        const response = await apiHandler.downloadFile(this.$route.params.bucket, file, previewConfig, (progressEvent) => {
           this.downloadProgress = progressEvent.loaded / progressEvent.total;
         }, this.abortControl);
 

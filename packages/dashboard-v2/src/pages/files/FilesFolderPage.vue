@@ -4,43 +4,50 @@
       <q-breadcrumbs>
         <q-breadcrumbs-el style="cursor: pointer" v-for="obj in breadcrumbs" :key="obj.name" :label="obj.name" @click="breadcrumbsClick(obj)" />
       </q-breadcrumbs>
-      <q-table
-        ref="table"
-        :rows="rows"
-        :columns="columns"
-        row-key="name"
-        :loading="loading"
-        :hide-pagination="true"
-        :rows-per-page-options="[0]"
-        column-sort-order="da"
-        :flat="true"
-      @rowClick="rowClick">
 
-        <template v-slot:body-cell-name="prop">
-          <td class="flex" style="align-items: center">
-            <q-icon :name="prop.row.icon" size="sm" :color="prop.row.color" class="q-mr-xs" />
-            {{prop.row.name}}
-          </td>
-        </template>
 
-        <template v-slot:body-cell-options="">
-          <td class="text-right">
-            <q-btn round flat icon="more_vert" size="sm">
-              <q-menu>
-                <q-list style="min-width: 100px">
-                  <q-item clickable v-close-popup> <!-- @click="rowClick(prop.row)" -->
-                    <q-item-section>Open</q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup>
-                    <q-item-section>New incognito tab</q-item-section>
-                  </q-item>
-                  <q-separator />
-                </q-list>
-              </q-menu>
-            </q-btn>
-          </td>
-        </template>
-      </q-table>
+      <drag-and-drop ref="uploader">
+
+        <q-table
+          ref="table"
+          :rows="rows"
+          :columns="columns"
+          row-key="name"
+          :loading="loading"
+          :hide-pagination="true"
+          :rows-per-page-options="[0]"
+          column-sort-order="da"
+          :flat="true"
+          @rowClick="rowClick">
+
+          <template v-slot:body-cell-name="prop">
+            <td class="flex" style="align-items: center">
+              <q-icon :name="prop.row.icon" size="sm" :color="prop.row.color" class="q-mr-xs" />
+              {{prop.row.name}}
+            </td>
+          </template>
+
+          <template v-slot:body-cell-options="">
+            <td class="text-right">
+              <q-btn round flat icon="more_vert" size="sm">
+                <q-menu>
+                  <q-list style="min-width: 100px">
+                    <q-item clickable v-close-popup> <!-- @click="rowClick(prop.row)" -->
+                      <q-item-section>Open</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup>
+                      <q-item-section>New incognito tab</q-item-section>
+                    </q-item>
+                    <q-separator />
+                  </q-list>
+                </q-menu>
+              </q-btn>
+            </td>
+          </template>
+        </q-table>
+
+      </drag-and-drop>
+
     </div>
   </q-page>
 
@@ -53,10 +60,11 @@ import { api } from "boot/axios";
 import { useMainStore } from "stores/main-store";
 import { bytesToSize, decode, encode, ROOT_FOLDER, timeSince } from "../../appUtils";
 import FilePreview from "components/preview/FilePreview.vue";
+import DragAndDrop from "components/utils/DragAndDrop.vue";
 
 export default defineComponent({
   name: 'FilesIndexPage',
-  components: { FilePreview },
+  components: { DragAndDrop, FilePreview },
   data: function () {
     return {
       loading: false,
@@ -122,7 +130,6 @@ export default defineComponent({
       return this.$route.params.bucket
     },
     selectedFolder: function () {
-      // TODO check if is root folder
       if (this.$route.params.folder && this.$route.params.folder !== ROOT_FOLDER) {
         return decode(this.$route.params.folder)
       }
@@ -255,6 +262,11 @@ export default defineComponent({
   },
   mounted() {
     this.$refs.table.sort('name')
+
+    this.$bus.on('fetchFiles', this.fetchFiles)
+  },
+  beforeUnmount() {
+    this.$bus.off('fetchFiles')
   },
   setup () {
     return {

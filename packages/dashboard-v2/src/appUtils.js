@@ -50,7 +50,26 @@ export const bytesToMegabytes = (bytes) => {
   return Math.round(bytes / Math.pow(1024, 2));
 };
 
-export const downloadFile = (bucket, file, previewConfig, onDownloadProgress, abortControl) => {
+export const encode = (key) => {
+  return btoa(unescape(encodeURIComponent(key)));
+};
+
+export const decode = (key) => {
+  return decodeURIComponent(escape(atob(key)));
+};
+
+export const apiHandler = {
+  createFolder: (key, bucket) => {
+    return api.post(`/buckets/${bucket}/folder`, {
+      key: encode(key)
+    })
+  },
+  deleteObject: (key, bucket) => {
+    return api.post(`/buckets/${bucket}/delete`, {
+      key: encode(key)
+    })
+  },
+  downloadFile: (bucket, file, previewConfig, onDownloadProgress, abortControl) => {
     const extra = {};
     if (previewConfig.downloadType === "objectUrl" || previewConfig.downloadType === "blob") {
       extra.responseType = "arraybuffer";
@@ -66,12 +85,66 @@ export const downloadFile = (bucket, file, previewConfig, onDownloadProgress, ab
       `/buckets/${bucket}/${encode(file.key)}`,
       extra
     );
-  }
-
-export const encode = (key) => {
-  return btoa(unescape(encodeURIComponent(key)));
-};
-
-export const decode = (key) => {
-  return decodeURIComponent(escape(atob(key)));
-};
+  },
+  // renameObject: (oldName, newName) => {
+  //   return axios.post(`/buckets/${store.state.activeBucket}/move`, {
+  //     oldKey: encodeKey(oldName, store.state.currentFolder),
+  //     newKey: encodeKey(newName, store.state.currentFolder)
+  //   })
+  // },
+  // updateMetadata: (file, metadata) => {
+  //   const filePath = encodeKey(file.name, getCurrentFolder())
+  //
+  //   return axios.post(
+  //     `/buckets/${store.state.activeBucket}/${filePath}`,
+  //     {
+  //       customMetadata: metadata
+  //     }
+  //   )
+  // },
+  multipartCreate: (file, key, bucket) => {
+    return api.post(`/buckets/${bucket}/multipart/create`, null, {
+      params: {
+        key: encode(key),
+        httpMetadata: encode(JSON.stringify({
+          contentType: file.type
+        }))
+      }
+    })
+  },
+  multipartComplete: (file, key, bucket, parts, uploadId) => {
+    return api.post(`/buckets/${bucket}/multipart/complete`, {
+      key: encode(key),
+      uploadId,
+      parts
+    })
+  },
+  multipartUpload: (uploadId, partNumber, bucket, key, chunk, callback) => {
+    return api.post(`/buckets/${bucket}/multipart/upload`, chunk, {
+      params: {
+        key: encode(key),
+        uploadId,
+        partNumber
+      },
+      onUploadProgress: callback,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+  },
+  uploadObjects: (file, key, bucket, callback) => {
+    console.log(key)
+    return api.post(`/buckets/${bucket}/upload`, file, {
+      params: {
+        key: encode(key),
+        httpMetadata: encode(JSON.stringify({
+          contentType: file.type
+        }))
+      },
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      onUploadProgress: callback
+    })
+  },
+}
