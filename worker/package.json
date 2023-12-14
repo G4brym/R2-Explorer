@@ -95,7 +95,7 @@
     "wrangler": "^3.6.0"
   },
   "dependencies": {
-    "@cloudflare/itty-router-openapi": "^1.0.3",
+    "@cloudflare/itty-router-openapi": "1.0.4",
     "postal-mime": "^1.0.16"
   },
   "bin": {
