@@ -116,21 +116,21 @@ export default {
       return latestVersion.localeCompare(currectVersion, undefined, { numeric: true, sensitivity: "base" }) === 1;
     }
 
-    axios.get("https://api.r2explorer.dev/api/releases/latest/").then((response) => {
-      this.$watch(
-        () => self.$store.state.serverVersion,
-        (serverVersion) => {
-            self.updateAvailable = compareVersions(
-              normalizeVersion(serverVersion),
-              normalizeVersion(response.data?.latest_version?.version)
-            );
-
-            if (self.updateAvailable && response.data?.latest_version?.url) {
-              self.updateUrl = response.data?.latest_version?.url;
-            }
-        }
-      );
-    });
+    // axios.get("https://api.r2explorer.dev/api/releases/latest/").then((response) => {
+    //   this.$watch(
+    //     () => self.$store.state.serverVersion,
+    //     (serverVersion) => {
+    //         self.updateAvailable = compareVersions(
+    //           normalizeVersion(serverVersion),
+    //           normalizeVersion(response.data?.latest_version?.version)
+    //         );
+    //
+    //         if (self.updateAvailable && response.data?.latest_version?.url) {
+    //           self.updateUrl = response.data?.latest_version?.url;
+    //         }
+    //     }
+    //   );
+    // });
   }
 };
 </script>
