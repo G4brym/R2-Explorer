@@ -128,7 +128,7 @@ export default {
           }
         }
 
-        if (!targetFolder.endsWith('/')) {
+        if (targetFolder !== '' && !targetFolder.endsWith('/')) {
           targetFolder = targetFolder + '/'
         }
 
