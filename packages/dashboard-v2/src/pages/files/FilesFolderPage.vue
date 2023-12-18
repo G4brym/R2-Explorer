@@ -17,8 +17,7 @@
           :hide-pagination="true"
           :rows-per-page-options="[0]"
           column-sort-order="da"
-          :flat="true"
-          @rowClick="rowClick">
+          :flat="true">
 
           <template v-slot:body-cell-name="prop">
             <td class="flex" style="align-items: center">
@@ -27,13 +26,22 @@
             </td>
           </template>
 
-          <template v-slot:body-cell-options="">
+          <template v-slot:body-cell-options="prop">
             <td class="text-right">
               <q-btn round flat icon="more_vert" size="sm">
                 <q-menu>
                   <q-list style="min-width: 100px">
-                    <q-item clickable v-close-popup> <!-- @click="rowClick(prop.row)" -->
+                    <q-item clickable v-close-popup @click="openObject(prop.row)">
                       <q-item-section>Open</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup @click="downloadObject(prop.row)" v-if="prop.row.type === 'file'">
+                      <q-item-section>Download</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup @click="shareObject(prop.row)">
+                      <q-item-section>Get sharable link</q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup @click="$refs.options.deleteObject(prop.row)">
+                      <q-item-section>Delete</q-item-section>
                     </q-item>
                     <q-item clickable v-close-popup>
                       <q-item-section>New incognito tab</q-item-section>
@@ -52,19 +60,22 @@
   </q-page>
 
   <file-preview ref="preview"/>
+  <file-options ref="options" />
 </template>
 
 <script>
 import { defineComponent } from "vue";
 import { api } from "boot/axios";
 import { useMainStore } from "stores/main-store";
-import { bytesToSize, decode, encode, ROOT_FOLDER, timeSince } from "../../appUtils";
+import { apiHandler, bytesToSize, decode, encode, ROOT_FOLDER, timeSince } from "../../appUtils";
 import FilePreview from "components/preview/FilePreview.vue";
 import DragAndDrop from "components/utils/DragAndDrop.vue";
+import FileOptions from "components/files/FileOptions.vue";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: 'FilesIndexPage',
-  components: { DragAndDrop, FilePreview },
+  components: { FileOptions, DragAndDrop, FilePreview },
   data: function () {
     return {
       loading: false,
@@ -177,83 +188,64 @@ export default defineComponent({
         this.$refs.preview.openFile(row)
       }
     },
-    fetchFiles: async function () {
-      const self = this
-      this.loading = true
-      let truncated = true
-      let cursor = null
-      let contentFiles = []
-      let contentFolders = []
-
-      while (truncated) {
-        const response = await api.get(`/buckets/${this.selectedBucket}?include=customMetadata&include=httpMetadata`, {
+    openObject: function(row) {
+      if (row.type === 'folder') {
+        this.$router.push({ name: `files-folder`, params: { bucket: this.selectedBucket, folder: encode(row.key) }})
+      } else {
+        // console.log(row)
+        this.$refs.preview.openFile(row)
+      }
+    },
+    shareObject: async function(row) {
+      let url
+      if (row.type === 'folder') {
+        url = window.location.origin + this.$router.resolve({
+          name: 'files-folder',
           params: {
-            delimiter: '/',
-            prefix: this.selectedFolder && this.selectedFolder !== '/' ? encode(this.selectedFolder) : '',
-            cursor: cursor
+            bucket: this.selectedBucket,
+            folder: encode(row.key)
           }
-        })
-
-        truncated = response.data.truncated
-        cursor = response.data.cursor
-
-        if (response.data.objects) {
-          const files = response.data.objects.filter(function(obj) {
-            return !obj.key.endsWith('/')  // Remove selected folder
-          }).map(function(obj) {
-            const date = new Date(obj.uploaded)
-
-            return {
-              ...obj,
-              hash: encode(obj.key),
-              name: obj.key.replace(self.selectedFolder, ''),
-              lastModified: timeSince(date),
-              timestamp: date.getTime(),
-              size: bytesToSize(obj.size),
-              sizeRaw: obj.size,
-              type: 'file',
-              icon: 'article',
-              color: 'grey',
-            }
-          }).filter(obj => {
-            // Remove hidden files
-            return !(this.mainStore.showHiddenFiles !== true && obj.name.startsWith('.'))
-          })
-
-          for (const f of files) {
-            contentFiles.push(f)
+        }).href
+      } else {
+        url = window.location.origin + this.$router.resolve({
+          name: 'files-file',
+          params: {
+            bucket: this.selectedBucket,
+            folder: encode(this.selectedFolder || ROOT_FOLDER),
+            file: row.nameHash
           }
-        }
-
-        if (response.data.delimitedPrefixes) {
-          const folders = response.data.delimitedPrefixes.map(function (obj) {
-            return {
-              name: obj.replace(self.selectedFolder, ''),
-              hash: encode(obj.key),
-              key: obj,
-              lastModified: '--',
-              timestamp: 0,
-              size: '--',
-              sizeRaw: 0,
-              type: 'folder',
-              icon: 'folder',
-              color: 'orange',
-            }
-          }).filter(obj => {
-            // Remove hidden files
-            return !(this.mainStore.showHiddenFiles !== true && obj.name.startsWith('.'))
-          })
-
-          for (const f of folders) {
-            contentFolders.push(f)
-          }
-        }
+        }).href
       }
 
-      this.rows = [
-        ...contentFolders,
-        ...contentFiles
-      ]
+      try {
+        await navigator.clipboard.writeText(url);
+        this.q.notify({
+          message: 'Link to file copied to clipboard!',
+          timeout: 5000,
+          type: 'positive',
+        })
+      } catch (err) {
+        this.q.notify({
+          message: 'Failed to copy: ' + err,
+          timeout: 5000,
+          type: 'negative',
+        })
+      }
+    },
+    downloadObject: function(row) {
+      const link = document.createElement('a')
+      link.download = row.name
+
+      link.href = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(row.key)}`
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    },
+    fetchFiles: async function () {
+      this.loading = true
+
+      this.rows = await apiHandler.fetchFile(this.selectedBucket, this.selectedFolder, '/')
       this.loading = false
     }
   },
@@ -270,7 +262,8 @@ export default defineComponent({
   },
   setup () {
     return {
-      mainStore: useMainStore()
+      mainStore: useMainStore(),
+      q: useQuasar()
     }
   },
 })

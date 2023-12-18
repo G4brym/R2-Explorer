@@ -1,4 +1,5 @@
 import { api } from "boot/axios";
+import { useMainStore } from "stores/main-store";
 
 export const ROOT_FOLDER = "IA=="  // IA== is a space
 
@@ -147,4 +148,82 @@ export const apiHandler = {
       onUploadProgress: callback
     })
   },
+  fetchFile: async (bucket, prefix, delimiter = '/') => {
+    const mainStore = useMainStore();
+    let truncated = true
+    let cursor = null
+    let contentFiles = []
+    let contentFolders = []
+
+    while (truncated) {
+      const response = await api.get(`/buckets/${bucket}?include=customMetadata&include=httpMetadata`, {
+        params: {
+          delimiter: delimiter,
+          prefix: prefix && prefix !== '/' ? encode(prefix) : '',
+          cursor: cursor
+        }
+      })
+
+      truncated = response.data.truncated
+      cursor = response.data.cursor
+
+      if (response.data.objects) {
+        const files = response.data.objects.filter(function(obj) {
+          return !(obj.key.endsWith('/') && delimiter !== '') && obj.key !== prefix  // Remove selected folder when delimiter is defined
+        }).map(function(obj) {
+          const date = new Date(obj.uploaded)
+
+          return {
+            ...obj,
+            hash: encode(obj.key),
+            nameHash: encode(obj.key.replace(prefix, '')),
+            name: obj.key.replace(prefix, ''),
+            lastModified: timeSince(date),
+            timestamp: date.getTime(),
+            size: bytesToSize(obj.size),
+            sizeRaw: obj.size,
+            type: 'file',
+            icon: 'article',
+            color: 'grey',
+          }
+        }).filter(obj => {
+          // Remove hidden files
+          return !(mainStore.showHiddenFiles !== true && obj.name.startsWith('.'))
+        })
+
+        for (const f of files) {
+          contentFiles.push(f)
+        }
+      }
+
+      if (response.data.delimitedPrefixes) {
+        const folders = response.data.delimitedPrefixes.map(function (obj) {
+          return {
+            name: obj.replace(prefix, ''),
+            hash: encode(obj.key),
+            key: obj,
+            lastModified: '--',
+            timestamp: 0,
+            size: '--',
+            sizeRaw: 0,
+            type: 'folder',
+            icon: 'folder',
+            color: 'orange',
+          }
+        }).filter(obj => {
+          // Remove hidden files
+          return !(mainStore.showHiddenFiles !== true && obj.name.startsWith('.'))
+        })
+
+        for (const f of folders) {
+          contentFolders.push(f)
+        }
+      }
+    }
+
+    return [
+      ...contentFolders,
+      ...contentFiles
+    ]
+  }
 }

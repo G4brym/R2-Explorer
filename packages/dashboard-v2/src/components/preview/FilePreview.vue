@@ -211,7 +211,7 @@ export default {
         params: {
           bucket: this.$route.params.bucket,
           folder: this.$route.params.folder || ROOT_FOLDER,
-          file: file.hash
+          file: file.nameHash
         }
       });
 

@@ -11,9 +11,9 @@ export class ListObjects extends OpenAPIRoute {
     parameters: {
       bucket: Path(String),
       limit: Query(Number, {required: false}),
-      prefix: Query(z.string().optional().describe('base64 encoded prefix'),),
-      cursor: Query(z.string().optional()),
-      delimiter: Query(z.string().optional()),
+      prefix: Query(z.string().nullable().optional().describe('base64 encoded prefix'),),
+      cursor: Query(z.string().nullable().optional()),
+      delimiter: Query(z.string().nullable().optional()),
       include: Query(z.string().array().optional()),
     },
   }
@@ -30,7 +30,7 @@ export class ListObjects extends OpenAPIRoute {
       limit: data.query.limit,
       prefix: data.query.prefix ? decodeURIComponent(escape(atob(data.query.prefix))) : undefined,
       cursor: data.query.cursor,
-      delimiter: data.query.delimiter,
+      delimiter: (data.query.delimiter) ? data.query.delimiter : '',
       include: data.query.include,
     })
   }

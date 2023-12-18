@@ -12,6 +12,12 @@ export const useMainStore = defineStore('main', {
     buckets: [],
   }),
   getters: {
+    serverUrl() {
+      if (process.env.NODE_ENV === 'development') {
+        return process.env.VUE_APP_SERVER_URL || 'http://localhost:8787'
+      }
+      return window.location.origin
+    }
   },
   actions: {
     async loadUserDisks() {
