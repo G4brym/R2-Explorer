@@ -38,6 +38,14 @@ Read this in other languages: [Español](READMEes.md), [Português](READMEpt.md)
 
 ## Getting Started
 
+You can either deploy with Cloudflare Deploy Button using GitHub Actions or deploy on your own.
+
+### Deploy with Cloudflare Deploy Button
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button?paid=true)](https://deploy.workers.cloudflare.com/?url=https://github.com/G4brym/R2-Explorer&paid=true)
+
+### Deploying manually using npm and Wrangler (command line)
+
 Run this command to get an example project setup
 
 ```bash
