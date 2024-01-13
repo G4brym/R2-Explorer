@@ -19,6 +19,7 @@
         </template>
       </q-field>
 
+      <q-field stack-label borderless dense>
       <q-btn-dropdown color="green" label="New" icon="add" style="width: 100%">
         <q-list>
           <q-item clickable v-close-popup @click="$refs.createFolder.open()">
@@ -29,19 +30,20 @@
 
           <q-separator></q-separator>
 
-          <q-item clickable v-close-popup @click="onItemClick">
+          <q-item clickable v-close-popup @click="$bus.emit('openFilesUploader')">
             <q-item-section>
               <q-item-label><q-icon name="upload_file" size="sm"/> Upload Files</q-item-label>
             </q-item-section>
           </q-item>
 
-          <q-item clickable v-close-popup @click="onItemClick">
+          <q-item clickable v-close-popup @click="$bus.emit('openFoldersUploader')">
             <q-item-section>
               <q-item-label><q-icon name="folder" size="sm"/> Upload Folders</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
       </q-btn-dropdown>
+      </q-field>
     </div>
   </div>
 

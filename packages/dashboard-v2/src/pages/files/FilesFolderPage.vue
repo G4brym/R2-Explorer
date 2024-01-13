@@ -5,7 +5,6 @@
         <q-breadcrumbs-el style="cursor: pointer" v-for="obj in breadcrumbs" :key="obj.name" :label="obj.name" @click="breadcrumbsClick(obj)" />
       </q-breadcrumbs>
 
-
       <drag-and-drop ref="uploader">
 
         <q-table
@@ -17,7 +16,10 @@
           :hide-pagination="true"
           :rows-per-page-options="[0]"
           column-sort-order="da"
-          :flat="true">
+          :flat="true"
+          @row-click="openRowMenu"
+          @row-contextmenu="openRowMenu"
+        >
 
           <template v-slot:body-cell-name="prop">
             <td class="flex" style="align-items: center">
@@ -29,7 +31,7 @@
           <template v-slot:body-cell-options="prop">
             <td class="text-right">
               <q-btn round flat icon="more_vert" size="sm">
-                <q-menu>
+                <q-menu :ref="(el) => setItemRef(el, prop.rowIndex)">
                   <q-list style="min-width: 100px">
                     <q-item clickable v-close-popup @click="openObject(prop.row)">
                       <q-item-section>Open</q-item-section>
@@ -42,9 +44,6 @@
                     </q-item>
                     <q-item clickable v-close-popup @click="$refs.options.deleteObject(prop.row)">
                       <q-item-section>Delete</q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup>
-                      <q-item-section>New incognito tab</q-item-section>
                     </q-item>
                     <q-separator />
                   </q-list>
@@ -78,6 +77,7 @@ export default defineComponent({
   components: { FileOptions, DragAndDrop, FilePreview },
   data: function () {
     return {
+      rowMenu: [],
       loading: false,
       rows: [],
       columns: [
@@ -177,6 +177,15 @@ export default defineComponent({
     },
   },
   methods: {
+    setItemRef(el, index) {
+      if (el) {
+        this.rowMenu[index] = el
+      }
+    },
+    openRowMenu: function(evt, row, index) {
+      evt.preventDefault()
+      this.rowMenu[index].show()
+    },
     breadcrumbsClick: function(obj) {
       this.$router.push({ name: `files-folder`, params: { bucket: this.selectedBucket, folder: encode(obj.path) }})
     },

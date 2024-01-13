@@ -9,16 +9,6 @@ bucket_name = 'teste'
 preview_bucket_name = 'teste'
 
 [[r2_buckets]]
-binding = 'r2-explorer-example-2'
-bucket_name = 'r2-explorer-example-2'
-preview_bucket_name = 'r2-explorer-example-2'
-
-[[r2_buckets]]
-binding = 'r2-explorer-example-1'
-bucket_name = 'r2-explorer-example-1'
-preview_bucket_name = 'r2-explorer-example-1'
-
-#[[r2_buckets]]
-#binding = 'drive'
-#bucket_name = 'drive'
-#preview_bucket_name = 'drive'
+binding = 'storage'
+bucket_name = 'storage'
+preview_bucket_name = 'storage'

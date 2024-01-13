@@ -104,8 +104,6 @@ export default {
       this.uploadFiles(folders)
     },
     async uploadFiles (folders) {
-      const self = this
-
       let totalFiles = 0
       const filenames = []
 
@@ -133,6 +131,9 @@ export default {
       let uploadCount = 0
       for (const [folder, files] of Object.entries(folders)) {
         let targetFolder = this.selectedFolder + folder
+        if (targetFolder.slice(-1) !== '/') {
+          targetFolder += '/'
+        }
 
         for (const file of files) {
           uploadCount += 1
@@ -257,6 +258,14 @@ export default {
 
       this.isHover = false
     }
+  },
+  mounted() {
+    this.$bus.on('openFilesUploader', this.openFilesUploader)
+    this.$bus.on('openFoldersUploader', this.openFoldersUploader)
+  },
+  beforeUnmount() {
+    this.$bus.off('openFilesUploader')
+    this.$bus.off('openFoldersUploader')
   },
   setup () {
     return {
