@@ -31,7 +31,9 @@ export function R2Explorer(config?: R2ExplorerConfig) {
   const router = OpenAPIRouter({
     schema: openapiSchema
   });
-  const { preflight, corsify } = createCors();
+  const { preflight, corsify } = createCors({
+    methods: ['*']
+  });
 
   if (config.cors === true) {
     router.all("/api*", preflight);

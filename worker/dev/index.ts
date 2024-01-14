@@ -1,18 +1,23 @@
 import { R2Explorer } from "../src";
 
-export default R2Explorer({
+const baseConfig = {
   readonly: false,
   cors: true,
   showHiddenFiles: true,
-  dashboardUrl: "https://dev.r2-explorer-dashboard.pages.dev/",
-  basicAuth: [{
-    username: 'teste',
-    password: 'abc'
-  },{
-    username: 'teste33',
-    password: 'abcdd'
-  },{
-    username: 'teste55',
-    password: 'abchh'
-  }]
-});
+  dashboardUrl: "https://dashboard-v2.r2-explorer-dashboard.pages.dev/"
+};
+
+export default {
+  async email(event, env, context) {
+    await R2Explorer(baseConfig).email(event, env, context);
+  },
+  async fetch(request, env, context) {
+    return R2Explorer({
+      ...baseConfig,
+      basicAuth: {
+        username: env.BASIC_USERNAME,
+        password: env.BASIC_PASSWORD
+      }
+    }).fetch(request, env, context);
+  }
+};

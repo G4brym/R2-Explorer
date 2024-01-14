@@ -6,6 +6,7 @@ spa
 # local env files
 .env.local
 .env.*.local
+**/.env
 
 # Log files
 npm-debug.log*
@@ -33,3 +34,6 @@ worker/dev/.wrangler
 
 packages/github-action/wrangler.toml
 packages/github-action/src
+
+packages/dashboard-v2/.env
+.dev.vars
