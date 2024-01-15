@@ -1,15 +1,15 @@
 import { boot } from 'quasar/wrappers';
 import { useAuthStore } from 'stores/auth-store';
 import { useMainStore } from "stores/main-store";
+import store from 'stores/index'
 
 export default boot(async () => {
-
   // Check if theres any auth token stored, if there is, try to fetch or redirect
-  const store = useAuthStore();
-  const authResp = await store.CheckLoginInStorage();
+  const authStore = useAuthStore(store());
+  const authResp = await authStore.CheckLoginInStorage();
 
   if (authResp === false) {  // No auth token stored, try to fetch without auth or redirect
-    const mainStore = useMainStore()
+    const mainStore = useMainStore(store())
     await mainStore.loadServerConfigs(true)
   }
 });

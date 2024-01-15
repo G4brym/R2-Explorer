@@ -7,12 +7,11 @@
 
         <q-toolbar-title class="text-bold">
           <q-avatar>
-            <img src="/logo-white.svg">
+            <img src="/v2.0/logo-white.svg">
           </q-avatar>
           R2-Explorer
         </q-toolbar-title>
 
-        <q-btn dense flat round icon="menu" @click="toggleRightDrawer" />
       </q-toolbar>
     </q-header>
 
@@ -21,7 +20,7 @@
     </q-drawer>
 
     <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
-      <!-- drawer content -->
+      <right-sidebar @updateDrawer="updateRightDrawer" />
     </q-drawer>
 
     <q-page-container>
@@ -35,10 +34,11 @@
 import { ref } from 'vue'
 import { useMainStore } from "stores/main-store";
 import LeftSidebar from "components/main/LeftSidebar.vue";
+import RightSidebar from "components/main/RightSidebar.vue";
 
 export default {
   name: 'MainLayout',
-  components: { LeftSidebar },
+  components: { RightSidebar, LeftSidebar },
   created() {
     const mainStore = useMainStore()
     mainStore.loadUserDisks().then((buckets) => {
@@ -58,13 +58,13 @@ export default {
       },
 
       rightDrawerOpen,
-      toggleRightDrawer () {
-        rightDrawerOpen.value = !rightDrawerOpen.value
+      updateRightDrawer (state) {
+        rightDrawerOpen.value = state
       }
     }
   },
   mounted() {
-    this.toggleRightDrawer()
+    this.updateRightDrawer(false)
   }
 }
 </script>

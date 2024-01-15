@@ -17,7 +17,8 @@
           :rows-per-page-options="[0]"
           column-sort-order="da"
           :flat="true"
-          @row-click="openRowMenu"
+          @row-dblclick="openRowClick"
+          @row-click="openRowDlbClick"
           @row-contextmenu="openRowMenu"
         >
 
@@ -181,6 +182,14 @@ export default defineComponent({
       if (el) {
         this.rowMenu[index] = el
       }
+    },
+    openRowClick: function(evt, row, index) {
+      evt.preventDefault()
+      this.openObject(row)
+    },
+    openRowDlbClick: function(evt, row, index) {
+      evt.preventDefault()
+      this.$bus.emit("openFileDetails", row);
     },
     openRowMenu: function(evt, row, index) {
       evt.preventDefault()
