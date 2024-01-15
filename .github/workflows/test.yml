@@ -32,4 +32,4 @@ jobs:
       - name: Build dashboard
         run: make build-dashboard
       - name: Build worker
-        run: cd worker && npm run build
+        run: make build-worker

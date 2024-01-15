@@ -4,7 +4,7 @@ const baseConfig = {
   readonly: false,
   cors: true,
   showHiddenFiles: true,
-  dashboardUrl: "https://dashboard-v2.r2-explorer-dashboard.pages.dev/"
+  // dashboardUrl: "https://dashboard-v2.r2-explorer-dashboard.pages.dev/"
 };
 
 export default {
