@@ -1,7 +1,6 @@
 import {getCurrentTimestampMilliseconds} from "../dates";
 import {Context} from "../interfaces";
-
-const PostalMime = require('postal-mime/dist/node').postalMime.default;
+import PostalMime from 'postal-mime';
 
 async function streamToArrayBuffer(stream, streamSize) {
   let result = new Uint8Array(streamSize);
