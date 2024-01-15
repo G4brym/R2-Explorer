@@ -95,9 +95,9 @@
     "wrangler": "^3.6.0"
   },
   "dependencies": {
-    "@cloudflare/itty-router-openapi": "1.0.4",
-    "postal-mime": "^1.0.16",
-    "itty-router": "4.0.26"
+    "@cloudflare/itty-router-openapi": "1.0.7",
+    "itty-router": "4.0.26",
+    "postal-mime": "^1.0.16"
   },
   "bin": {
     "r2-explorer": "bin/r2-explorer.js"
