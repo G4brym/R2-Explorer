@@ -13,7 +13,13 @@
             <span class="logo-lg-text-light">R2 Explorer</span>
           </a>
         </div>
+        <div class="d-none d-lg-flex align-items-center">
+          <div class="alert m-0 text-white" style="background-color: rgb(26 188 156 / 50%);">
+            New Dashboard V2 is now in beta <a href="/v2.0/" class="text-warning">try it out here!</a>
+          </div>
+        </div>
         <ul class="topbar-menu d-flex align-items-center">
+
 
 <!--          <li class="dropdown">-->
 <!--            <form class="search-bar">-->
