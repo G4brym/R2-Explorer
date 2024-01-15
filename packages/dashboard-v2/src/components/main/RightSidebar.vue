@@ -150,7 +150,7 @@ export default defineComponent({
   },
   methods: {
     openFileDetails: function(row) {
-      this.$emit('updateDrawer', true)
+      // this.$emit('updateDrawer', true)  // TODO: enable
       console.log(row)
     },
   },
