@@ -61,7 +61,7 @@
 import { defineComponent } from "vue";
 import { api } from "boot/axios";
 import { useMainStore } from "stores/main-store";
-import { encode, timeSince } from "../../appUtils";
+import { decode, encode, timeSince } from "../../appUtils";
 
 export default defineComponent({
   name: 'EmailFolderPage',
@@ -113,7 +113,10 @@ export default defineComponent({
   },
   methods: {
     rowClick: function(evt, row, index) {
-      console.log(row)
+      const file = row.key.replace(/^.*[\\/]/, '')
+      // const folder = row.key.replace(file, '')
+
+      this.$router.push({ name: `email-file`, params: { bucket: this.selectedBucket, folder: 'inbox', file: encode(file) }})
     },
     fetchFiles: async function () {
       const self = this

@@ -70,7 +70,7 @@ export const apiHandler = {
       key: encode(key)
     })
   },
-  downloadFile: (bucket, file, previewConfig, onDownloadProgress, abortControl) => {
+  downloadFile: (bucket, key, previewConfig, onDownloadProgress, abortControl) => {
     const extra = {};
     if (previewConfig.downloadType === "objectUrl" || previewConfig.downloadType === "blob") {
       extra.responseType = "arraybuffer";
@@ -83,9 +83,12 @@ export const apiHandler = {
     }
 
     return api.get(
-      `/buckets/${bucket}/${encode(file.key)}`,
+      `/buckets/${bucket}/${encode(key)}`,
       extra
     );
+  },
+  headFile: (bucket, key) => {
+    return api.get(`/buckets/${bucket}/${encode(key)}/head`);
   },
   // renameObject: (oldName, newName) => {
   //   return axios.post(`/buckets/${store.state.activeBucket}/move`, {
@@ -93,16 +96,14 @@ export const apiHandler = {
   //     newKey: encodeKey(newName, store.state.currentFolder)
   //   })
   // },
-  // updateMetadata: (file, metadata) => {
-  //   const filePath = encodeKey(file.name, getCurrentFolder())
-  //
-  //   return axios.post(
-  //     `/buckets/${store.state.activeBucket}/${filePath}`,
-  //     {
-  //       customMetadata: metadata
-  //     }
-  //   )
-  // },
+  updateMetadata: (bucket, key, metadata) => {
+    return api.post(
+      `/buckets/${bucket}/${encode(key)}`,
+      {
+        customMetadata: metadata
+      }
+    )
+  },
   multipartCreate: (file, key, bucket) => {
     return api.post(`/buckets/${bucket}/multipart/create`, null, {
       params: {
@@ -134,7 +135,7 @@ export const apiHandler = {
     })
   },
   uploadObjects: (file, key, bucket, callback) => {
-    console.log(key)
+    // console.log(key)
     return api.post(`/buckets/${bucket}/upload`, file, {
       params: {
         key: encode(key),

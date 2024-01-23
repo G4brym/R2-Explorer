@@ -27,9 +27,14 @@ export class PutMetadata extends OpenAPIRoute {
 
     const bucket = env[data.params.bucket]
 
-    const key = decodeURIComponent(escape(atob(data.params.key)))
+    let filePath
+    try {
+      filePath = decodeURIComponent(escape(atob(data.params.key)));
+    } catch (e) {
+      filePath = decodeURIComponent(escape(atob(decodeURIComponent(data.params.key))));
+    }
 
-    const object = await bucket.get(key)
-    return await bucket.put(key, object.body, {customMetadata: data.body.customMetadata})
+    const object = await bucket.get(filePath)
+    return await bucket.put(filePath, object.body, {customMetadata: data.body.customMetadata})
   }
 }

@@ -221,7 +221,7 @@ export default {
       if (previewConfig) {
         this.type = previewConfig.type;
 
-        const response = await apiHandler.downloadFile(this.$route.params.bucket, file, previewConfig, (progressEvent) => {
+        const response = await apiHandler.downloadFile(this.$route.params.bucket, file.key, previewConfig, (progressEvent) => {
           this.downloadProgress = progressEvent.loaded / progressEvent.total;
         }, this.abortControl);
 

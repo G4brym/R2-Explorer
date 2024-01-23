@@ -18,7 +18,7 @@ const routes = [
 
       { path: '/:bucket/email', name: 'email-home', component: () => import('pages/email/EmailFolderPage.vue') },
       { path: '/:bucket/email/:folder', name: 'email-folder', component: () => import('pages/email/EmailFolderPage.vue') },
-      { path: '/:bucket/email/:folder/:file', name: 'email-file', component: () => import('pages/email/EmailFolderPage.vue') }
+      { path: '/:bucket/email/:folder/:file', name: 'email-file', component: () => import('pages/email/EmailFilePage.vue') }
     ]
   },
 

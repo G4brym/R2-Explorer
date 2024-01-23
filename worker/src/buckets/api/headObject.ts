@@ -10,7 +10,7 @@ export class HeadObject extends OpenAPIRoute {
     summary: 'Get Object',
     parameters: {
       bucket: Path(String),
-      key: Query(z.string().describe('base64 encoded file key')),
+      key: Path(z.string().describe('base64 encoded file key')),
     },
   }
 
@@ -21,7 +21,13 @@ export class HeadObject extends OpenAPIRoute {
     data: any
   ) {
     const bucket = env[data.params.bucket]
-    const filePath = decodeURIComponent(escape(atob(data.params.key)));
+
+    let filePath
+    try {
+      filePath = decodeURIComponent(escape(atob(data.params.key)));
+    } catch (e) {
+      filePath = decodeURIComponent(escape(atob(decodeURIComponent(data.params.key))));
+    }
 
     const object = await bucket.head(filePath)
 

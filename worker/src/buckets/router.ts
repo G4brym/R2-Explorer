@@ -30,5 +30,6 @@ bucketsRouter.post('/:bucket/multipart/upload', PartUpload)
 bucketsRouter.post('/:bucket/multipart/complete', CompleteUpload)
 bucketsRouter.post('/:bucket/delete', DeleteObject)
 bucketsRouter.head('/:bucket/:key', HeadObject)
+bucketsRouter.get('/:bucket/:key/head', HeadObject)  // There are some issues with calling the head method
 bucketsRouter.get('/:bucket/:key', GetObject)
 bucketsRouter.post('/:bucket/:key', PutMetadata)
