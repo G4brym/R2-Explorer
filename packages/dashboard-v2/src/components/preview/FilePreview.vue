@@ -6,10 +6,10 @@
     @hide="close"
   >
     <q-card>
-      <q-card-section class="row items-center q-pb-none">
-        <div class="text-h6">{{ filename }}</div>
+      <q-card-section class="row items-center q-p-sm bg-grey-3" style="font-size: 20px">
+        <div>{{ filename }}</div>
         <q-space />
-        <q-btn icon="close" flat round dense v-close-popup />
+        <q-btn icon="close" size="md" flat round dense v-close-popup />
       </q-card-section>
 
       <q-card-section class="scroll">

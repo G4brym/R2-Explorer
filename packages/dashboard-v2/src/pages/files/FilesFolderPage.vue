@@ -150,7 +150,7 @@ export default defineComponent({
     breadcrumbs: function () {
       if (this.selectedFolder) {
         return [{
-          name: "Home",
+          name: this.selectedBucket,
           path: '/'
         }, ...this.selectedFolder.split('/')
           .filter((obj) => obj !== '')
@@ -163,7 +163,7 @@ export default defineComponent({
         ]
       } else {
         return [{
-          name: "Home",
+          name: this.selectedBucket,
           path: '/'
         }]
       }

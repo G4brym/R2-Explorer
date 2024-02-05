@@ -1,49 +1,32 @@
 <template>
   <div class="q-pa-md">
-    <div class="q-gutter-md">
+    <div class="flex column">
+      <q-btn color="green" icon="add" stack class="q-mb-lg" label="New">
+        <q-menu>
+          <q-list>
+            <q-item clickable v-close-popup @click="$refs.createFolder.open()">
+              <q-item-section>
+                <q-item-label><q-icon name="create_new_folder" size="sm"/> New Folder</q-item-label>
+              </q-item-section>
+            </q-item>
 
-      <q-select :model-value="selectedBucket" @update:model-value="changeBucket" :options="mainStore.buckets.map((obj) => obj.name)" label="Bucket" />
+            <q-item clickable v-close-popup @click="$bus.emit('openFilesUploader')">
+              <q-item-section>
+                <q-item-label><q-icon name="upload_file" size="sm"/> Upload Files</q-item-label>
+              </q-item-section>
+            </q-item>
 
-      <q-field label="Application" stack-label borderless>
-        <template v-slot:control>
-          <q-btn-toggle
-            style="width: 100%"
-            :model-value="selectedApp" @update:model-value="changeApp"
-            :spread="true"
-            toggle-color="primary"
-            :options="[
-        {label: 'Files', value: 'files'},
-        {label: 'Email', value: 'email'}
-      ]"
-          />
-        </template>
-      </q-field>
+            <q-item clickable v-close-popup @click="$bus.emit('openFoldersUploader')">
+              <q-item-section>
+                <q-item-label><q-icon name="folder" size="sm"/> Upload Folders</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-menu>
+      </q-btn>
 
-      <q-field stack-label borderless dense>
-      <q-btn-dropdown color="green" label="New" icon="add" style="width: 100%">
-        <q-list>
-          <q-item clickable v-close-popup @click="$refs.createFolder.open()">
-            <q-item-section>
-              <q-item-label><q-icon name="create_new_folder" size="sm"/> New Folder</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-separator></q-separator>
-
-          <q-item clickable v-close-popup @click="$bus.emit('openFilesUploader')">
-            <q-item-section>
-              <q-item-label><q-icon name="upload_file" size="sm"/> Upload Files</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable v-close-popup @click="$bus.emit('openFoldersUploader')">
-            <q-item-section>
-              <q-item-label><q-icon name="folder" size="sm"/> Upload Folders</q-item-label>
-            </q-item-section>
-          </q-item>
-        </q-list>
-      </q-btn-dropdown>
-      </q-field>
+      <q-btn class="q-mb-sm" @click="gotoFiles" color="blue" icon="folder_copy" label="Files" stack />
+      <q-btn class="q-mb-sm" @click="gotoEmail" color="blue" icon="email" label="Email" stack />
     </div>
   </div>
 
@@ -53,15 +36,19 @@
 <script>
 import { defineComponent } from "vue";
 import { useMainStore } from "stores/main-store";
-import FilePreview from "components/preview/FilePreview.vue";
 import CreateFolder from "components/files/CreateFolder.vue";
 
 export default defineComponent({
   name: 'LeftSidebar',
   components: { CreateFolder },
   methods: {
-    changeBucket: function(bucket) {
-      this.$router.push({ name: `${this.selectedApp}-home`, params: { bucket: bucket }})
+    gotoEmail: function() {
+      if(this.selectedApp !== 'email')
+        this.changeApp('email')
+    },
+    gotoFiles: function() {
+      if(this.selectedApp !== 'files')
+        this.changeApp('files')
     },
     changeApp: function(app) {
       this.$router.push({ name: `${app}-home`, params: { bucket: this.selectedBucket }})
@@ -84,3 +71,9 @@ export default defineComponent({
   },
 })
 </script>
+
+<style scoped>
+.q-btn {
+  max-width: 100%;
+}
+</style>
