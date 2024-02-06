@@ -19,8 +19,24 @@
           :flat="true"
           @row-dblclick="openRowClick"
           @row-click="openRowDlbClick"
-          @row-contextmenu="openRowMenu"
         >
+
+          <template v-slot:loading>
+              <div class="full-width q-my-lg">
+                  <h6 class="flex items-center justify-center">
+                      <q-spinner
+                              color="primary"
+                              size="xl"
+                      />
+                  </h6>
+              </div>
+          </template>
+
+          <template v-slot:no-data>
+            <div class="full-width q-my-lg" v-if="!loading">
+              <h6 class="flex items-center justify-center"><q-icon name="folder" color="orange" size="lg" />This folder is empty</h6>
+            </div>
+          </template>
 
           <template v-slot:body-cell-name="prop">
             <td class="flex" style="align-items: center">
@@ -29,25 +45,23 @@
             </td>
           </template>
 
+          <template v-slot:body-cell="prop">
+            <q-td :props="prop">
+              {{prop.value}}
+            </q-td>
+            <q-menu
+              touch-position
+              context-menu
+            >
+              <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" />
+            </q-menu>
+          </template>
+
           <template v-slot:body-cell-options="prop">
             <td class="text-right">
               <q-btn round flat icon="more_vert" size="sm">
-                <q-menu :ref="(el) => setItemRef(el, prop.rowIndex)">
-                  <q-list style="min-width: 100px">
-                    <q-item clickable v-close-popup @click="openObject(prop.row)">
-                      <q-item-section>Open</q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup @click="downloadObject(prop.row)" v-if="prop.row.type === 'file'">
-                      <q-item-section>Download</q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup @click="shareObject(prop.row)">
-                      <q-item-section>Get sharable link</q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup @click="$refs.options.deleteObject(prop.row)">
-                      <q-item-section>Delete</q-item-section>
-                    </q-item>
-                    <q-separator />
-                  </q-list>
+                <q-menu>
+                  <FileContextMenu :prop="prop" />
                 </q-menu>
               </q-btn>
             </td>
@@ -65,20 +79,19 @@
 
 <script>
 import { defineComponent } from "vue";
-import { api } from "boot/axios";
 import { useMainStore } from "stores/main-store";
-import { apiHandler, bytesToSize, decode, encode, ROOT_FOLDER, timeSince } from "../../appUtils";
+import { apiHandler, decode, encode, ROOT_FOLDER } from "../../appUtils";
 import FilePreview from "components/preview/FilePreview.vue";
 import DragAndDrop from "components/utils/DragAndDrop.vue";
 import FileOptions from "components/files/FileOptions.vue";
 import { useQuasar } from "quasar";
+import FileContextMenu from "pages/files/FileContextMenu.vue";
 
 export default defineComponent({
   name: 'FilesIndexPage',
-  components: { FileOptions, DragAndDrop, FilePreview },
+  components: { FileContextMenu, FileOptions, DragAndDrop, FilePreview },
   data: function () {
     return {
-      rowMenu: [],
       loading: false,
       rows: [],
       columns: [
@@ -178,11 +191,6 @@ export default defineComponent({
     },
   },
   methods: {
-    setItemRef(el, index) {
-      if (el) {
-        this.rowMenu[index] = el
-      }
-    },
     openRowClick: function(evt, row, index) {
       evt.preventDefault()
       this.openObject(row)
@@ -190,10 +198,6 @@ export default defineComponent({
     openRowDlbClick: function(evt, row, index) {
       evt.preventDefault()
       this.$bus.emit("openFileDetails", row);
-    },
-    openRowMenu: function(evt, row, index) {
-      evt.preventDefault()
-      this.rowMenu[index].show()
     },
     breadcrumbsClick: function(obj) {
       this.$router.push({ name: `files-folder`, params: { bucket: this.selectedBucket, folder: encode(obj.path) }})
@@ -213,52 +217,6 @@ export default defineComponent({
         // console.log(row)
         this.$refs.preview.openFile(row)
       }
-    },
-    shareObject: async function(row) {
-      let url
-      if (row.type === 'folder') {
-        url = window.location.origin + this.$router.resolve({
-          name: 'files-folder',
-          params: {
-            bucket: this.selectedBucket,
-            folder: encode(row.key)
-          }
-        }).href
-      } else {
-        url = window.location.origin + this.$router.resolve({
-          name: 'files-file',
-          params: {
-            bucket: this.selectedBucket,
-            folder: encode(this.selectedFolder || ROOT_FOLDER),
-            file: row.nameHash
-          }
-        }).href
-      }
-
-      try {
-        await navigator.clipboard.writeText(url);
-        this.q.notify({
-          message: 'Link to file copied to clipboard!',
-          timeout: 5000,
-          type: 'positive',
-        })
-      } catch (err) {
-        this.q.notify({
-          message: 'Failed to copy: ' + err,
-          timeout: 5000,
-          type: 'negative',
-        })
-      }
-    },
-    downloadObject: function(row) {
-      const link = document.createElement('a')
-      link.download = row.name
-
-      link.href = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(row.key)}`
-
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
     },
     fetchFiles: async function () {
       this.loading = true

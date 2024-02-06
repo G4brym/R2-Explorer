@@ -1,5 +1,5 @@
 <template>
-  <q-btn dense flat round icon="menu" @click="$emit('toggleLeftDrawer')" />
+  <q-btn dense flat round icon="menu" @click="$emit('toggle')" />
 
   <q-toolbar-title class="text-bold">
     <q-avatar>
@@ -19,6 +19,7 @@ import BucketPicker from "components/main/BucketPicker.vue";
 
 export default defineComponent({
   name: "TopBar",
+  emits: ['toggle'],
   components: { BucketPicker }
 });
 </script>

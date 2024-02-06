@@ -2,11 +2,20 @@
   <template v-if="this.file">
   <div>
     <q-card>
-      <q-card-section class="bg-grey-3 text-black" vertical>
-          <q-btn-group push>
-            <q-btn push icon="arrow_back" :to="{ name: `email-folder`, params: { bucket: $route.params.bucket, folder: $route.params.folder }}" />
-            <q-btn push icon="chevron_left" />
-            <q-btn push icon="chevron_right" />
+      <q-card-section class="bg-grey-2 text-black" vertical>
+          <q-btn-group unelevated>
+            <q-btn push icon="arrow_back" :to="{ name: `email-folder`, params: { bucket: $route.params.bucket, folder: $route.params.folder }}">
+              <q-tooltip>Back</q-tooltip>
+            </q-btn>
+            <q-btn push icon="chevron_left">
+              <q-tooltip>More recent</q-tooltip>
+            </q-btn>
+            <q-btn push icon="chevron_right">
+              <q-tooltip>More older</q-tooltip>
+            </q-btn>
+            <q-btn push icon="mark_email_unread">
+              <q-tooltip>Mark email as unread</q-tooltip>
+            </q-btn>
           </q-btn-group>
       </q-card-section>
 
@@ -19,7 +28,7 @@
           <q-icon name="account_circle" size="xl" class="q-mr-sm"/>
           <div class="d-flex column">
             <span>{{ file.from.name }} <small class="text-muted">&lt;{{ file.from.address }}></small></span>
-            <span>{{ file.to[0].address }}</span>
+            <span>to {{ file.to[0].address }}</span>
           </div>
         </div>
 
@@ -40,8 +49,10 @@
         </div>
       </q-card-actions>
 
+
       <q-card-actions vertical v-if="file.attachments.length > 0">
-        <h6 class="q-mb-3">Attachments</h6>
+        <q-separator/>
+        <h6 class="q-my-md">Attachments</h6>
 
         <div class="row">
           <div class="col-xl-4 col-lg-6 col-md-6" v-for="attachment of file.attachments" :key="attachment.filename">

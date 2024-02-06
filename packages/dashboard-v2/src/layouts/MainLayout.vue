@@ -4,7 +4,7 @@
     <q-header reveal class="bg-green text-white">
       <q-toolbar>
 
-        <top-bar @toggleLeftDrawer="toggleLeftDrawer"/>
+        <top-bar @toggle="toggleLeftDrawer"/>
 
       </q-toolbar>
     </q-header>

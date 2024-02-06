@@ -12,6 +12,23 @@
         :flat="true"
         @row-click="rowClick">
 
+        <template v-slot:loading>
+          <div class="full-width q-my-lg">
+            <h6 class="flex items-center justify-center">
+              <q-spinner
+                color="primary"
+                size="xl"
+              />
+            </h6>
+          </div>
+        </template>
+
+        <template v-slot:no-data>
+          <div class="full-width q-my-lg" v-if="!loading">
+            <h6 class="flex items-center justify-center"><q-icon name="alternate_email" color="orange" size="lg" />This bucket doesn't have Emails</h6>
+          </div>
+        </template>
+
         <template v-slot:body-cell-has_attachments="prop">
           <td>
             <q-icon v-if="prop.row.has_attachments" name="attachment" size="sm" color="black" />
