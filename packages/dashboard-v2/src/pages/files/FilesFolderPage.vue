@@ -53,7 +53,7 @@
               touch-position
               context-menu
             >
-              <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" />
+              <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="renameObject" />
             </q-menu>
           </template>
 
@@ -61,7 +61,7 @@
             <td class="text-right">
               <q-btn round flat icon="more_vert" size="sm">
                 <q-menu>
-                  <FileContextMenu :prop="prop" />
+                  <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="renameObject" />
                 </q-menu>
               </q-btn>
             </td>
@@ -218,11 +218,28 @@ export default defineComponent({
         this.$refs.preview.openFile(row)
       }
     },
+    renameObject: function(row) {
+      if (row.type === 'folder') {
+        this.$router.push({ name: `files-folder`, params: { bucket: this.selectedBucket, folder: encode(row.key) }})
+      } else {
+        // console.log(row)
+        this.$refs.preview.openFile(row)
+      }
+    },
     fetchFiles: async function () {
       this.loading = true
 
       this.rows = await apiHandler.fetchFile(this.selectedBucket, this.selectedFolder, '/')
       this.loading = false
+    },
+    openPreviewFromKey: async function () {
+      let key = `${decode(this.$route.params.file)}`
+      if (this.selectedFolder && this.selectedFolder !== ROOT_FOLDER) {
+        key = `${this.selectedFolder}${decode(this.$route.params.file)}`
+      }
+
+      const file = await apiHandler.headFile(this.selectedBucket, key)
+      this.$refs.preview.openFile(file)
     }
   },
   created() {
@@ -232,6 +249,10 @@ export default defineComponent({
     this.$refs.table.sort('name')
 
     this.$bus.on('fetchFiles', this.fetchFiles)
+
+    if (this.$route.params.file) {
+      this.openPreviewFromKey()
+    }
   },
   beforeUnmount() {
     this.$bus.off('fetchFiles')

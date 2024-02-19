@@ -3,6 +3,24 @@ import { useMainStore } from "stores/main-store";
 
 export const ROOT_FOLDER = "IA=="  // IA== is a space
 
+function mapFile(obj, prefix) {
+  const date = new Date(obj.uploaded)
+
+  return {
+    ...obj,
+    hash: encode(obj.key),
+    nameHash: encode(obj.key.replace(prefix, '')),
+    name: obj.key.replace(prefix, ''),
+    lastModified: timeSince(date),
+    timestamp: date.getTime(),
+    size: bytesToSize(obj.size),
+    sizeRaw: obj.size,
+    type: 'file',
+    icon: 'article',
+    color: 'grey',
+  }
+}
+
 export const timeSince = (date) => {
   const seconds = Math.floor((new Date() - date) / 1000);
 
@@ -87,8 +105,17 @@ export const apiHandler = {
       extra
     );
   },
-  headFile: (bucket, key) => {
-    return api.get(`/buckets/${bucket}/${encode(key)}/head`);
+  headFile: async (bucket, key) => {
+    let prefix = ''
+    if (key.includes('/')) {
+      prefix = key.replace(key.split('/').pop(), '')
+    }
+
+    const resp = await api.get(`/buckets/${bucket}/${encode(key)}/head`);
+
+    if (resp.status === 200) {
+      return mapFile(resp.data, prefix)
+    }
   },
   // renameObject: (oldName, newName) => {
   //   return axios.post(`/buckets/${store.state.activeBucket}/move`, {
@@ -171,23 +198,7 @@ export const apiHandler = {
       if (response.data.objects) {
         const files = response.data.objects.filter(function(obj) {
           return !(obj.key.endsWith('/') && delimiter !== '') && obj.key !== prefix  // Remove selected folder when delimiter is defined
-        }).map(function(obj) {
-          const date = new Date(obj.uploaded)
-
-          return {
-            ...obj,
-            hash: encode(obj.key),
-            nameHash: encode(obj.key.replace(prefix, '')),
-            name: obj.key.replace(prefix, ''),
-            lastModified: timeSince(date),
-            timestamp: date.getTime(),
-            size: bytesToSize(obj.size),
-            sizeRaw: obj.size,
-            type: 'file',
-            icon: 'article',
-            color: 'grey',
-          }
-        }).filter(obj => {
+        }).map((obj) => mapFile(obj, prefix)).filter(obj => {
           // Remove hidden files
           return !(mainStore.showHiddenFiles !== true && obj.name.startsWith('.'))
         })

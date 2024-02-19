@@ -6,6 +6,9 @@
     <q-item clickable v-close-popup @click="downloadObject" v-if="prop.row.type === 'file'">
       <q-item-section>Download</q-item-section>
     </q-item>
+    <q-item clickable v-close-popup @click="renameObject" v-if="prop.row.type === 'file'">
+      <q-item-section>Rename</q-item-section>
+    </q-item>
     <q-item clickable v-close-popup @click="shareObject">
       <q-item-section>Get sharable link</q-item-section>
     </q-item>
@@ -36,6 +39,9 @@ export default {
     },
   },
   methods: {
+    renameObject: function() {
+      this.$emit('renameObject', this.prop.row)
+    },
     openObject: function() {
       this.$emit('openObject', this.prop.row)
     },
@@ -57,7 +63,7 @@ export default {
           name: 'files-file',
           params: {
             bucket: this.selectedBucket,
-            folder: encode(this.selectedFolder || ROOT_FOLDER),
+            folder: this.selectedFolder ? encode(this.selectedFolder) : ROOT_FOLDER,
             file: this.prop.row.nameHash
           }
         }).href

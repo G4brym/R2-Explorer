@@ -1,18 +1,32 @@
 <template>
-  <q-dialog v-model="deleteModal" @hide="deleteReset">
+  <q-dialog v-model="deleteModal" @hide="reset">
     <q-card>
-      <q-card-section class="row column" v-if="deleteRow">
+      <q-card-section class="row column" v-if="row">
         <q-avatar class="q-mb-md" icon="delete" color="red" text-color="white" />
-        <span v-if="deleteRow.type === 'folder'" class="q-ml-sm">Are you sure you want to delete the folder <code>{{deleteRow.name}}</code>, and
+        <span v-if="row.type === 'folder'" class="q-ml-sm">Are you sure you want to delete the folder <code>{{row.name}}</code>, and
           <code v-if="deleteFolderInnerFilesCount !== null">{{deleteFolderInnerFilesCount}}</code>
           <code v-else><q-spinner color="primary"/></code>
           files inside?</span>
-        <span v-else class="q-ml-sm">Are you sure you want to delete the file <code>{{deleteRow.name}}</code>?</span>
+        <span v-else class="q-ml-sm">Are you sure you want to delete the file <code>{{row.name}}</code>?</span>
       </q-card-section>
 
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" v-close-popup />
         <q-btn flat label="Delete" color="red" @click="deleteConfirm" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
+  <q-dialog v-model="renameModal" @hide="reset">
+    <q-card>
+      <q-card-section class="row column" v-if="row">
+        <q-avatar class="q-mb-md" icon="pencil" color="red" text-color="white" />
+        <span class="q-ml-sm">Are you sure you want to rename the file <code>{{row.name}}</code>?</span>
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="Cancel" color="primary" v-close-popup />
+        <q-btn flat label="Rename" color="red" @click="renameConfirm" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -28,9 +42,10 @@ export default defineComponent({
   name: 'FileOptions',
   data: function () {
     return {
-      deleteRow: null,
+      row: null,
       deleteFolderContents: [],
       deleteModal: false,
+      renameModal: false,
       deleteFolderInnerFilesCount: null,
       newFolderName: ''
     }
@@ -38,16 +53,28 @@ export default defineComponent({
   methods: {
     deleteObject: async function(row) {
       this.deleteModal = true
-      this.deleteRow = row
+      this.row = row
       if (row.type === 'folder') {
         this.deleteFolderContents = await apiHandler.fetchFile(this.selectedBucket, row.key, '')
         this.deleteFolderInnerFilesCount = this.deleteFolderContents.length
       }
     },
+    renameObject: async function(row) {
+      this.deleteModal = true
+      this.row = row
+      if (row.type === 'folder') {
+        this.deleteFolderContents = await apiHandler.fetchFile(this.selectedBucket, row.key, '')
+        this.deleteFolderInnerFilesCount = this.deleteFolderContents.length
+      }
+    },
+    renameConfirm: async function() {
+      this.$bus.emit('fetchFiles')
+      this.reset()
+    },
     deleteConfirm: async function() {
       this.deleteModal = false
 
-      if (this.deleteRow.type === 'folder') {
+      if (this.row.type === 'folder') {
         const notif = this.q.notify({
           group: false,
           spinner: true,
@@ -65,7 +92,7 @@ export default defineComponent({
             caption: `${parseInt(i*100/(this.deleteFolderInnerFilesCount+1))}%`  // +1 because still needs to delete the folder
           })
         }
-        await apiHandler.deleteObject(this.deleteRow.key, this.selectedBucket)
+        await apiHandler.deleteObject(this.row.key, this.selectedBucket)
 
         notif({
           icon: 'done', // we add an icon
@@ -75,7 +102,7 @@ export default defineComponent({
           timeout: 2500 // we will timeout it in 2.5s
         })
       } else {
-        await apiHandler.deleteObject(this.deleteRow.key, this.selectedBucket)
+        await apiHandler.deleteObject(this.row.key, this.selectedBucket)
         this.q.notify({
           group: false,
           icon: 'done', // we add an icon
@@ -86,11 +113,12 @@ export default defineComponent({
       }
 
       this.$bus.emit('fetchFiles')
-      this.deleteReset()
+      this.reset()
     },
-    deleteReset: function() {
+    reset: function() {
       this.deleteModal = false
-      this.deleteRow = null
+      this.renameModal = false
+      this.row = null
       this.deleteFolderInnerFilesCount = null
       this.deleteFolderContents = []
     },
