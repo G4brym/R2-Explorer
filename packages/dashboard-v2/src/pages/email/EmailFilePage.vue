@@ -7,20 +7,25 @@
             <q-btn push icon="arrow_back" :to="{ name: `email-folder`, params: { bucket: $route.params.bucket, folder: $route.params.folder }}">
               <q-tooltip>Back</q-tooltip>
             </q-btn>
-            <q-btn push icon="chevron_left">
-              <q-tooltip>More recent</q-tooltip>
-            </q-btn>
-            <q-btn push icon="chevron_right">
-              <q-tooltip>More older</q-tooltip>
-            </q-btn>
-            <q-btn push icon="mark_email_unread">
-              <q-tooltip>Mark email as unread</q-tooltip>
-            </q-btn>
+<!--            <q-btn push icon="chevron_left">-->
+<!--              <q-tooltip>More recent</q-tooltip>-->
+<!--            </q-btn>-->
+<!--            <q-btn push icon="chevron_right">-->
+<!--              <q-tooltip>More older</q-tooltip>-->
+<!--            </q-btn>-->
+            <template v-if="fileHead">
+              <q-btn push icon="mark_email_unread" @click="markAsUnread" v-if="fileHead.customMetadata.read === 'true'">
+                <q-tooltip>Mark email as unread</q-tooltip>
+              </q-btn>
+              <q-btn push icon="mark_email_read" @click="markAsRead" v-else>
+                <q-tooltip>Mark email as read</q-tooltip>
+              </q-btn>
+            </template>
           </q-btn-group>
       </q-card-section>
 
       <q-card-section vertical>
-        <h5 class="font-18">{{ file.subject }}</h5>
+        <h5 class="font-18 q-my-none">{{ file.subject }}</h5>
       </q-card-section>
 
       <q-card-section horizontal class="q-px-sm">
@@ -55,29 +60,16 @@
         <h6 class="q-my-md">Attachments</h6>
 
         <div class="row">
-          <div class="col-xl-4 col-lg-6 col-md-6" v-for="attachment of file.attachments" :key="attachment.filename">
-            <div class="card mb-1 shadow-none border">
-              <div class="p-2">
-                <div class="row align-items-center">
-                  <div class="col-auto">
-                    <div class="avatar-sm">
-                    <span class="avatar-title bg-soft-primary text-primary rounded">
-                        .{{ attachment.filename.split(".").pop() }}
-                    </span>
-                    </div>
-                  </div>
-                  <div class="col ps-0">
-                    <span class="text-muted fw-bold">{{ attachment.filename }}</span>
-                    <!--                  <p class="mb-0">{{ bytesToSize(attachment.size) }}</p>-->
-                  </div>
-                  <div class="col-auto">
-                    <a :href="attachment.downloadUrl" class="btn btn-link btn-lg text-muted">
-                      <i class="bi bi-download"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="col-md-4" v-for="attachment of file.attachments" :key="attachment.filename">
+
+            <q-card>
+              <q-card-section class="q-pa-sm flex" style="align-items: center">
+                <q-icon name="description" size="md" color="blue" class="q-mr-sm"/>
+                {{ attachment.filename }}
+                <q-btn color="white" text-color="black" icon="download" class="q-mr-0 q-ml-auto" />
+              </q-card-section>
+            </q-card>
+
           </div>
         </div>
       </q-card-actions>
@@ -102,12 +94,14 @@ import { defineComponent } from "vue";
 import { api } from "boot/axios";
 import { useMainStore } from "stores/main-store";
 import { apiHandler, decode, encode, timeSince } from "../../appUtils";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "EmailFolderPage",
   data: function() {
     return {
       file: null,
+      fileHead: null,
       timeInterval: null
     };
   },
@@ -120,6 +114,10 @@ export default defineComponent({
     },
     selectedFile: function() {
       return this.$route.params.file;
+    },
+    filePath: function() {
+      const fileName = decode(this.selectedFile)
+      return `.r2-explorer/emails/${this.selectedFolder}/${fileName}`
     }
   },
   watch: {
@@ -136,40 +134,65 @@ export default defineComponent({
       this.resizeIframe()
     },
     resizeIframe() {
-      this.$refs.renderWindow.style.height = this.$refs.renderWindow.contentWindow.document.documentElement.scrollHeight + "px";
+      if (this.$refs.renderWindow) {
+        this.$refs.renderWindow.style.height = this.$refs.renderWindow.contentWindow.document.documentElement.scrollHeight + "px";
+      }
     },
 
     fetchEmail: async function() {
+      const self = this
       const fileName = decode(this.selectedFile)
-      const filePath = `.r2-explorer/emails/${this.selectedFolder}/${fileName}`
 
-      const fileData = await apiHandler.downloadFile(this.selectedBucket, filePath, {})
+      const fileData = await apiHandler.downloadFile(this.selectedBucket, this.filePath, {})
 
       const filename = fileName.split(".json")[0];
       for (const att of fileData.data.attachments) {
         att.downloadUrl = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(`${filename}/${att.filename}`)}`;
       }
       this.file = fileData.data;
-      console.log(this.file)
 
-      this.timeInterval = setInterval(function() {
-        this.resizeIframe()
-      }, 400);
-
-      try {
-        // Up to 1.0.6 there was a bug in the file head endpoint
-        const fileHead = await apiHandler.headFile(this.selectedBucket, filePath)
-
-        if (fileHead.data.customMetadata.read === false) {
-          await apiHandler.updateMetadata(this.selectedBucket, filePath, {
-            ...fileHead.data.customMetadata,
+      apiHandler.headFile(this.selectedBucket, this.filePath).then(async (obj) => {
+        if (obj.customMetadata.read === 'false') {
+          self.fileHead = await apiHandler.updateMetadata(self.selectedBucket, self.filePath, {
+            ...obj.customMetadata,
             read: true
           });
+        } else {
+          self.fileHead = obj
         }
-      } catch (e) {
-        // Empty
-      }
+      })
 
+      this.timeInterval = setInterval(function() {
+        self.resizeIframe()
+      }, 400);
+    },
+    markAsUnread: async function () {
+      this.fileHead = await apiHandler.updateMetadata(this.selectedBucket, this.filePath, {
+        ...this.fileHead.customMetadata,
+        read: false
+      });
+
+      this.q.notify({
+        group: false,
+        icon: 'done', // we add an icon
+        spinner: false, // we reset the spinner setting so the icon can be displayed
+        message: 'Email marked as unread!',
+        timeout: 2500 // we will timeout it in 2.5s
+      })
+    },
+    markAsRead: async function () {
+      this.fileHead = await apiHandler.updateMetadata(this.selectedBucket, this.filePath, {
+        ...this.fileHead.customMetadata,
+        read: true
+      });
+
+      this.q.notify({
+        group: false,
+        icon: 'done', // we add an icon
+        spinner: false, // we reset the spinner setting so the icon can be displayed
+        message: 'Email marked as read!',
+        timeout: 2500 // we will timeout it in 2.5s
+      })
     }
   },
   created() {
@@ -177,7 +200,8 @@ export default defineComponent({
   },
   setup() {
     return {
-      mainStore: useMainStore()
+      mainStore: useMainStore(),
+      q: useQuasar()
     };
   }
 });

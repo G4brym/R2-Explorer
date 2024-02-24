@@ -1,7 +1,7 @@
 <template>
   <q-btn dense flat round icon="menu" @click="$emit('toggle')" />
 
-  <q-toolbar-title class="text-bold">
+  <q-toolbar-title style="overflow: unset" class="text-bold">
     <q-avatar>
       <img src="/v2.0/logo-white.svg">
     </q-avatar>

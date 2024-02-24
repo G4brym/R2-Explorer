@@ -17,6 +17,7 @@
           :rows-per-page-options="[0]"
           column-sort-order="da"
           :flat="true"
+          table-class="file-list"
           @row-dblclick="openRowClick"
           @row-click="openRowDlbClick"
         >
@@ -265,3 +266,25 @@ export default defineComponent({
   },
 })
 </script>
+
+<style>
+.file-list table , .file-list tbody , .file-list thead {
+  width: 100%;
+  display: block;
+}
+
+
+.file-list td:first-of-type, .file-list th:first-of-type {
+  overflow-x: hidden;
+  white-space: nowrap;
+  flex-grow: 1;
+  text-overflow: ellipsis;
+}
+
+.file-list tr {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+
+}
+</style>

@@ -123,13 +123,22 @@ export const apiHandler = {
       newKey: encode(newKey)
     })
   },
-  updateMetadata: (bucket, key, metadata) => {
-    return api.post(
+  updateMetadata: async (bucket, key, metadata) => {
+    let prefix = ''
+    if (key.includes('/')) {
+      prefix = key.replace(key.split('/').pop(), '')
+    }
+
+    const resp = await api.post(
       `/buckets/${bucket}/${encode(key)}`,
       {
         customMetadata: metadata
       }
     )
+
+    if (resp.status === 200) {
+      return mapFile(resp.data, prefix)
+    }
   },
   multipartCreate: (file, key, bucket) => {
     return api.post(`/buckets/${bucket}/multipart/create`, null, {
@@ -193,7 +202,7 @@ export const apiHandler = {
     let contentFolders = []
 
     while (truncated) {
-      const response = await this.listObjects(bucket, prefix, delimiter, cursor)
+      const response = await apiHandler.listObjects(bucket, prefix, delimiter, cursor)
 
       truncated = response.data.truncated
       cursor = response.data.cursor

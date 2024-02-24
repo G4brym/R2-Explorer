@@ -11,6 +11,7 @@
           :hide-pagination="true"
           :rows-per-page-options="[0]"
           :flat="true"
+          table-class="email-list"
           @row-click="rowClick">
 
           <template v-slot:loading>
@@ -24,6 +25,28 @@
             </div>
           </template>
 
+          <template v-slot:body-cell="prop">
+            <q-td :props="prop" :class="rowClass(prop)">
+              {{prop.value}}
+            </q-td>
+          </template>
+
+          <template v-slot:header>
+            <!-- sfd-->
+          </template>
+
+          <template v-slot:body-cell-sender="prop">
+            <q-td :props="prop" class="email-sender" :class="rowClass(prop)">
+              {{prop.value}}
+            </q-td>
+          </template>
+
+          <template v-slot:body-cell-subject="prop">
+            <q-td :props="prop" class="email-subject" :class="rowClass(prop)">
+              {{prop.value}}
+            </q-td>
+          </template>
+
           <template v-slot:no-data>
             <div class="full-width q-my-lg" v-if="!loading">
               <h6 class="flex items-center justify-center">
@@ -34,44 +57,10 @@
           </template>
 
           <template v-slot:body-cell-has_attachments="prop">
-            <td>
+            <q-td :props="prop" :class="rowClass(prop)">
               <q-icon v-if="prop.row.has_attachments" name="attachment" size="sm" color="black" />
-            </td>
-          </template>
-
-          <template v-slot:body-cell-options="">
-            <td class="text-right">
-              <q-btn round flat icon="more_vert" size="sm">
-                <q-menu>
-                  <q-list style="min-width: 100px">
-                    <q-item clickable v-close-popup>
-                      <q-item-section>New tab</q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup>
-                      <q-item-section>New incognito tab</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable v-close-popup>
-                      <q-item-section>Recent tabs</q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup>
-                      <q-item-section>History</q-item-section>
-                    </q-item>
-                    <q-item clickable v-close-popup>
-                      <q-item-section>Downloads</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable v-close-popup>
-                      <q-item-section>Settings</q-item-section>
-                    </q-item>
-                    <q-separator />
-                    <q-item clickable v-close-popup>
-                      <q-item-section>Help &amp; Feedback</q-item-section>
-                    </q-item>
-                  </q-list>
-                </q-menu>
-              </q-btn>
-            </td>
+              <q-icon v-else size="sm" color="white" />
+            </q-td>
           </template>
         </q-table>
         <template v-if="!hasMorePages">
@@ -120,19 +109,19 @@ export default defineComponent({
           sortable: false
         },
         {
+          name: "lastModified",
+          required: true,
+          align: "left",
+          field: "lastModified",
+          sortable: false
+        },
+        {
           name: "has_attachments",
           required: true,
           align: "left",
           field: "has_attachments",
           sortable: false
         },
-        {
-          name: "lastModified",
-          required: true,
-          align: "left",
-          field: "lastModified",
-          sortable: false
-        }
       ]
     };
   },
@@ -150,6 +139,9 @@ export default defineComponent({
     }
   },
   methods: {
+    rowClass: function (prop) {
+      return prop.row.customMetadata.read === 'true' ? 'email-read' : 'email-unread'
+    },
     rowClick: function(evt, row, index) {
       const file = row.key.replace(/^.*[\\/]/, "");
       // const folder = row.key.replace(file, '')
@@ -238,8 +230,8 @@ export default defineComponent({
 
       this.indexCursors = indexData.cursors.reverse()
 
-      await this.$refs.infScroll.setIndex(-1)  // First page is 0
-      await this.$refs.infScroll.trigger()
+      await this.loadNextPage(0, () => {})
+      await this.$refs.infScroll.setIndex(0)  // First page is 0
 
       this.loadMoreAutomatically = false
 
@@ -286,3 +278,55 @@ export default defineComponent({
   }
 });
 </script>
+
+<style>
+.email-read {
+  background-color: #f3f7f9;
+  color: grey;
+}
+.email-unread {
+  font-weight: 500;
+}
+
+.email-sender {
+  width: 200px;
+  overflow-x: hidden;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-overflow: ellipsis;
+
+  .mobile-subject {
+    display: none;
+  }
+}
+
+.email-subject {
+  overflow-x: hidden;
+  white-space: nowrap;
+  flex-grow: 1;
+  text-overflow: ellipsis;
+}
+
+.email-list table , .email-list tbody {
+  width: 100%;
+  display: block;
+}
+
+.email-list td {
+  vertical-align: middle !important;
+}
+
+.email-list tr {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+
+  //width: 100%;
+  //display: block;
+
+  &:hover {
+    box-shadow: 0 2px 2px -2px gray;
+    z-index: 10
+  }
+}
+</style>

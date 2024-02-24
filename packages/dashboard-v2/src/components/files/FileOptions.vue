@@ -77,6 +77,13 @@ export default defineComponent({
 
       this.$bus.emit('fetchFiles')
       this.reset()
+      this.q.notify({
+        group: false,
+        icon: 'done', // we add an icon
+        spinner: false, // we reset the spinner setting so the icon can be displayed
+        message: 'File renamed!',
+        timeout: 2500 // we will timeout it in 2.5s
+      })
     },
     deleteConfirm: async function() {
       this.deleteModal = false
@@ -90,7 +97,7 @@ export default defineComponent({
           timeout: 0
         })
 
-        console.log(this.deleteFolderContents)
+        // console.log(this.deleteFolderContents)
         for (const [i, innerFile] of this.deleteFolderContents.entries()) {
           if (innerFile.key) {
             await apiHandler.deleteObject(innerFile.key, this.selectedBucket)
