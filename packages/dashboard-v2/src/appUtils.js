@@ -117,12 +117,12 @@ export const apiHandler = {
       return mapFile(resp.data, prefix)
     }
   },
-  // renameObject: (oldName, newName) => {
-  //   return axios.post(`/buckets/${store.state.activeBucket}/move`, {
-  //     oldKey: encodeKey(oldName, store.state.currentFolder),
-  //     newKey: encodeKey(newName, store.state.currentFolder)
-  //   })
-  // },
+  renameObject: (bucket, oldKey, newKey) => {
+    return api.post(`/buckets/${bucket}/move`, {
+      oldKey: encode(oldKey),
+      newKey: encode(newKey)
+    })
+  },
   updateMetadata: (bucket, key, metadata) => {
     return api.post(
       `/buckets/${bucket}/${encode(key)}`,

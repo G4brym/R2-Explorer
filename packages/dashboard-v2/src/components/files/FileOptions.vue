@@ -12,21 +12,21 @@
 
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" v-close-popup />
-        <q-btn flat label="Delete" color="red" @click="deleteConfirm" />
+        <q-btn flat label="Delete" color="red" :loading="loading" @click="deleteConfirm" />
       </q-card-actions>
     </q-card>
   </q-dialog>
 
   <q-dialog v-model="renameModal" @hide="reset">
-    <q-card>
+    <q-card style="min-width: 300px;">
       <q-card-section class="row column" v-if="row">
-        <q-avatar class="q-mb-md" icon="pencil" color="red" text-color="white" />
-        <span class="q-ml-sm">Are you sure you want to rename the file <code>{{row.name}}</code>?</span>
+        <q-avatar class="q-mb-md" icon="edit" color="orange" text-color="white" />
+        <q-input v-model="renameInput" label="Standard" />
       </q-card-section>
 
       <q-card-actions align="right">
         <q-btn flat label="Cancel" color="primary" v-close-popup />
-        <q-btn flat label="Rename" color="red" @click="renameConfirm" />
+        <q-btn flat label="Rename" color="orange" :loading="loading" @click="renameConfirm" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -47,7 +47,9 @@ export default defineComponent({
       deleteModal: false,
       renameModal: false,
       deleteFolderInnerFilesCount: null,
-      newFolderName: ''
+      newFolderName: '',
+      renameInput: '',
+      loading: false,
     }
   },
   methods: {
@@ -60,14 +62,19 @@ export default defineComponent({
       }
     },
     renameObject: async function(row) {
-      this.deleteModal = true
+      this.renameModal = true
       this.row = row
-      if (row.type === 'folder') {
-        this.deleteFolderContents = await apiHandler.fetchFile(this.selectedBucket, row.key, '')
-        this.deleteFolderInnerFilesCount = this.deleteFolderContents.length
-      }
+      // console.log(row)
+      this.renameInput = row.name
     },
     renameConfirm: async function() {
+      if (this.renameInput.length === 0) {
+        return
+      }
+
+      this.loading = true
+      await apiHandler.renameObject(this.selectedBucket, this.row.key, this.row.key.replace(this.row.name, this.renameInput))
+
       this.$bus.emit('fetchFiles')
       this.reset()
     },
@@ -116,8 +123,10 @@ export default defineComponent({
       this.reset()
     },
     reset: function() {
+      this.loading = false
       this.deleteModal = false
       this.renameModal = false
+      this.renameInput = ''
       this.row = null
       this.deleteFolderInnerFilesCount = null
       this.deleteFolderContents = []
