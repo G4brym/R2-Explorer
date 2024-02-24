@@ -131,8 +131,12 @@ export default {
       let uploadCount = 0
       for (const [folder, files] of Object.entries(folders)) {
         let targetFolder = this.selectedFolder + folder
-        if (targetFolder.slice(-1) !== '/') {
+        if (targetFolder.length > 0 && targetFolder.slice(-1) !== '/') {
           targetFolder += '/'
+        }
+
+        if(targetFolder === '/' || targetFolder === ROOT_FOLDER) {
+          targetFolder = ''
         }
 
         for (const file of files) {

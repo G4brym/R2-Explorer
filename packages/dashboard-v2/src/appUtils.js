@@ -176,6 +176,15 @@ export const apiHandler = {
       onUploadProgress: callback
     })
   },
+  listObjects: async (bucket, prefix, delimiter = '/', cursor = null) => {
+    return await api.get(`/buckets/${bucket}?include=customMetadata&include=httpMetadata`, {
+      params: {
+        delimiter: delimiter,
+        prefix: prefix && prefix !== '/' ? encode(prefix) : '',
+        cursor: cursor
+      }
+    })
+  },
   fetchFile: async (bucket, prefix, delimiter = '/') => {
     const mainStore = useMainStore();
     let truncated = true
@@ -184,13 +193,7 @@ export const apiHandler = {
     let contentFolders = []
 
     while (truncated) {
-      const response = await api.get(`/buckets/${bucket}?include=customMetadata&include=httpMetadata`, {
-        params: {
-          delimiter: delimiter,
-          prefix: prefix && prefix !== '/' ? encode(prefix) : '',
-          cursor: cursor
-        }
-      })
+      const response = await this.listObjects(bucket, prefix, delimiter, cursor)
 
       truncated = response.data.truncated
       cursor = response.data.cursor
