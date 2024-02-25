@@ -68,11 +68,11 @@ export default createStore({
       if ((state.activeBucket === null && data.buckets.length > 0) || router.currentRoute.value.href.startsWith('/auth')) {
         const targetView = (location.pathname.startsWith('/email')) ? 'email-home' : 'storage-home'
 
-        const lastOpenTab = localStorage.getItem('lastOpenTab')
-        if (lastOpenTab && location.pathname === '/') {
-          router.push(JSON.parse(lastOpenTab))
-          return
-        }
+        //const lastOpenTab = localStorage.getItem('lastOpenTab')
+        //if (lastOpenTab && location.pathname === '/') {
+        //  router.push(JSON.parse(lastOpenTab))
+        //  return
+        //}
 
         router.push({ name: targetView, params: { bucket: data.buckets[0].name } })
       }

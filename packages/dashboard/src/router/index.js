@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from "vue-router";
 import StorageHomeView from '@/views/StorageHomeView'
 import EmailHomeView from "@/views/EmailHomeView.vue";
 import EmailDetailsView from "@/views/EmailDetailsView.vue";
@@ -48,7 +48,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes
 })
 

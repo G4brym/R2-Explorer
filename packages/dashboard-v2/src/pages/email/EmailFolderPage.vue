@@ -1,7 +1,8 @@
 <template>
   <q-page class="">
     <div class="q-pa-md">
-      <q-infinite-scroll ref="infScroll" :disable="loadMoreAutomatically" @load="loadNextPage" :offset="250" :debounce="100">
+      <q-infinite-scroll ref="infScroll" :disable="loadMoreAutomatically" @load="loadNextPage" :offset="250"
+                         :debounce="100">
         <q-table
           ref="table"
           :rows="rows"
@@ -27,23 +28,33 @@
 
           <template v-slot:body-cell="prop">
             <q-td :props="prop" :class="rowClass(prop)">
-              {{prop.value}}
+              {{ prop.value }}
             </q-td>
           </template>
 
           <template v-slot:header>
-            <!-- sfd-->
+            <tr class="q-mb-md">
+              <th class="text-left">
+                <q-btn color="green" icon="refresh" :loading="loading" @click="fetchFiles">
+                  <template v-slot:loading>
+                    <q-spinner
+                      color="white"
+                    />
+                  </template>
+                </q-btn>
+              </th>
+            </tr>
           </template>
 
           <template v-slot:body-cell-sender="prop">
             <q-td :props="prop" class="email-sender" :class="rowClass(prop)">
-              {{prop.value}}
+              {{ prop.value }}
             </q-td>
           </template>
 
           <template v-slot:body-cell-subject="prop">
             <q-td :props="prop" class="email-subject" :class="rowClass(prop)">
-              {{prop.value}}
+              {{ prop.value }}
             </q-td>
           </template>
 
@@ -88,6 +99,7 @@ export default defineComponent({
   name: "EmailFolderPage",
   data: function() {
     return {
+      timeInterval: null,
       indexCursors: null,
       loading: false,
       loadMoreAutomatically: true,
@@ -121,7 +133,7 @@ export default defineComponent({
           align: "left",
           field: "has_attachments",
           sortable: false
-        },
+        }
       ]
     };
   },
@@ -139,8 +151,8 @@ export default defineComponent({
     }
   },
   methods: {
-    rowClass: function (prop) {
-      return prop.row.customMetadata.read === 'true' ? 'email-read' : 'email-unread'
+    rowClass: function(prop) {
+      return prop.row.customMetadata.read === "true" ? "email-read" : "email-unread";
     },
     rowClick: function(evt, row, index) {
       const file = row.key.replace(/^.*[\\/]/, "");
@@ -211,29 +223,31 @@ export default defineComponent({
       return updatedIndex;
     },
     loadNextPage: async function(index, done) {
-      const page = this.indexCursors[index]
+      const page = this.indexCursors[index];
 
       if (page) {
-        await this.loadIndexPage(page)
+        await this.loadIndexPage(page);
       } else {
         // No more pages to load
-        this.loadMoreAutomatically = true
-        this.hasMorePages = false
+        this.loadMoreAutomatically = true;
+        this.hasMorePages = false;
       }
 
-      done()
+      done();
     },
     fetchFiles: async function() {
       this.loading = true;
+      this.rows = []
 
       const indexData = await this.getOrCreateIndex();
 
-      this.indexCursors = indexData.cursors.reverse()
+      this.indexCursors = indexData.cursors.reverse();
 
-      await this.loadNextPage(0, () => {})
-      await this.$refs.infScroll.setIndex(0)  // First page is 0
+      await this.loadNextPage(0, () => {
+      });
+      await this.$refs.infScroll.setIndex(0);  // First page is 0
 
-      this.loadMoreAutomatically = false
+      this.loadMoreAutomatically = false;
 
       this.loading = false;
     },
@@ -268,6 +282,17 @@ export default defineComponent({
       }
     }
   },
+  unmounted () {
+    clearInterval(this.timeInterval)
+    this.timeInterval = null
+  },
+  mounted () {
+    const self = this
+
+    this.timeInterval = setInterval(() => {
+      self.fetchFiles()
+    }, 300000) // 5 minutes
+  },
   created() {
     this.fetchFiles();
   },
@@ -284,6 +309,7 @@ export default defineComponent({
   background-color: #f3f7f9;
   color: grey;
 }
+
 .email-unread {
   font-weight: 500;
 }
@@ -307,22 +333,31 @@ export default defineComponent({
   text-overflow: ellipsis;
 }
 
-.email-list table , .email-list tbody {
+.email-list table, .email-list tbody, .email-list thead {
   width: 100%;
   display: block;
+}
+
+.email-list thead {
+  th {
+    border: 0;
+
+     &:hover {
+       border: 0;
+     }
+  }
 }
 
 .email-list td {
   vertical-align: middle !important;
 }
 
-.email-list tr {
+.email-list tbody tr {
   display: flex;
   width: 100%;
   justify-content: center;
 
-  //width: 100%;
-  //display: block;
+//width: 100%; //display: block;
 
   &:hover {
     box-shadow: 0 2px 2px -2px gray;

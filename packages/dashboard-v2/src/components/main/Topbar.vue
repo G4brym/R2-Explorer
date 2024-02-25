@@ -3,7 +3,7 @@
 
   <q-toolbar-title style="overflow: unset" class="text-bold">
     <q-avatar>
-      <img src="/v2.0/logo-white.svg">
+      <img src="/logo-white.svg">
     </q-avatar>
     R2-Explorer
   </q-toolbar-title>

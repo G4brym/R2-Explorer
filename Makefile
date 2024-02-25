@@ -11,8 +11,8 @@ build-dashboard:
 	npm install && \
 	npm run build
 
-	cp -r packages/dashboard/dist/ dist/
-	cp -r packages/dashboard-v2/dist/spa/ dist/v2.0/
+	cp -r packages/dashboard-v2/dist/spa/ dist/
+	cp -r packages/dashboard/dist/ dist/v1.0/
 
 build-worker:
 	rm -rf worker/dist/

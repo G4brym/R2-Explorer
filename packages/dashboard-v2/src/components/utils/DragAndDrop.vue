@@ -26,6 +26,7 @@
 
 import { useMainStore } from "stores/main-store";
 import { apiHandler, decode, ROOT_FOLDER } from "src/appUtils";
+import { useQuasar } from "quasar";
 
 export default {
   data: function () {
@@ -127,9 +128,22 @@ export default {
       this.$bus.emit('fetchFiles')
       // self.$store.dispatch('addUploadingFiles', filenames)  // TODO!
 
+      const notif = this.q.notify({
+        group: false,
+        spinner: true,
+        message: `Uploading files 1/${filenames.length}...`,
+        caption: '0%',
+        timeout: 0
+      })
+
       // Upload files
       let uploadCount = 0
       for (const [folder, files] of Object.entries(folders)) {
+        notif({
+          message: `Uploading files ${uploadCount+1}/${filenames.length}...`,
+          caption: `${parseInt((uploadCount+1)*100/(filenames.length))}%`  // +1 because still needs to delete the folder
+        })
+
         let targetFolder = this.selectedFolder + folder
         if (targetFolder.length > 0 && targetFolder.slice(-1) !== '/') {
           targetFolder += '/'
@@ -159,7 +173,7 @@ export default {
               // console.log(`${start} -> ${end}`)
 
               const { data } = await apiHandler.multipartUpload(uploadId, partNumber, this.selectedBucket, key, chunk, (progressEvent) => {
-                console.log((start + progressEvent.loaded) * 100 / file.size)
+                //console.log((start + progressEvent.loaded) * 100 / file.size)
                 // self.$store.dispatch('setUploadProgress', {
                 //   filename: file.name,
                 //   progress: (start + progressEvent.loaded) * 100 / file.size
@@ -173,7 +187,7 @@ export default {
             await apiHandler.multipartComplete(file, key, this.selectedBucket, parts, uploadId)
           } else {
             await apiHandler.uploadObjects(file, key, this.selectedBucket, (progressEvent) => {
-              console.log(progressEvent.loaded * 100 / file.size)
+              //console.log(progressEvent.loaded * 100 / file.size)
               // self.$store.dispatch('setUploadProgress', {
               //   filename: file.name,
               //   progress: progressEvent.loaded * 100 / file.size
@@ -183,9 +197,13 @@ export default {
         }
       }
 
-      // this.$store.dispatch('makeToast', {
-      //   message: `${totalFiles} Files uploaded successfully`, timeout: 5000
-      // })
+      notif({
+        icon: 'done', // we add an icon
+        spinner: false, // we reset the spinner setting so the icon can be displayed
+        caption: '100%',
+        message: 'Files Uploaded!',
+        timeout: 5000 // we will timeout it in 5s
+      })
 
       this.$bus.emit('fetchFiles')
     },
@@ -273,7 +291,8 @@ export default {
   },
   setup () {
     return {
-      mainStore: useMainStore()
+      mainStore: useMainStore(),
+      q: useQuasar()
     }
   },
 }
@@ -281,6 +300,7 @@ export default {
 
 <style lang="scss" scoped>
 .upload-box {
+  //outline: 2px dashed black;
   .box {
     display: none;
   }

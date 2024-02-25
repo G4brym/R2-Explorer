@@ -1,6 +1,6 @@
 <template>
   <div id="wrapper">
-    <template v-if="$route.href?.startsWith('/auth')">
+    <template v-if="$route.href?.startsWith('/v1.0/auth')">
       <router-view />
     </template>
 
