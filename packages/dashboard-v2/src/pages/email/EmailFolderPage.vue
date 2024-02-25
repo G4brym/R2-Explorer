@@ -218,7 +218,9 @@ export default defineComponent({
       const blob = new Blob([JSON.stringify(updatedIndex)], {
         type: "application/json"
       });
-      await apiHandler.uploadObjects(blob, indexKey, this.selectedBucket);
+      try {
+        await apiHandler.uploadObjects(blob, indexKey, this.selectedBucket);
+      } catch (e) {}
 
       return updatedIndex;
     },
