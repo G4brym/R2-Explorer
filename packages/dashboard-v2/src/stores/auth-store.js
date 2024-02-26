@@ -14,13 +14,13 @@ export const useAuthStore = defineStore('auth', {
     StateUser: state => state.user
   },
   actions: {
-    async LogIn(form) {
+    async LogIn(router, form) {
       const mainStore = useMainStore();
       const token = btoa(form.username + ':' + form.password)
 
       api.defaults.headers.common['Authorization'] = `Basic ${token}`;
       try {
-        await mainStore.loadServerConfigs();
+        await mainStore.loadServerConfigs(router);
       } catch (e) {
         console.log(e)
         delete api.defaults.headers.common['Authorization'];
@@ -38,9 +38,9 @@ export const useAuthStore = defineStore('auth', {
         sessionStorage.setItem(SESSION_KEY, token);
       }
 
-      this.router.replace(this.router.currentRoute.value.query?.next || '/');
+      router.replace(router.currentRoute.value.query?.next || '/');
     },
-    async CheckLoginInStorage() {
+    async CheckLoginInStorage(router) {
       let token = sessionStorage.getItem(SESSION_KEY);
       if (!token) {
         token = localStorage.getItem(SESSION_KEY);
@@ -54,24 +54,24 @@ export const useAuthStore = defineStore('auth', {
       api.defaults.headers.common['Authorization'] = `Basic ${token}`;
 
       try {
-        await mainStore.loadServerConfigs();
+        await mainStore.loadServerConfigs(router);
       } catch (e) {
         // Auth token expired
         delete api.defaults.headers.common['Authorization'];
-        await this.router.replace({ name: 'login', query: { next: this.router.currentRoute.fullPath } });
+        await router.replace({ name: 'login', query: { next: router.currentRoute.fullPath } });
         return
       }
 
       this.user = atob(token).split(':')[0];
       this.loginMethod = 'basic'
     },
-    LogOut() {
+    async LogOut(router) {
       localStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem(SESSION_KEY);
 
       this.user = '';
       this.loginMethod = '';
-      this.router.replace('/auth/login');
+      await router.replace({ name: 'login'});
     },
   }
 });

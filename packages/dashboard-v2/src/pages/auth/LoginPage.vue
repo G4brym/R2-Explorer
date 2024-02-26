@@ -67,7 +67,7 @@ export default defineComponent({
     async onSubmit() {
       this.loading = true
       try {
-        await authStore.LogIn(this.form)
+        await authStore.LogIn(this.$router, this.form)
         this.showError = '';
       } catch (error) {
         this.showError = error.message;

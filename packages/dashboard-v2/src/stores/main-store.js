@@ -26,7 +26,7 @@ export const useMainStore = defineStore('main', {
       this.buckets = response.data.buckets
       return response.data.buckets
     },
-    async loadServerConfigs(handleError = false) {
+    async loadServerConfigs(router, handleError = false) {
       // This is the initial requests to server, that also checks if user needs auth
 
       try {
@@ -51,9 +51,8 @@ export const useMainStore = defineStore('main', {
         }
 
         if (handleError) {
-          // console.log(error)
           if (error.response?.status === 401) {
-            await this.router.push({ name: 'login' })
+            await router.push({ name: 'login', query: { next: router.currentRoute.value.fullPath } })
             return
           }
 
