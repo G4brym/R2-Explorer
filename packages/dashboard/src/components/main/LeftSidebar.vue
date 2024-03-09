@@ -56,9 +56,11 @@
         To revisit this message in the future, simply click on the question mark icon located in the left corner. Your
         feedback is invaluable to us, so don't hesitate to reach out with any thoughts or concerns.<br>
         <br>
-        Please report issues here: <a href="https://github.com/G4brym/R2-Explorer/issues/58" target="_blank">https://github.com/G4brym/R2-Explorer/issues/58</a><br>
+        Please report issues here: <a href="https://github.com/G4brym/R2-Explorer/issues" target="_blank">https://github.com/G4brym/R2-Explorer/issues</a><br>
         <br>
-        If you would like to continue using the old Dashboard: <a href="/v1.0/">click here</a><br>
+        If you would like to continue using the old Dashboard, please follow this <a
+        href="https://r2explorer.dev/guides/continue-using-legacy-dashboard/" target="_blank">guide from the
+        documentation</a><br>
         <br>
         Thank you for being a part of our journey towards excellence! 🌟<br>
         <br>
