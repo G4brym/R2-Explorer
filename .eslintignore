@@ -1,2 +1,7 @@
 dist
 node_modules
+packages/create-r2-explorer/*
+packages/github-action/*
+packages/worker/bin/*
+packages/worker/config/*
+packages/dashboard/quasar.config.js

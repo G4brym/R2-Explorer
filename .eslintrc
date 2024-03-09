@@ -13,7 +13,7 @@
 		"typescript",
 		"prettier"
 	],
-	"ignorePatterns": ["**/test/*.js","**/test/*.ts","**/test/**/*.js","**/test/**/*.ts", "packages/worker-constellation-entry/src/ai/tasks/data/validators.js"],
+	"ignorePatterns": [],
 	"rules": {
 		"@typescript-eslint/ban-ts-comment": "off",
 		"@typescript-eslint/no-explicit-any": "off",
