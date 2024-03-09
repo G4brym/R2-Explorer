@@ -3,8 +3,7 @@
 ## Build and publish Dashboard into Dev
 
 ```bash
-cd packages/dashboard/
-npm run build
+make build-dashboard
 wrangler pages publish --branch dev --project-name r2-explorer-dashboard dist/
 ```
 

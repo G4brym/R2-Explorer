@@ -1,6 +1,6 @@
 <template>
   <q-page class="">
-    <div class="q-pa-md">
+    <div class="">
       <q-infinite-scroll ref="infScroll" :disable="loadMoreAutomatically" @load="loadNextPage" :offset="250"
                          :debounce="100">
         <q-table
@@ -48,7 +48,20 @@
 
           <template v-slot:body-cell-sender="prop">
             <q-td :props="prop" class="email-sender" :class="rowClass(prop)">
-              {{ prop.value }}
+              <div class="flex column">
+                <div class="flex">
+                  <div class="mobile-title">
+                    {{ prop.value }}
+                  </div>
+                  <div class="mobile-last-modified mobile-subject">
+                    {{prop.row.lastModified}}
+                    <q-icon v-if="prop.row.has_attachments" name="attachment" size="sm" color="black" />
+                  </div>
+                </div>
+                <div class="email-subject mobile-subject">
+                  {{prop.row.subject}}
+                </div>
+              </div>
             </q-td>
           </template>
 
@@ -248,6 +261,7 @@ export default defineComponent({
       await this.loadNextPage(0, () => {
       });
       await this.$refs.infScroll.setIndex(0);  // First page is 0
+      await this.$refs.infScroll.poll();
 
       this.loadMoreAutomatically = false;
 
@@ -326,6 +340,30 @@ export default defineComponent({
   .mobile-subject {
     display: none;
   }
+
+  @media (max-width: 992px) {
+    width: 100%;
+    height: auto !important;
+
+    .mobile-subject {
+      display: block;
+    }
+
+    .mobile-title {
+      font-size: 18px;
+    }
+
+    .mobile-last-modified {
+      margin-right: 0;
+      margin-left: auto;
+      align-self: end;
+    }
+
+    .email-subject {
+      font-size: 14px;
+      max-width: 100%;
+    }
+  }
 }
 
 .email-subject {
@@ -352,6 +390,12 @@ export default defineComponent({
 
 .email-list td {
   vertical-align: middle !important;
+
+  @media (max-width: 992px) {
+    &:not(.email-sender) {
+      display: none;
+    }
+  }
 }
 
 .email-list tbody tr {

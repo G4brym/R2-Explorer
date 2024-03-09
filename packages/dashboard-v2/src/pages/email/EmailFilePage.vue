@@ -66,7 +66,7 @@
               <q-card-section class="q-pa-sm flex" style="align-items: center">
                 <q-icon name="description" size="md" color="blue" class="q-mr-sm"/>
                 {{ attachment.filename }}
-                <q-btn color="white" text-color="black" icon="download" class="q-mr-0 q-ml-auto" />
+                <q-btn color="white" text-color="black" icon="download" class="q-mr-0 q-ml-auto" @click="downloadAtt(attachment)" />
               </q-card-section>
             </q-card>
 
@@ -147,7 +147,7 @@ export default defineComponent({
 
       const filename = fileName.split(".json")[0];
       for (const att of fileData.data.attachments) {
-        att.downloadUrl = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(`${filename}/${att.filename}`)}`;
+        att.downloadUrl = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(`.r2-explorer/emails/${this.selectedFolder}/${filename}/${att.filename}`)}`;
       }
       this.file = fileData.data;
 
@@ -193,6 +193,18 @@ export default defineComponent({
         message: 'Email marked as read!',
         timeout: 2500 // we will timeout it in 2.5s
       })
+    },
+    downloadAtt: function(attachment) {
+      console.log(attachment)
+      // return
+      const link = document.createElement('a')
+      link.download = attachment.filename
+
+      link.href = attachment.downloadUrl
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     }
   },
   created() {
