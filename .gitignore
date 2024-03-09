@@ -26,11 +26,11 @@ pnpm-debug.log*
 # local tests
 my-r2-explorer
 
-worker/bin
-worker/README.md
-worker/LICENSE
+packages/worker/bin
+packages/worker/README.md
+packages/worker/LICENSE
 
-worker/dev/.wrangler
+packages/worker/dev/.wrangler
 
 packages/github-action/wrangler.toml
 packages/github-action/src

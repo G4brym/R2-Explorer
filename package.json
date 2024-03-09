@@ -1,0 +1,26 @@
+{
+  "name": "r2-explorer-root",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "(eslint .  || (eslint . --fix; exit 1)) && (prettier --check '*.{json,js}' 'packages/*/src/**/*.{js,ts}' || (prettier -w '*.{json,js}' 'packages/*/src/**/*.{js,ts}'; exit 1))",
+    "build-create": "pnpm run --filter create-r2-explorer build",
+    "build-dashboard": "pnpm run --filter r2-explorer-dashboard build",
+    "build-worker": "pnpm run --filter r2-explorer build",
+    "build": "pnpm build-create && pnpm build-dashboard && pnpm build-worker",
+    "deploy-dashboard": "pnpm run --filter r2-explorer-dashboard deploy",
+    "deploy-dashboard-dev": "pnpm run --filter r2-explorer-dashboard deploy-dev",
+    "deploy-dev-worker": "pnpm run --filter r2-explorer-dev-worker deploy",
+    "publish-npm": "pnpm run --filter worker publish"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-typescript": "^3.0.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "husky": "^9.0.11",
+    "prettier": "^3.2.5",
+    "typescript": "^4.7.4"
+  }
+}

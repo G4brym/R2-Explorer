@@ -7,8 +7,5 @@
   },
   "scripts": {
     "publish": "wrangler publish"
-  },
-  "dependencies": {
-    "r2-explorer": "^1.0.0"
   }
 }

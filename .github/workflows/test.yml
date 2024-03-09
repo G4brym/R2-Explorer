@@ -28,8 +28,10 @@ jobs:
       - name: Set RELEASE_VERSION
         run: echo "RELEASE_VERSION=0.0.1" >> $GITHUB_ENV
       - name: Apply new version
-        run: node worker/config/preparePublish.js
-      - name: Build dashboard
-        run: make build-dashboard
-      - name: Build worker
-        run: make build-worker
+        run: node packages/worker/config/preparePublish.js
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build everything
+        run: pnpm build

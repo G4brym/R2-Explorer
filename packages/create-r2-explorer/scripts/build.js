@@ -15,6 +15,7 @@ const run = async () => {
 
 	const runBuild = async () => {
 		await build(config);
+		await build({...config, outdir: undefined, outfile: '../worker/bin/r2-explorer.js'});
 	};
 
 	const runWatch = async () => {

@@ -8,8 +8,8 @@
 		"cloudflare workers",
 		"serverless",
 		"serverless application",
-    "r2-explorer",
-    "cloudflare-r2"
+		"r2-explorer",
+		"cloudflare-r2"
 	],
 	"repository": {
 		"type": "git",
@@ -17,7 +17,7 @@
 		"directory": "packages/create-r2-explorer"
 	},
 	"license": "MIT",
-  "author": "Gabriel Massadas",
+	"author": "Gabriel Massadas",
 	"exports": {
 		".": "./dist/cli.js"
 	},
@@ -62,5 +62,10 @@
 	},
 	"engines": {
 		"node": ">=16.13.0"
+	},
+	"dependencies": {
+		"@clack/core": "^0.3.4",
+		"semver": "^7.6.0",
+		"undici": "^6.7.1"
 	}
 }
