@@ -1,6 +1,15 @@
 # R2 Explorer Dashboard
 
 
+# deploy dashboard v1
+
+```
+cd packages/dashboard
+npm run build
+wrangler pages publish --branch dashboard-v1 --project-name r2-explorer-dashboard dist/
+```
+
+
 Generate PWA icons
 
 ```bash
