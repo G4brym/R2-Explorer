@@ -279,7 +279,7 @@ export default defineComponent({
         const files = response.data.objects.filter(function(obj) {
           return !obj.key.endsWith("/");  // Remove selected folder
         }).map(function(obj) {
-          const date = new Date(obj.uploaded);
+          const date = new Date(parseInt(obj.customMetadata.timestamp));
 
           return {
             ...obj,
@@ -288,7 +288,7 @@ export default defineComponent({
             has_attachments: obj.customMetadata.has_attachments === "true",
             read: obj.customMetadata.read,
             lastModified: timeSince(date),
-            timestamp: date.getTime()
+            timestamp: parseInt(obj.customMetadata.timestamp)
           };
         });
 

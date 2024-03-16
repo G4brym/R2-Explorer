@@ -44,9 +44,10 @@
 
       <q-card-actions vertical>
         <div class="overflow-auto d-block email-wrapper">
-          <iframe v-if="file.html" frameborder="0" scrolling="no" class="w-100 d-block" @load="contentFinishedLoading"
+          <iframe v-if="srcdoc" frameborder="0" scrolling="no" class="w-100 d-block" @load="contentFinishedLoading"
                   ref="renderWindow"
-                  :srcdoc="file.html"
+                  id="renderWindow"
+                  :srcdoc="srcdoc"
                   sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin"
                   csp="script-src 'none'"
           />
@@ -55,22 +56,22 @@
       </q-card-actions>
 
 
-      <q-card-actions vertical v-if="file.attachments.length > 0">
+      <q-card-actions vertical v-if="attachments.length > 0">
         <q-separator/>
         <h6 class="q-my-md">Attachments</h6>
 
-        <div class="row">
-          <div class="col-md-4" v-for="attachment of file.attachments" :key="attachment.filename">
+        <div class="row attachments">
+            <div v-for="attachment of file.attachments" class="col-md-4 col-sm-12" :key="attachment.filename">
 
-            <q-card>
-              <q-card-section class="q-pa-sm flex" style="align-items: center">
-                <q-icon name="description" size="md" color="blue" class="q-mr-sm"/>
-                {{ attachment.filename }}
-                <q-btn color="white" text-color="black" icon="download" class="q-mr-0 q-ml-auto" @click="downloadAtt(attachment)" />
-              </q-card-section>
-            </q-card>
+              <q-card>
+                <q-card-section class="q-pa-sm flex" style="align-items: center">
+                  <q-icon name="description" size="md" color="blue" class="q-mr-sm"/>
+                  {{ attachment.filename }}
+                  <q-btn color="white" text-color="black" icon="download" class="q-mr-0 q-ml-auto" @click="downloadAtt(attachment)" />
+                </q-card-section>
+              </q-card>
 
-          </div>
+            </div>
         </div>
       </q-card-actions>
     </q-card>
@@ -100,9 +101,11 @@ export default defineComponent({
   name: "EmailFolderPage",
   data: function() {
     return {
+      srcdoc: null,
       file: null,
       fileHead: null,
-      timeInterval: null
+      timeInterval: null,
+      attachments: []
     };
   },
   computed: {
@@ -146,10 +149,37 @@ export default defineComponent({
       const fileData = await apiHandler.downloadFile(this.selectedBucket, this.filePath, {})
 
       const filename = fileName.split(".json")[0];
-      for (const att of fileData.data.attachments) {
-        att.downloadUrl = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(`.r2-explorer/emails/${this.selectedFolder}/${filename}/${att.filename}`)}`;
-      }
+
       this.file = fileData.data;
+      let htmlContent = fileData.data.html
+
+      if (htmlContent) {
+        // Add target blank to all links
+        htmlContent = htmlContent.replaceAll(/<a(.*?)>(.*?)<\/a>/gi, '<a$1 target="_blank">$2</a>');
+
+        // Inject attachment url and replace in html to point to correct path
+        for (const att of fileData.data.attachments) {
+          att.display = true
+          att.downloadUrl = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(`.r2-explorer/emails/${this.selectedFolder}/${filename}/${att.filename}`)}`;
+
+          let contentId = att.contentId
+          if (contentId){
+            if (contentId.startsWith('<') && contentId.endsWith('>')){
+              contentId = contentId.substring(1, contentId.length-1);
+            }
+
+            const matchString = `cid:${contentId}`
+            if (htmlContent.includes(matchString)) {
+              htmlContent = htmlContent.replaceAll(`cid:${contentId}`, att.downloadUrl)
+              att.display = false
+            }
+          }
+        }
+
+        this.srcdoc = htmlContent
+      }
+
+      this.attachments = fileData.data.attachments.filter((obj) => obj.display)
 
       apiHandler.headFile(this.selectedBucket, this.filePath).then(async (obj) => {
         if (obj.customMetadata.read === 'false') {
@@ -161,6 +191,10 @@ export default defineComponent({
           self.fileHead = obj
         }
       })
+
+      setTimeout(function() {
+        self.contentFinishedLoading()
+      }, 10000)
 
       this.timeInterval = setInterval(function() {
         self.resizeIframe()
@@ -222,5 +256,13 @@ export default defineComponent({
 <style scoped lang="scss">
 iframe {
   width: 100%;
+}
+
+.attachments {
+  gap: 10px;
+
+  @media (max-width: 992px) {
+    flex-direction: column;
+  }
 }
 </style>

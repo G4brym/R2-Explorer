@@ -8,6 +8,7 @@ import { receiveEmail } from "./emails/receiveEmail";
 import { serverRouter } from "./server/router";
 import { config as settings } from "./settings";
 import { validateBasicAuth } from "./authentication/api/basic";
+import { emailsRouter } from "./emails/router";
 
 export function R2Explorer(config?: R2ExplorerConfig) {
   config = config || {};
@@ -59,6 +60,7 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
   router.all("/api/server/*", serverRouter);
   router.all("/api/buckets/*", bucketsRouter);
+  router.all("/api/emails/*", emailsRouter);
 
   router.original.get("*", dashboardProxy);
 

@@ -62,8 +62,11 @@ wrangler publish
 - allow bucket names with spaces
 - Search files
 - Rename folders
-- Delete folders
-- Image thumbnail's using Cloudflare workers
+- Image thumbnail's ?
+- Object detection on images using workers-ai ?
 - Tooltip when hovering a file with absolute time in "x days time ago" format
-- bundle bootstrap icons instead of importing
 - support for responding to emails
+
+## Known issues
+
+- Email inline images and assets don't load when using basic auth

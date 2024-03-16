@@ -9,8 +9,8 @@
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
     "build": "quasar build",
-    "deploy": "wrangler pages deploy --branch main --project-name r2-explorer-dashboard dist/",
-    "deploy-dev": "wrangler pages deploy --branch dev --project-name r2-explorer-dashboard dist/"
+    "deploy": "wrangler pages deploy --branch main --project-name r2-explorer-dashboard dist/spa/",
+    "deploy-dev": "wrangler pages deploy --branch dev --project-name r2-explorer-dashboard dist/spa/"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.9",
