@@ -4,7 +4,7 @@ import { api } from "boot/axios";
 export const useMainStore = defineStore('main', {
   state: () => ({
     // Config
-    readonly: true,
+    apiReadonly: true,
     dashboardUrl: '',
     showHiddenFiles: false,
 
@@ -36,7 +36,7 @@ export const useMainStore = defineStore('main', {
           }
         })
 
-        this.readonly = response.data.config.readonly;
+        this.apiReadonly = response.data.config.readonly;
         this.dashboardUrl = response.data.config.dashboardUrl;
         this.showHiddenFiles = response.data.config.showHiddenFiles;
 

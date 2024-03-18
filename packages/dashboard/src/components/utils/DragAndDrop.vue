@@ -60,7 +60,7 @@ export default {
       this.$refs.foldersUploader.click()
     },
     dragover (event) {
-      if (this.mainStore.readonly) {
+      if (this.mainStore.apiReadonly || this.isHover === true) {
         return
       }
 
@@ -75,6 +75,10 @@ export default {
       this.isHover = true
     },
     dragleave (event) {
+      if (this.isHover === false) {
+        return
+      }
+
       if (
         event.clientX < this.dragContainer.left ||
         event.clientX > this.dragContainer.right ||
