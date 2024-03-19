@@ -110,6 +110,7 @@ export default {
     },
     async uploadFiles (folders) {
       let totalFiles = 0
+      let totalSize = 0
       const filenames = []
 
       // Create folders and count files
@@ -119,13 +120,16 @@ export default {
         // }
 
         if (folder !== '') {
-          await apiHandler.createFolder(this.selectedFolder + folder + '/', this.selectedBucket)
+          let folderKey = this.selectedFolder + folder + '/'
+
+          await apiHandler.createFolder(folderKey, this.selectedBucket)
         }
 
         totalFiles += files.length
 
         for (const file of files) {
           filenames.push(file.name)
+          totalSize += file.size
         }
       }
 
@@ -142,6 +146,7 @@ export default {
 
       // Upload files
       let uploadCount = 0
+      let uploadSize = 0
       for (const [folder, files] of Object.entries(folders)) {
         notif({
           message: `Uploading files ${uploadCount+1}/${filenames.length}...`,
@@ -164,7 +169,7 @@ export default {
           const chunkSize = 95 * 1024 * 1024
           // Files bigger than 100MB require multipart upload
           if (file.size > chunkSize) {
-            const { uploadId, key } = (await apiHandler.multipartCreate(file, key, this.selectedBucket)).data
+            const { uploadId } = (await apiHandler.multipartCreate(file, key, this.selectedBucket)).data
 
             let partNumber = 1
             const parts = []
@@ -178,6 +183,9 @@ export default {
 
               const { data } = await apiHandler.multipartUpload(uploadId, partNumber, this.selectedBucket, key, chunk, (progressEvent) => {
                 //console.log((start + progressEvent.loaded) * 100 / file.size)
+                notif({
+                  caption: `${parseInt((uploadSize+start + progressEvent.loaded)*100/(totalSize))}%`
+                })
                 // self.$store.dispatch('setUploadProgress', {
                 //   filename: file.name,
                 //   progress: (start + progressEvent.loaded) * 100 / file.size
@@ -192,12 +200,17 @@ export default {
           } else {
             await apiHandler.uploadObjects(file, key, this.selectedBucket, (progressEvent) => {
               //console.log(progressEvent.loaded * 100 / file.size)
+              notif({
+                caption: `${parseInt((uploadSize+progressEvent.loaded)*100/(totalSize))}%`
+              })
               // self.$store.dispatch('setUploadProgress', {
               //   filename: file.name,
               //   progress: progressEvent.loaded * 100 / file.size
               // })  // TODO
             })
           }
+
+          uploadSize += file.size
         }
       }
 

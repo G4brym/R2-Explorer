@@ -86,9 +86,14 @@ export default defineComponent({
       })
     },
     deleteConfirm: async function() {
-      this.deleteModal = false
-
       if (this.row.type === 'folder') {
+        // When deleting folders, first must copy the objects, because the popup close forces a reset on properties
+        const originalFolder = { ...this.row }
+        const folderContents = [...this.deleteFolderContents]
+        const folderContentsCount = this.deleteFolderInnerFilesCount
+
+        this.deleteModal = false
+
         const notif = this.q.notify({
           group: false,
           spinner: true,
@@ -97,16 +102,16 @@ export default defineComponent({
           timeout: 0
         })
 
-        // console.log(this.deleteFolderContents)
-        for (const [i, innerFile] of this.deleteFolderContents.entries()) {
+        for (const [i, innerFile] of folderContents.entries()) {
           if (innerFile.key) {
             await apiHandler.deleteObject(innerFile.key, this.selectedBucket)
           }
           notif({
-            caption: `${parseInt(i*100/(this.deleteFolderInnerFilesCount+1))}%`  // +1 because still needs to delete the folder
+            caption: `${parseInt(i*100/(folderContentsCount+1))}%`  // +1 because still needs to delete the folder
           })
         }
-        await apiHandler.deleteObject(this.row.key, this.selectedBucket)
+
+        await apiHandler.deleteObject(originalFolder.key, this.selectedBucket)
 
         notif({
           icon: 'done', // we add an icon
@@ -116,6 +121,7 @@ export default defineComponent({
           timeout: 2500 // we will timeout it in 2.5s
         })
       } else {
+        this.deleteModal = false
         await apiHandler.deleteObject(this.row.key, this.selectedBucket)
         this.q.notify({
           group: false,

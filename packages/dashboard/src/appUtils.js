@@ -70,6 +70,10 @@ export const bytesToMegabytes = (bytes) => {
 };
 
 export const encode = (key) => {
+  if (key && key !== '/' && key.startsWith('/')) {
+    // File keys should never start with /
+    key = key.slice(1)
+  }
   return btoa(unescape(encodeURIComponent(key)));
 };
 
