@@ -110,8 +110,17 @@
             <email-viewer :filedata="fileData" />
           </template>
 
-          <template v-else>
-            <h4 class="text-center">Unsupported file type</h4>
+          <template v-else-if="fileData">
+            <div class="flex column" style="height: 100%; flex-wrap: nowrap; max-width: 100%; line-break: anywhere;">
+              <q-card class="bg-orange-2" flat square>
+                <q-card-section>
+                  This in a unknown file type, opening as text.
+                </q-card-section>
+              </q-card>
+              <div class="file-edit">
+                <div v-html="fileData.replaceAll('\n', '<br>')"></div>
+              </div>
+            </div>
           </template>
         </template>
       </q-card-section>
@@ -214,6 +223,12 @@ export default {
           }
         }
       }
+
+      // Open unknown files as text
+      return {
+        type: "unknown",
+        downloadType: "text"
+      }
     },
     async openFile(file) {
       console.log(file)
@@ -251,6 +266,7 @@ export default {
       this.filename = file.name;
       this.file = file;
       this.open = true;
+
       if (previewConfig) {
         this.type = previewConfig.type;
 
