@@ -37,12 +37,14 @@
       <q-btn class="q-mb-sm" @click="gotoFiles" color="blue" icon="folder_copy" label="Files" stack />
       <q-btn class="q-mb-sm" @click="gotoEmail" color="blue" icon="email" label="Email" stack />
 
-      <q-btn class="q-mb-sm q-mt-auto q-mb-0" @click="alert=true" color="secondary" icon="question_mark" label="Info"
+<!--      <q-btn class="q-mb-sm q-mt-auto q-mb-0" @click="settingsPopup=true" color="secondary" icon="settings" label="Server"-->
+<!--             stack />-->
+      <q-btn class="q-mb-sm q-mt-auto q-mb-0" @click="upgradePopup=true" color="secondary" icon="question_mark" label="Info"
              stack />
     </div>
   </div>
 
-  <q-dialog v-model="alert" persistent no-esc-dismiss no-route-dismiss no-backdrop-dismiss>
+  <q-dialog v-model="upgradePopup" persistent no-esc-dismiss no-route-dismiss no-backdrop-dismiss>
     <q-card>
       <q-card-section>
         <div class="text-h6">🎉 Welcome to the new Dashboard v2! 🚀</div>
@@ -73,6 +75,32 @@
     </q-card>
   </q-dialog>
 
+  <q-dialog v-model="settingsPopup">
+    <q-card>
+      <q-card-section>
+        <div class="text-h6">Your server configurations</div>
+      </q-card-section>
+
+      <q-card-section class="q-pt-none">
+        <q-input
+          filled
+          disable
+          v-if="mainStore.username"
+          v-model="mainStore.username"
+        />
+        <q-input
+          filled
+          disable
+          :model-value="mainStore.version"
+        />
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="OK" color="primary" v-close-popup />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
   <create-folder ref="createFolder" />
 </template>
 
@@ -85,7 +113,8 @@ export default defineComponent({
   name: "LeftSidebar",
   data: function() {
     return {
-      alert: false
+      upgradePopup: false,
+      settingsPopup: false
     };
   },
   components: { CreateFolder },
@@ -114,7 +143,7 @@ export default defineComponent({
     const alertSeen = localStorage.getItem("DASH_V2_ALERT");
 
     if (!alertSeen) {
-      this.alert = true;
+      this.upgradePopup = true;
       localStorage.setItem("DASH_V2_ALERT", true);
     }
   },
@@ -131,5 +160,6 @@ export default defineComponent({
 <style scoped>
 .q-btn {
   max-width: 100%;
+  padding: 4px;
 }
 </style>

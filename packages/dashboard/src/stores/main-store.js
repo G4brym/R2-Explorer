@@ -5,6 +5,8 @@ export const useMainStore = defineStore('main', {
   state: () => ({
     // Config
     apiReadonly: true,
+    username: '',
+    version: '',
     dashboardUrl: '',
     showHiddenFiles: false,
 
@@ -37,6 +39,8 @@ export const useMainStore = defineStore('main', {
         })
 
         this.apiReadonly = response.data.config.readonly;
+        this.username = response.data.config.user?.username;
+        this.version = response.data.config.version;
         this.dashboardUrl = response.data.config.dashboardUrl;
         this.showHiddenFiles = response.data.config.showHiddenFiles;
 
