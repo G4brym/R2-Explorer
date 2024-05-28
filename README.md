@@ -35,6 +35,7 @@ Read this in other languages: [Español](READMEes.md), [Português](READMEpt.md)
 - Upload/Rename/Download/Delete files
 - Right click in file for extra options
 - Multipart upload for big files
+- File editing
 
 ## Getting Started
 
@@ -66,6 +67,7 @@ wrangler publish
 - Object detection on images using workers-ai ?
 - Tooltip when hovering a file with absolute time in "x days time ago" format
 - support for responding to emails
+- More advanced file editing with more validations per file type
 
 ## Known issues
 

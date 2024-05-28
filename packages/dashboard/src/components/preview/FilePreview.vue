@@ -231,7 +231,6 @@ export default {
       }
     },
     async openFile(file) {
-      console.log(file)
       if (bytesToMegabytes(file.size) > 200) {
         this.q.notify({
           message: "File is too big to preview.",
@@ -359,7 +358,11 @@ export default {
 
     // Edit functions
     enableEdit: function() {
-      this.fileDataEdited = this.fileData;
+      if (typeof this.fileData === 'object') {
+        this.fileDataEdited = JSON.stringify(this.fileData, null, 2)
+      } else {
+        this.fileDataEdited = this.fileData;
+      }
       this.editMode = true;
     },
     cancelEdit: function() {
@@ -416,8 +419,8 @@ export default {
         timeout: 5000 // we will timeout it in 5s
       })
 
-      this.fileData = this.fileDataEdited
       this.cancelEdit()
+      this.openFile(this.file)
     }
   },
   computed: {
