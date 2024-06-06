@@ -157,7 +157,7 @@ export default {
 
       previewConfig: [
         {
-          extensions: ["png", "jpg", "jpeg", "webp"],
+          extensions: ["png", "jpg", "jpeg", "webp", "avif"],
           type: "image",
           downloadType: "objectUrl"
         },
