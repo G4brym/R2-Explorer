@@ -33,144 +33,156 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
-import { useMainStore } from "stores/main-store";
-import { apiHandler, decode, encode, ROOT_FOLDER } from "src/appUtils";
 import { useQuasar } from "quasar";
+import { ROOT_FOLDER, apiHandler, decode, encode } from "src/appUtils";
+import { useMainStore } from "stores/main-store";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'FileOptions',
-  data: function () {
-    return {
-      row: null,
-      deleteFolderContents: [],
-      deleteModal: false,
-      renameModal: false,
-      deleteFolderInnerFilesCount: null,
-      newFolderName: '',
-      renameInput: '',
-      loading: false,
-    }
-  },
-  methods: {
-    deleteObject: async function(row) {
-      this.deleteModal = true
-      this.row = row
-      if (row.type === 'folder') {
-        this.deleteFolderContents = await apiHandler.fetchFile(this.selectedBucket, row.key, '')
-        this.deleteFolderInnerFilesCount = this.deleteFolderContents.length
-      }
-    },
-    renameObject: async function(row) {
-      this.renameModal = true
-      this.row = row
-      // console.log(row)
-      this.renameInput = row.name
-    },
-    renameConfirm: async function() {
-      if (this.renameInput.length === 0) {
-        return
-      }
+	name: "FileOptions",
+	data: () => ({
+		row: null,
+		deleteFolderContents: [],
+		deleteModal: false,
+		renameModal: false,
+		deleteFolderInnerFilesCount: null,
+		newFolderName: "",
+		renameInput: "",
+		loading: false,
+	}),
+	methods: {
+		deleteObject: async function (row) {
+			this.deleteModal = true;
+			this.row = row;
+			if (row.type === "folder") {
+				this.deleteFolderContents = await apiHandler.fetchFile(
+					this.selectedBucket,
+					row.key,
+					"",
+				);
+				this.deleteFolderInnerFilesCount = this.deleteFolderContents.length;
+			}
+		},
+		renameObject: async function (row) {
+			this.renameModal = true;
+			this.row = row;
+			// console.log(row)
+			this.renameInput = row.name;
+		},
+		renameConfirm: async function () {
+			if (this.renameInput.length === 0) {
+				return;
+			}
 
-      this.loading = true
-      await apiHandler.renameObject(this.selectedBucket, this.row.key, this.row.key.replace(this.row.name, this.renameInput))
+			this.loading = true;
+			await apiHandler.renameObject(
+				this.selectedBucket,
+				this.row.key,
+				this.row.key.replace(this.row.name, this.renameInput),
+			);
 
-      this.$bus.emit('fetchFiles')
-      this.reset()
-      this.q.notify({
-        group: false,
-        icon: 'done', // we add an icon
-        spinner: false, // we reset the spinner setting so the icon can be displayed
-        message: 'File renamed!',
-        timeout: 2500 // we will timeout it in 2.5s
-      })
-    },
-    deleteConfirm: async function() {
-      if (this.row.type === 'folder') {
-        // When deleting folders, first must copy the objects, because the popup close forces a reset on properties
-        const originalFolder = { ...this.row }
-        const folderContents = [...this.deleteFolderContents]
-        const folderContentsCount = this.deleteFolderInnerFilesCount
+			this.$bus.emit("fetchFiles");
+			this.reset();
+			this.q.notify({
+				group: false,
+				icon: "done", // we add an icon
+				spinner: false, // we reset the spinner setting so the icon can be displayed
+				message: "File renamed!",
+				timeout: 2500, // we will timeout it in 2.5s
+			});
+		},
+		deleteConfirm: async function () {
+			if (this.row.type === "folder") {
+				// When deleting folders, first must copy the objects, because the popup close forces a reset on properties
+				const originalFolder = { ...this.row };
+				const folderContents = [...this.deleteFolderContents];
+				const folderContentsCount = this.deleteFolderInnerFilesCount;
 
-        this.deleteModal = false
+				this.deleteModal = false;
 
-        const notif = this.q.notify({
-          group: false,
-          spinner: true,
-          message: 'Deleting files...',
-          caption: '0%',
-          timeout: 0
-        })
+				const notif = this.q.notify({
+					group: false,
+					spinner: true,
+					message: "Deleting files...",
+					caption: "0%",
+					timeout: 0,
+				});
 
-        for (const [i, innerFile] of folderContents.entries()) {
-          if (innerFile.key) {
-            await apiHandler.deleteObject(innerFile.key, this.selectedBucket)
-          }
-          notif({
-            caption: `${parseInt(i*100/(folderContentsCount+1))}%`  // +1 because still needs to delete the folder
-          })
-        }
+				for (const [i, innerFile] of folderContents.entries()) {
+					if (innerFile.key) {
+						await apiHandler.deleteObject(innerFile.key, this.selectedBucket);
+					}
+					notif({
+						caption: `${Number.parseInt((i * 100) / (folderContentsCount + 1))}%`, // +1 because still needs to delete the folder
+					});
+				}
 
-        await apiHandler.deleteObject(originalFolder.key, this.selectedBucket)
+				await apiHandler.deleteObject(originalFolder.key, this.selectedBucket);
 
-        notif({
-          icon: 'done', // we add an icon
-          spinner: false, // we reset the spinner setting so the icon can be displayed
-          caption: '100%',
-          message: 'Folder deleted!',
-          timeout: 2500 // we will timeout it in 2.5s
-        })
-      } else {
-        this.deleteModal = false
-        await apiHandler.deleteObject(this.row.key, this.selectedBucket)
-        this.q.notify({
-          group: false,
-          icon: 'done', // we add an icon
-          spinner: false, // we reset the spinner setting so the icon can be displayed
-          message: 'File deleted!',
-          timeout: 2500 // we will timeout it in 2.5s
-        })
-      }
+				notif({
+					icon: "done", // we add an icon
+					spinner: false, // we reset the spinner setting so the icon can be displayed
+					caption: "100%",
+					message: "Folder deleted!",
+					timeout: 2500, // we will timeout it in 2.5s
+				});
+			} else {
+				this.deleteModal = false;
+				await apiHandler.deleteObject(this.row.key, this.selectedBucket);
+				this.q.notify({
+					group: false,
+					icon: "done", // we add an icon
+					spinner: false, // we reset the spinner setting so the icon can be displayed
+					message: "File deleted!",
+					timeout: 2500, // we will timeout it in 2.5s
+				});
+			}
 
-      this.$bus.emit('fetchFiles')
-      this.reset()
-    },
-    reset: function() {
-      this.loading = false
-      this.deleteModal = false
-      this.renameModal = false
-      this.renameInput = ''
-      this.row = null
-      this.deleteFolderInnerFilesCount = null
-      this.deleteFolderContents = []
-    },
-    onSubmit: async function() {
-      await apiHandler.createFolder(this.selectedFolder + this.newFolderName + '/', this.selectedBucket)
-      this.$bus.emit('fetchFiles')
-      this.modal = false
-    },
-    open: function() {
-      this.modal = true
-    }
-  },
-  computed: {
-    selectedBucket: function () {
-      return this.$route.params.bucket
-    },
-    selectedFolder: function () {
-      if (this.$route.params.folder && this.$route.params.folder !== ROOT_FOLDER) {
-        return decode(this.$route.params.folder)
-      }
-      return ''
-    },
-  },
-  setup() {
-    return {
-      mainStore: useMainStore(),
-      q: useQuasar()
-    };
-  },
-})
+			this.$bus.emit("fetchFiles");
+			this.reset();
+		},
+		reset: function () {
+			this.loading = false;
+			this.deleteModal = false;
+			this.renameModal = false;
+			this.renameInput = "";
+			this.row = null;
+			this.deleteFolderInnerFilesCount = null;
+			this.deleteFolderContents = [];
+		},
+		onSubmit: async function () {
+			await apiHandler.createFolder(
+				this.selectedFolder + this.newFolderName + "/",
+				this.selectedBucket,
+			);
+			this.$bus.emit("fetchFiles");
+			this.modal = false;
+		},
+		open: function () {
+			this.modal = true;
+		},
+	},
+	computed: {
+		selectedBucket: function () {
+			return this.$route.params.bucket;
+		},
+		selectedFolder: function () {
+			if (
+				this.$route.params.folder &&
+				this.$route.params.folder !== ROOT_FOLDER
+			) {
+				return decode(this.$route.params.folder);
+			}
+			return "";
+		},
+	},
+	setup() {
+		return {
+			mainStore: useMainStore(),
+			q: useQuasar(),
+		};
+	},
+});
 </script>
 
 <style scoped>

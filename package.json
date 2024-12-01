@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "prepare": "husky install",
-    "lint": "(eslint .  || (eslint . --fix; exit 1)) && (prettier --check '*.{json,js}' 'packages/*/src/**/*.{js,ts}' || (prettier -w '*.{json,js}' 'packages/*/src/**/*.{js,ts}'; exit 1))",
+    "prepare": "husky",
+    "lint": "npx @biomejs/biome check template/ packages/dashboard/src packages/worker/src || (npx @biomejs/biome check --write template/ packages/dashboard/src packages/worker/src/; exit 1)",
     "build-dashboard": "pnpm run --filter r2-explorer-dashboard build",
     "build-worker": "pnpm run --filter r2-explorer build",
     "build": "pnpm build-dashboard && pnpm build-worker",
@@ -14,12 +14,7 @@
     "publish-npm": "pnpm run --filter worker publish"
   },
   "devDependencies": {
-    "esbuild": "0.17.19",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-config-typescript": "^3.0.0",
-    "husky": "^9.0.11",
-    "prettier": "^3.2.5",
-    "typescript": "^4.7.4"
+    "@biomejs/biome": "1.9.4",
+    "husky": "^9.1.7"
   }
 }

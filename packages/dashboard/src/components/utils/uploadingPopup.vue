@@ -30,12 +30,12 @@
 
 <script>
 export default {
-  methods: {
-    close: function () {
-      this.$store.dispatch('clearUploadingFiles')
-    }
-  }
-}
+	methods: {
+		close: function () {
+			this.$store.dispatch("clearUploadingFiles");
+		},
+	},
+};
 </script>
 
 <style scoped lang="scss">

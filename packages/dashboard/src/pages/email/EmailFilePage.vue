@@ -91,165 +91,191 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
 import { api } from "boot/axios";
-import { useMainStore } from "stores/main-store";
-import { apiHandler, decode, encode, timeSince } from "../../appUtils";
 import { useQuasar } from "quasar";
+import { useMainStore } from "stores/main-store";
+import { defineComponent } from "vue";
+import { apiHandler, decode, encode, timeSince } from "../../appUtils";
 
 export default defineComponent({
-  name: "EmailFolderPage",
-  data: function() {
-    return {
-      srcdoc: null,
-      file: null,
-      fileHead: null,
-      timeInterval: null,
-      attachments: []
-    };
-  },
-  computed: {
-    selectedBucket: function() {
-      return this.$route.params.bucket;
-    },
-    selectedFolder: function() {
-      return this.$route.params.folder;
-    },
-    selectedFile: function() {
-      return this.$route.params.file;
-    },
-    filePath: function() {
-      const fileName = decode(this.selectedFile)
-      return `.r2-explorer/emails/${this.selectedFolder}/${fileName}`
-    }
-  },
-  watch: {
-    selectedBucket(newVal) {
-      this.$router.push({ name: `email-folder`, params: { bucket: newVal, folder: encode(this.selectedFolder) }})
-    }
-  },
-  methods: {
-    timeSince,
-    contentFinishedLoading() {
-      clearInterval(this.timeInterval)
-      this.timeInterval = null
+	name: "EmailFolderPage",
+	data: () => ({
+		srcdoc: null,
+		file: null,
+		fileHead: null,
+		timeInterval: null,
+		attachments: [],
+	}),
+	computed: {
+		selectedBucket: function () {
+			return this.$route.params.bucket;
+		},
+		selectedFolder: function () {
+			return this.$route.params.folder;
+		},
+		selectedFile: function () {
+			return this.$route.params.file;
+		},
+		filePath: function () {
+			const fileName = decode(this.selectedFile);
+			return `.r2-explorer/emails/${this.selectedFolder}/${fileName}`;
+		},
+	},
+	watch: {
+		selectedBucket(newVal) {
+			this.$router.push({
+				name: `email-folder`,
+				params: { bucket: newVal, folder: encode(this.selectedFolder) },
+			});
+		},
+	},
+	methods: {
+		timeSince,
+		contentFinishedLoading() {
+			clearInterval(this.timeInterval);
+			this.timeInterval = null;
 
-      this.resizeIframe()
-    },
-    resizeIframe() {
-      if (this.$refs.renderWindow) {
-        this.$refs.renderWindow.style.height = this.$refs.renderWindow.contentWindow.document.documentElement.scrollHeight + "px";
-      }
-    },
+			this.resizeIframe();
+		},
+		resizeIframe() {
+			if (this.$refs.renderWindow) {
+				this.$refs.renderWindow.style.height =
+					this.$refs.renderWindow.contentWindow.document.documentElement
+						.scrollHeight + "px";
+			}
+		},
 
-    fetchEmail: async function() {
-      const self = this
-      const fileName = decode(this.selectedFile)
+		fetchEmail: async function () {
+			const fileName = decode(this.selectedFile);
 
-      const fileData = await apiHandler.downloadFile(this.selectedBucket, this.filePath, {})
+			const fileData = await apiHandler.downloadFile(
+				this.selectedBucket,
+				this.filePath,
+				{},
+			);
 
-      const filename = fileName.split(".json")[0];
+			const filename = fileName.split(".json")[0];
 
-      this.file = fileData.data;
-      let htmlContent = fileData.data.html
+			this.file = fileData.data;
+			let htmlContent = fileData.data.html;
 
-      if (htmlContent) {
-        // Add target blank to all links
-        htmlContent = htmlContent.replaceAll(/<a(.*?)>(.*?)<\/a>/gi, '<a$1 target="_blank">$2</a>');
+			if (htmlContent) {
+				// Add target blank to all links
+				htmlContent = htmlContent.replaceAll(
+					/<a(.*?)>(.*?)<\/a>/gi,
+					'<a$1 target="_blank">$2</a>',
+				);
 
-        // Inject attachment url and replace in html to point to correct path
-        for (const att of fileData.data.attachments) {
-          att.display = true
-          att.downloadUrl = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(`.r2-explorer/emails/${this.selectedFolder}/${filename}/${att.filename}`)}`;
+				// Inject attachment url and replace in html to point to correct path
+				for (const att of fileData.data.attachments) {
+					att.display = true;
+					att.downloadUrl = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(`.r2-explorer/emails/${this.selectedFolder}/${filename}/${att.filename}`)}`;
 
-          let contentId = att.contentId
-          if (contentId){
-            if (contentId.startsWith('<') && contentId.endsWith('>')){
-              contentId = contentId.substring(1, contentId.length-1);
-            }
+					let contentId = att.contentId;
+					if (contentId) {
+						if (contentId.startsWith("<") && contentId.endsWith(">")) {
+							contentId = contentId.substring(1, contentId.length - 1);
+						}
 
-            const matchString = `cid:${contentId}`
-            if (htmlContent.includes(matchString)) {
-              htmlContent = htmlContent.replaceAll(`cid:${contentId}`, att.downloadUrl)
-              att.display = false
-            }
-          }
-        }
+						const matchString = `cid:${contentId}`;
+						if (htmlContent.includes(matchString)) {
+							htmlContent = htmlContent.replaceAll(
+								`cid:${contentId}`,
+								att.downloadUrl,
+							);
+							att.display = false;
+						}
+					}
+				}
 
-        this.srcdoc = htmlContent
-      }
+				this.srcdoc = htmlContent;
+			}
 
-      this.attachments = fileData.data.attachments.filter((obj) => obj.display)
+			this.attachments = fileData.data.attachments.filter((obj) => obj.display);
 
-      apiHandler.headFile(this.selectedBucket, this.filePath).then(async (obj) => {
-        if (obj.customMetadata.read === 'false') {
-          self.fileHead = await apiHandler.updateMetadata(self.selectedBucket, self.filePath, {
-            ...obj.customMetadata,
-            read: true
-          });
-        } else {
-          self.fileHead = obj
-        }
-      })
+			apiHandler
+				.headFile(this.selectedBucket, this.filePath)
+				.then(async (obj) => {
+					if (obj.customMetadata.read === "false") {
+						this.fileHead = await apiHandler.updateMetadata(
+							this.selectedBucket,
+							this.filePath,
+							{
+								...obj.customMetadata,
+								read: true,
+							},
+						);
+					} else {
+						this.fileHead = obj;
+					}
+				});
 
-      setTimeout(function() {
-        self.contentFinishedLoading()
-      }, 10000)
+			setTimeout(() => {
+				this.contentFinishedLoading();
+			}, 10000);
 
-      this.timeInterval = setInterval(function() {
-        self.resizeIframe()
-      }, 400);
-    },
-    markAsUnread: async function () {
-      this.fileHead = await apiHandler.updateMetadata(this.selectedBucket, this.filePath, {
-        ...this.fileHead.customMetadata,
-        read: false
-      });
+			this.timeInterval = setInterval(() => {
+				this.resizeIframe();
+			}, 400);
+		},
+		markAsUnread: async function () {
+			this.fileHead = await apiHandler.updateMetadata(
+				this.selectedBucket,
+				this.filePath,
+				{
+					...this.fileHead.customMetadata,
+					read: false,
+				},
+			);
 
-      this.q.notify({
-        group: false,
-        icon: 'done', // we add an icon
-        spinner: false, // we reset the spinner setting so the icon can be displayed
-        message: 'Email marked as unread!',
-        timeout: 2500 // we will timeout it in 2.5s
-      })
-    },
-    markAsRead: async function () {
-      this.fileHead = await apiHandler.updateMetadata(this.selectedBucket, this.filePath, {
-        ...this.fileHead.customMetadata,
-        read: true
-      });
+			this.q.notify({
+				group: false,
+				icon: "done", // we add an icon
+				spinner: false, // we reset the spinner setting so the icon can be displayed
+				message: "Email marked as unread!",
+				timeout: 2500, // we will timeout it in 2.5s
+			});
+		},
+		markAsRead: async function () {
+			this.fileHead = await apiHandler.updateMetadata(
+				this.selectedBucket,
+				this.filePath,
+				{
+					...this.fileHead.customMetadata,
+					read: true,
+				},
+			);
 
-      this.q.notify({
-        group: false,
-        icon: 'done', // we add an icon
-        spinner: false, // we reset the spinner setting so the icon can be displayed
-        message: 'Email marked as read!',
-        timeout: 2500 // we will timeout it in 2.5s
-      })
-    },
-    downloadAtt: function(attachment) {
-      console.log(attachment)
-      // return
-      const link = document.createElement('a')
-      link.download = attachment.filename
+			this.q.notify({
+				group: false,
+				icon: "done", // we add an icon
+				spinner: false, // we reset the spinner setting so the icon can be displayed
+				message: "Email marked as read!",
+				timeout: 2500, // we will timeout it in 2.5s
+			});
+		},
+		downloadAtt: (attachment) => {
+			console.log(attachment);
+			// return
+			const link = document.createElement("a");
+			link.download = attachment.filename;
 
-      link.href = attachment.downloadUrl
+			link.href = attachment.downloadUrl;
 
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }
-  },
-  created() {
-    this.fetchEmail();
-  },
-  setup() {
-    return {
-      mainStore: useMainStore(),
-      q: useQuasar()
-    };
-  }
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+		},
+	},
+	created() {
+		this.fetchEmail();
+	},
+	setup() {
+		return {
+			mainStore: useMainStore(),
+			q: useQuasar(),
+		};
+	},
 });
 </script>
 
