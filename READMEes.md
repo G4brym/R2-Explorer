@@ -39,7 +39,7 @@ Leer esto en otros idiomas: [English](README.md), [Português](READMEpt.md), [Fr
 Ejecuta este comando para configurar un proyecto de ejemplo
 
 ```bash
-npm create r2-explorer@latest
+npm create cloudflare@latest r2-explorer -- --template "G4brym/R2-Explorer/template"
 ```
 
 ## Actualizar tu instalación

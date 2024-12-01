@@ -1,5 +1,5 @@
 {
-	"name": "<TBD>",
+	"name": "r2-explorer",
 	"version": "1.0.0",
 	"private": true,
 	"scripts": {
@@ -8,7 +8,7 @@
     "start": "wrangler dev"
 	},
 	"dependencies": {
-		"r2-explorer": "^1.0.0"
+		"r2-explorer": "^1.0.7"
 	},
 	"devDependencies": {
 		"wrangler": "^3.91.0"

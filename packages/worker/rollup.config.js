@@ -23,10 +23,6 @@ export default defineConfig({
           src: ['../LICENSE', '../README.md'],
           dest: '.',
         },
-        {
-          src: '../create-r2-explorer/dist/cli.js',
-          dest: './bin',
-        },
       ],
     }),
   ],

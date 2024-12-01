@@ -38,3 +38,6 @@ packages/github-action/src
 packages/dashboard/.env
 packages/dashboard/.quasar
 .dev.vars
+
+template/package-lock.json
+template/node_modules/

@@ -15,16 +15,6 @@ npm run build
 wrangler pages publish --branch main --project-name r2-explorer-dashboard dist/
 ```
 
-## Publish create-r2-explorer package
-
-Increase version in `packages/create-r2-explorer/package.json`
-
-```bash
-cd packages/create-r2-explorer/
-npm run build
-npm publish --access public
-```
-
 ## Manually publish worker
 
 ```bash

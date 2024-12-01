@@ -5,10 +5,9 @@
   "scripts": {
     "prepare": "husky install",
     "lint": "(eslint .  || (eslint . --fix; exit 1)) && (prettier --check '*.{json,js}' 'packages/*/src/**/*.{js,ts}' || (prettier -w '*.{json,js}' 'packages/*/src/**/*.{js,ts}'; exit 1))",
-    "build-create": "pnpm run --filter create-r2-explorer build",
     "build-dashboard": "pnpm run --filter r2-explorer-dashboard build",
     "build-worker": "pnpm run --filter r2-explorer build",
-    "build": "pnpm build-create && pnpm build-dashboard && pnpm build-worker",
+    "build": "pnpm build-dashboard && pnpm build-worker",
     "deploy-dashboard": "pnpm run --filter r2-explorer-dashboard deploy",
     "deploy-dashboard-dev": "pnpm run --filter r2-explorer-dashboard deploy-dev",
     "deploy-dev-worker": "pnpm run --filter r2-explorer-dev-worker deploy",

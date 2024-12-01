@@ -1,6 +1,6 @@
-name = "<TBD>"
+name = "r2-explorer"
 main = "src/index.ts"
-compatibility_date = "<TBD>"
+compatibility_date = "2024-12-01"
 
 # Bind R2 Buckets to your application.
 # Docs: https://r2explorer.dev/getting-started/add-r2-buckets/

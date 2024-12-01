@@ -42,7 +42,7 @@ Read this in other languages: [Español](READMEes.md), [Português](READMEpt.md)
 Run this command to get an example project setup
 
 ```bash
-npm create r2-explorer@latest
+npm create cloudflare@latest r2-explorer -- --template "G4brym/R2-Explorer/template"
 ```
 
 ## Upgrading your installation
