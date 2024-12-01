@@ -54,7 +54,7 @@
               touch-position
               context-menu
             >
-              <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" />
+              <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject"  />
             </q-menu>
           </template>
 
@@ -62,7 +62,7 @@
             <td class="text-right">
               <q-btn round flat icon="more_vert" size="sm">
                 <q-menu>
-                  <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" />
+                  <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject" />
                 </q-menu>
               </q-btn>
             </td>

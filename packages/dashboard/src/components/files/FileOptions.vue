@@ -30,6 +30,44 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+
+  <q-dialog v-model="updateMetadataModal" @hide="reset">
+    <q-card style="min-width: 300px;">
+      <q-card-section class="row column" v-if="row">
+        <h6 class="q-mt-none q-mb-sm flex">HTTP Metadata <q-btn class="q-mr-none q-ml-auto" round size="sm" color="primary" icon="add" @click="updateHttpMetadata.push({key: '', value: ''})" /></h6>
+        <div class="flex row" v-for="(val, index) in updateHttpMetadata" :key="index">
+          <div>
+            <q-input v-model="updateHttpMetadata[index].key" label="Key" />
+          </div>
+          <div>
+            <q-input v-model="updateHttpMetadata[index].value" label="Value" />
+          </div>
+          <div class="flex">
+            <q-btn class="q-my-auto" round size="sm" color="orange" icon="remove" @click="updateHttpMetadata.splice(index, 1)" />
+          </div>
+        </div>
+
+        <h6 class="q-mt-xl q-mb-sm flex">Custom Metadata <q-btn class="q-mr-none q-ml-auto" round size="sm" color="primary" icon="add" @click="updateCustomMetadata.push({key: '', value: ''})" /></h6>
+        <div class="flex row" v-for="(val, index) in updateCustomMetadata" :key="index">
+          <div>
+            <q-input v-model="updateCustomMetadata[index].key" label="Key" />
+          </div>
+          <div>
+            <q-input v-model="updateCustomMetadata[index].value" label="Value" />
+          </div>
+          <div class="flex">
+            <q-btn class="q-my-auto" round size="sm" color="orange" icon="remove" @click="updateCustomMetadata.splice(index, 1)" />
+          </div>
+        </div>
+
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="Cancel" color="primary" v-close-popup />
+        <q-btn flat label="Update Metadata" color="orange" :loading="loading" @click="updateConfirm" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
@@ -45,9 +83,12 @@ export default defineComponent({
 		deleteFolderContents: [],
 		deleteModal: false,
 		renameModal: false,
+		updateMetadataModal: false,
 		deleteFolderInnerFilesCount: null,
 		newFolderName: "",
 		renameInput: "",
+		updateCustomMetadata: [],
+		updateHttpMetadata: [],
 		loading: false,
 	}),
 	methods: {
@@ -69,6 +110,24 @@ export default defineComponent({
 			// console.log(row)
 			this.renameInput = row.name;
 		},
+		updateMetadataObject: async function (row) {
+			this.updateMetadataModal = true;
+			this.row = row;
+			if (row.httpMetadata) {
+				this.updateHttpMetadata = Object.entries(row.httpMetadata).map(
+					([key, value]) => {
+						return { key: key, value: value };
+					},
+				);
+			}
+			if (row.customMetadata) {
+				this.updateCustomMetadata = Object.entries(row.customMetadata).map(
+					([key, value]) => {
+						return { key: key, value: value };
+					},
+				);
+			}
+		},
 		renameConfirm: async function () {
 			if (this.renameInput.length === 0) {
 				return;
@@ -88,6 +147,30 @@ export default defineComponent({
 				icon: "done", // we add an icon
 				spinner: false, // we reset the spinner setting so the icon can be displayed
 				message: "File renamed!",
+				timeout: 2500, // we will timeout it in 2.5s
+			});
+		},
+		updateConfirm: async function () {
+			this.loading = true;
+			await apiHandler.updateMetadata(
+				this.selectedBucket,
+				this.row.key,
+				this.updateCustomMetadata.reduce(
+					(a, v) => ({ ...a, [v.key]: v.value }),
+					{},
+				),
+				this.updateHttpMetadata.reduce(
+					(a, v) => ({ ...a, [v.key]: v.value }),
+					{},
+				),
+			);
+			this.$bus.emit("fetchFiles");
+			this.reset();
+			this.q.notify({
+				group: false,
+				icon: "done", // we add an icon
+				spinner: false, // we reset the spinner setting so the icon can be displayed
+				message: "File Updated!",
 				timeout: 2500, // we will timeout it in 2.5s
 			});
 		},
@@ -145,7 +228,10 @@ export default defineComponent({
 			this.loading = false;
 			this.deleteModal = false;
 			this.renameModal = false;
+			this.updateMetadataModal = false;
 			this.renameInput = "";
+			this.updateCustomMetadata = [];
+			this.updateHttpMetadata = [];
 			this.row = null;
 			this.deleteFolderInnerFilesCount = null;
 			this.deleteFolderContents = [];

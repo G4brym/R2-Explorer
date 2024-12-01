@@ -144,11 +144,18 @@ export default defineComponent({
 		const resp = await fetch(
 			"https://api.github.com/repos/G4brym/R2-Explorer/releases/latest",
 		);
-		const parsed = await resp.json();
-		const latestVersion = parsed.tag_name.replace("v", "");
-		if (this.isUpdateAvailable(this.mainStore.version, latestVersion)) {
-			this.latestVersion = latestVersion;
-			this.updateAvailable = true;
+		if (!resp.ok) {
+			console.log("Unable to retrieve latest r2-explorer updates :(");
+			console.log(
+				"Manually check them here: https://github.com/G4brym/R2-Explorer/releases",
+			);
+		} else {
+			const parsed = await resp.json();
+			const latestVersion = parsed.tag_name.replace("v", "");
+			if (this.isUpdateAvailable(this.mainStore.version, latestVersion)) {
+				this.latestVersion = latestVersion;
+				this.updateAvailable = true;
+			}
 		}
 	},
 	setup() {
