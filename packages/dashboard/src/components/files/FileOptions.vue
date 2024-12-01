@@ -30,6 +30,20 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+
+  <q-dialog v-model="updateMetadataModal" @hide="reset">
+    <q-card style="min-width: 300px;">
+      <q-card-section class="row column" v-if="row">
+        <q-avatar class="q-mb-md" icon="edit" color="orange" text-color="white" />
+        <q-input v-model="updateContentType" label="Content type" />
+      </q-card-section>
+
+      <q-card-actions align="right">
+        <q-btn flat label="Cancel" color="primary" v-close-popup />
+        <q-btn flat label="Rename" color="orange" :loading="loading" @click="updateConfirm" />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
@@ -45,9 +59,11 @@ export default defineComponent({
 		deleteFolderContents: [],
 		deleteModal: false,
 		renameModal: false,
+		updateMetadataModal: false,
 		deleteFolderInnerFilesCount: null,
 		newFolderName: "",
 		renameInput: "",
+		updateContentType: "",
 		loading: false,
 	}),
 	methods: {
@@ -69,6 +85,12 @@ export default defineComponent({
 			// console.log(row)
 			this.renameInput = row.name;
 		},
+		updateMetadataObject: async function (row) {
+			console.log(row);
+			this.updateMetadataModal = true;
+			this.row = row;
+			this.updateContentType = row.httpMetadata?.contentType || "";
+		},
 		renameConfirm: async function () {
 			if (this.renameInput.length === 0) {
 				return;
@@ -88,6 +110,30 @@ export default defineComponent({
 				icon: "done", // we add an icon
 				spinner: false, // we reset the spinner setting so the icon can be displayed
 				message: "File renamed!",
+				timeout: 2500, // we will timeout it in 2.5s
+			});
+		},
+		updateConfirm: async function () {
+			if (this.updateContentType.length === 0) {
+				return;
+			}
+			this.loading = true;
+			await apiHandler.updateMetadata(
+				this.selectedBucket,
+				this.row.key,
+				this.row.customMetadata,
+				{
+					...this.row.httpMetadata,
+					contentType: this.updateContentType,
+				},
+			);
+			this.$bus.emit("fetchFiles");
+			this.reset();
+			this.q.notify({
+				group: false,
+				icon: "done", // we add an icon
+				spinner: false, // we reset the spinner setting so the icon can be displayed
+				message: "File Updated!",
 				timeout: 2500, // we will timeout it in 2.5s
 			});
 		},
@@ -145,7 +191,9 @@ export default defineComponent({
 			this.loading = false;
 			this.deleteModal = false;
 			this.renameModal = false;
+			this.updateMetadataModal = false;
 			this.renameInput = "";
+			this.updateContentType = "";
 			this.row = null;
 			this.deleteFolderInnerFilesCount = null;
 			this.deleteFolderContents = [];
