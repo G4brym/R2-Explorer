@@ -1,0 +1,9 @@
+name = "<TBD>"
+main = "src/index.ts"
+compatibility_date = "<TBD>"
+
+# Bind R2 Buckets to your application.
+# Docs: https://r2explorer.dev/getting-started/add-r2-buckets/
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
