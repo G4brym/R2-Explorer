@@ -14,12 +14,12 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
 import BucketPicker from "components/main/BucketPicker.vue";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "TopBar",
-  emits: ['toggle'],
-  components: { BucketPicker }
+	name: "TopBar",
+	emits: ["toggle"],
+	components: { BucketPicker },
 });
 </script>

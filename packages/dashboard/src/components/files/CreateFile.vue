@@ -24,68 +24,73 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { ROOT_FOLDER, apiHandler, decode, encode } from "src/appUtils";
 import { useMainStore } from "stores/main-store";
-import { apiHandler, decode, encode, ROOT_FOLDER } from "src/appUtils";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "CreateFile",
-  data: function() {
-    return {
-      modal: false,
-      newFileName: "",
-      loading: false
-    };
-  },
-  methods: {
-    cancel: function() {
-      this.modal = false;
-      this.newFileName = "";
-      this.loading = false
-    },
-    onSubmit: async function() {
-      this.loading = true
+	name: "CreateFile",
+	data: () => ({
+		modal: false,
+		newFileName: "",
+		loading: false,
+	}),
+	methods: {
+		cancel: function () {
+			this.modal = false;
+			this.newFileName = "";
+			this.loading = false;
+		},
+		onSubmit: async function () {
+			this.loading = true;
 
-      const newFile = new Blob([''], {type: 'text/plain'});
-      await apiHandler.uploadObjects(newFile, this.selectedFolder + this.newFileName, this.selectedBucket);
+			const newFile = new Blob([""], { type: "text/plain" });
+			await apiHandler.uploadObjects(
+				newFile,
+				this.selectedFolder + this.newFileName,
+				this.selectedBucket,
+			);
 
-      this.$bus.emit("fetchFiles");
+			this.$bus.emit("fetchFiles");
 
-      // TODO: open the new file in preview and edit mode
-      // await this.$router.push({
-      //   name: "files-file",
-      //   params: {
-      //     bucket: this.$route.params.bucket,
-      //     folder: this.$route.params.folder || ROOT_FOLDER,
-      //     file: encode(this.newFileName)
-      //   }
-      // });
+			// TODO: open the new file in preview and edit mode
+			// await this.$router.push({
+			//   name: "files-file",
+			//   params: {
+			//     bucket: this.$route.params.bucket,
+			//     folder: this.$route.params.folder || ROOT_FOLDER,
+			//     file: encode(this.newFileName)
+			//   }
+			// });
 
-      this.loading = false
-      this.modal = false;
-      this.newFileName = "";
-    },
-    open: function() {
-      this.modal = true;
-    }
-  },
-  computed: {
-    selectedBucket: function() {
-      return this.$route.params.bucket;
-    },
-    selectedFolder: function() {
-      if (this.$route.params.folder && this.$route.params.folder !== ROOT_FOLDER) {
-        return decode(this.$route.params.folder);
-      }
-      return "";
-    }
-  },
-  setup() {
-    const mainStore = useMainStore();
+			this.loading = false;
+			this.modal = false;
+			this.newFileName = "";
+		},
+		open: function () {
+			this.modal = true;
+		},
+	},
+	computed: {
+		selectedBucket: function () {
+			return this.$route.params.bucket;
+		},
+		selectedFolder: function () {
+			if (
+				this.$route.params.folder &&
+				this.$route.params.folder !== ROOT_FOLDER
+			) {
+				return decode(this.$route.params.folder);
+			}
+			return "";
+		},
+	},
+	setup() {
+		const mainStore = useMainStore();
 
-    return {
-      mainStore
-    };
-  }
+		return {
+			mainStore,
+		};
+	},
 });
 </script>

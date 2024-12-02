@@ -114,56 +114,55 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
-import { useMainStore } from "stores/main-store";
-import CreateFolder from "components/files/CreateFolder.vue";
 import CreateFile from "components/files/CreateFile.vue";
+import CreateFolder from "components/files/CreateFolder.vue";
+import { useMainStore } from "stores/main-store";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "LeftSidebar",
-  data: function() {
-    return {
-      upgradePopup: false,
-      settingsPopup: false
-    };
-  },
-  components: { CreateFolder, CreateFile },
-  methods: {
-    gotoEmail: function() {
-      if (this.selectedApp !== "email")
-        this.changeApp("email");
-    },
-    gotoFiles: function() {
-      if (this.selectedApp !== "files")
-        this.changeApp("files");
-    },
-    changeApp: function(app) {
-      this.$router.push({ name: `${app}-home`, params: { bucket: this.selectedBucket } });
-    }
-  },
-  computed: {
-    selectedBucket: function() {
-      return this.$route.params.bucket;
-    },
-    selectedApp: function() {
-      return this.$route.name.split("-")[0];
-    }
-  },
-  mounted: function() {
-    const alertSeen = localStorage.getItem("DASH_V2_ALERT");
+	name: "LeftSidebar",
+	data: () => ({
+		upgradePopup: false,
+		settingsPopup: false,
+	}),
+	components: { CreateFolder, CreateFile },
+	methods: {
+		gotoEmail: function () {
+			if (this.selectedApp !== "email") this.changeApp("email");
+		},
+		gotoFiles: function () {
+			if (this.selectedApp !== "files") this.changeApp("files");
+		},
+		changeApp: function (app) {
+			this.$router.push({
+				name: `${app}-home`,
+				params: { bucket: this.selectedBucket },
+			});
+		},
+	},
+	computed: {
+		selectedBucket: function () {
+			return this.$route.params.bucket;
+		},
+		selectedApp: function () {
+			return this.$route.name.split("-")[0];
+		},
+	},
+	mounted: function () {
+		const alertSeen = localStorage.getItem("DASH_V2_ALERT");
 
-    if (!alertSeen) {
-      this.upgradePopup = true;
-      localStorage.setItem("DASH_V2_ALERT", true);
-    }
-  },
-  setup() {
-    const mainStore = useMainStore();
+		if (!alertSeen) {
+			this.upgradePopup = true;
+			localStorage.setItem("DASH_V2_ALERT", true);
+		}
+	},
+	setup() {
+		const mainStore = useMainStore();
 
-    return {
-      mainStore
-    };
-  }
+		return {
+			mainStore,
+		};
+	},
 });
 </script>
 

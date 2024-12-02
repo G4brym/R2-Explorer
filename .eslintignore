@@ -1,6 +1,0 @@
-dist
-node_modules
-packages/github-action/*
-packages/worker/bin/*
-packages/worker/config/*
-packages/dashboard/quasar.config.js
