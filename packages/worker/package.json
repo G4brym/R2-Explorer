@@ -60,6 +60,7 @@
 	"dependencies": {
 		"chanfana": "^2.3.0",
 		"hono": "^4.6.12",
-		"postal-mime": "^2.3.2"
+		"postal-mime": "^2.3.2",
+		"zod": "^3.23.8"
 	}
 }

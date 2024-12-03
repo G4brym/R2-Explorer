@@ -1,28 +1,14 @@
-import {
-	OpenAPIRoute,
-	Path,
-	Query,
-	RequestBody,
-} from "@cloudflare/itty-router-openapi";
-import type { OpenAPIRouteSchema } from "@cloudflare/itty-router-openapi/dist/src/types";
-import { z } from "zod";
-import type { Context } from "../../interfaces";
+import { OpenAPIRoute, Path, Query } from "@cloudflare/itty-router-openapi";
 
-export class PutObject extends OpenAPIRoute {
-	static schema: OpenAPIRouteSchema = {
-		operationId: "post-bucket-upload-object",
-		tags: ["Buckets"],
-		summary: "Upload object",
-		requestBody: new RequestBody({
-			content: {
-				"application/octet-stream": {
-					schema: {
-						type: "string",
-						format: "binary",
-					},
-				},
-			},
-		}),
+import { z } from "zod";
+import type { Context } from "../../../interfaces";
+import { AppContext } from "../../../types";
+
+export class CreateUpload extends OpenAPIRoute {
+	schema = {
+		operationId: "post-multipart-create-upload",
+		tags: ["Multipart"],
+		summary: "Create upload",
 		parameters: {
 			bucket: Path(String),
 			key: Query(z.string().describe("base64 encoded file key")),
@@ -35,7 +21,7 @@ export class PutObject extends OpenAPIRoute {
 		},
 	};
 
-	async handle(request: Request, env: any, context: Context, data: any) {
+	async handle(c: AppContext) {
 		if (context.config.readonly === true)
 			return Response.json({ msg: "unauthorized" }, { status: 401 });
 
@@ -57,7 +43,7 @@ export class PutObject extends OpenAPIRoute {
 			);
 		}
 
-		return await bucket.put(key, request.body, {
+		return await bucket.createMultipartUpload(key, {
 			customMetadata: customMetadata,
 			httpMetadata: httpMetadata,
 		});

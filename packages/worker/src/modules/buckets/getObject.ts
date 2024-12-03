@@ -1,10 +1,11 @@
 import { OpenAPIRoute, Path } from "@cloudflare/itty-router-openapi";
-import type { OpenAPIRouteSchema } from "@cloudflare/itty-router-openapi/dist/src/types";
+
 import { z } from "zod";
 import type { Context } from "../../interfaces";
+import { AppContext } from "../../types";
 
 export class GetObject extends OpenAPIRoute {
-	static schema: OpenAPIRouteSchema = {
+	schema = {
 		operationId: "get-bucket-object",
 		tags: ["Buckets"],
 		summary: "Get Object",
@@ -20,7 +21,7 @@ export class GetObject extends OpenAPIRoute {
 		},
 	};
 
-	async handle(request: Request, env: any, context: Context, data: any) {
+	async handle(c: AppContext) {
 		const bucket = env[data.params.bucket];
 
 		let filePath;

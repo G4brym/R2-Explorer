@@ -1,10 +1,11 @@
 import { OpenAPIRoute, Path, Query } from "@cloudflare/itty-router-openapi";
-import type { OpenAPIRouteSchema } from "@cloudflare/itty-router-openapi/dist/src/types";
+
 import { z } from "zod";
 import type { Context } from "../../interfaces";
+import { AppContext } from "../../types";
 
 export class CreateFolder extends OpenAPIRoute {
-	static schema: OpenAPIRouteSchema = {
+	schema = {
 		operationId: "post-bucket-create-folder",
 		tags: ["Buckets"],
 		summary: "Create folder",
@@ -16,7 +17,7 @@ export class CreateFolder extends OpenAPIRoute {
 		},
 	};
 
-	async handle(request: Request, env: any, context: Context, data: any) {
+	async handle(c: AppContext) {
 		if (context.config.readonly === true)
 			return Response.json({ msg: "unauthorized" }, { status: 401 });
 

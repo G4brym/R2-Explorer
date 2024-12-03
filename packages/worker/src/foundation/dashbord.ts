@@ -1,6 +1,7 @@
 import type { Context } from "./interfaces";
+import { AppContext } from "./types";
 
-export async function dashboardProxy(request: any, env: any, context: Context) {
+export async function dashboardProxy(c: AppContext) {
 	// Initialize the default cache
 	//@ts-ignore
 	const cache = caches.default;

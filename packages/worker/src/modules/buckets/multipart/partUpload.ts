@@ -5,12 +5,13 @@ import {
 	Query,
 	RequestBody,
 } from "@cloudflare/itty-router-openapi";
-import type { OpenAPIRouteSchema } from "@cloudflare/itty-router-openapi/dist/src/types";
+
 import { z } from "zod";
 import type { Context } from "../../../interfaces";
+import { AppContext } from "../../../types";
 
 export class PartUpload extends OpenAPIRoute {
-	static schema: OpenAPIRouteSchema = {
+	schema = {
 		operationId: "post-multipart-part-upload",
 		tags: ["Multipart"],
 		summary: "Part upload",
@@ -32,7 +33,7 @@ export class PartUpload extends OpenAPIRoute {
 		},
 	};
 
-	async handle(request: Request, env: any, context: Context, data: any) {
+	async handle(c: AppContext) {
 		if (context.config.readonly === true)
 			return Response.json({ msg: "unauthorized" }, { status: 401 });
 

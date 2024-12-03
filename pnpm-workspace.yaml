@@ -1,4 +1,4 @@
 packages:
-  - "template"
+#  - "template"
   - "packages/*"
   - "packages/worker/dev"

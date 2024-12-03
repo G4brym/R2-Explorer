@@ -1,9 +1,11 @@
-export interface BasicAuth {
+import { Context } from "hono";
+
+export type BasicAuth = {
 	username: string;
 	password: string;
 }
 
-export interface R2ExplorerConfig {
+export type R2ExplorerConfig = {
 	readonly?: boolean;
 	cors?: boolean;
 	cfAccessTeamName?: string;
@@ -16,8 +18,11 @@ export interface R2ExplorerConfig {
 	basicAuth?: BasicAuth | BasicAuth[];
 }
 
-export interface Context {
-	config: R2ExplorerConfig;
-	username?: string;
-	executionContext: ExecutionContext;
+export type AppEnv = {
+  [key: string]: R2Bucket
 }
+export type AppVariables = {
+	config: R2ExplorerConfig;
+  username?: string
+}
+export type AppContext = Context<{ Bindings: AppEnv, Variables: AppVariables }>;

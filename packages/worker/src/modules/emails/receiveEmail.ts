@@ -1,6 +1,7 @@
 import PostalMime from "postal-mime";
-import { getCurrentTimestampMilliseconds } from "../dates";
-import type { Context } from "../interfaces";
+import { ExecutionContext } from "hono";
+import { AppEnv, R2ExplorerConfig } from "../../types";
+import { getCurrentTimestampMilliseconds } from "../../foundation/dates";
 
 async function streamToArrayBuffer(stream, streamSize) {
 	const result = new Uint8Array(streamSize);
@@ -17,14 +18,14 @@ async function streamToArrayBuffer(stream, streamSize) {
 	return result;
 }
 
-export async function receiveEmail(event, env, ctx: Context) {
-	let bucket = undefined;
+export async function receiveEmail(event: {raw: unknown, rawSize: unknown}, env: AppEnv, ctx: ExecutionContext, config: R2ExplorerConfig) {
+	let bucket;
 
 	if (
-		ctx.config?.emailRouting?.targetBucket &&
-		env[ctx.config.emailRouting.targetBucket]
+		config?.emailRouting?.targetBucket &&
+		env[config.emailRouting.targetBucket]
 	) {
-		bucket = env[ctx.config.emailRouting.targetBucket];
+		bucket = env[config.emailRouting.targetBucket];
 	}
 
 	if (!bucket) {
