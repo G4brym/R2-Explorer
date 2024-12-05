@@ -19,30 +19,33 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
 import { useMainStore } from "stores/main-store";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "BucketPicker",
-  methods: {
-    changeBucket: function(bucket) {
-      this.$router.push({ name: `${this.selectedApp}-home`, params: { bucket: bucket } });
-    }
-  },
-  computed: {
-    selectedBucket: function() {
-      return this.$route.params.bucket;
-    },
-    selectedApp: function() {
-      return this.$route.name.split("-")[0];
-    }
-  },
-  setup() {
-    const mainStore = useMainStore();
+	name: "BucketPicker",
+	methods: {
+		changeBucket: function (bucket) {
+			this.$router.push({
+				name: `${this.selectedApp}-home`,
+				params: { bucket: bucket },
+			});
+		},
+	},
+	computed: {
+		selectedBucket: function () {
+			return this.$route.params.bucket;
+		},
+		selectedApp: function () {
+			return this.$route.name.split("-")[0];
+		},
+	},
+	setup() {
+		const mainStore = useMainStore();
 
-    return {
-      mainStore
-    };
-  }
+		return {
+			mainStore,
+		};
+	},
 });
 </script>

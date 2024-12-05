@@ -17,36 +17,34 @@
 </template>
 
 <script>
-import pdf from 'components/preview/PdfVuer.vue'
+import pdf from "components/preview/PdfVuer.vue";
 
 export default {
-  components: {
-    pdf
-  },
-  props: ['pdfUrl'],
-  data () {
-    return {
-      page: 1,
-      numPages: 0,
-      pdfdata: undefined,
-      errors: [],
-      scale: 'page-width'
-    }
-  },
-  mounted () {
-    this.getPdf()
-  },
-  methods: {
-    getPdf () {
-      const self = this
-
-      self.pdfdata = pdf.createLoadingTask(this.pdfUrl)
-      self.pdfdata.then((pdf) => {
-        self.numPages = pdf.numPages
-      })
-    }
-  }
-}
+	components: {
+		pdf,
+	},
+	props: ["pdfUrl"],
+	data() {
+		return {
+			page: 1,
+			numPages: 0,
+			pdfdata: undefined,
+			errors: [],
+			scale: "page-width",
+		};
+	},
+	mounted() {
+		this.getPdf();
+	},
+	methods: {
+		getPdf() {
+			this.pdfdata = pdf.createLoadingTask(this.pdfUrl);
+			this.pdfdata.then((pdf) => {
+				this.numPages = pdf.numPages;
+			});
+		},
+	},
+};
 </script>
 <style lang="css" scoped>
 /* Page content */

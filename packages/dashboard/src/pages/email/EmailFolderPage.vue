@@ -103,220 +103,227 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
 import { api } from "boot/axios";
 import { useMainStore } from "stores/main-store";
+import { defineComponent } from "vue";
 import { apiHandler, encode, timeSince } from "../../appUtils";
 
 export default defineComponent({
-  name: "EmailFolderPage",
-  data: function() {
-    return {
-      timeInterval: null,
-      indexCursors: null,
-      loading: false,
-      loadMoreAutomatically: true,
-      hasMorePages: true,
-      rows: [],
-      columns: [
-        {
-          name: "sender",
-          required: true,
-          field: "sender",
-          align: "left",
-          sortable: false
-        },
-        {
-          name: "subject",
-          required: true,
-          field: "subject",
-          align: "left",
-          sortable: false
-        },
-        {
-          name: "lastModified",
-          required: true,
-          align: "left",
-          field: "lastModified",
-          sortable: false
-        },
-        {
-          name: "has_attachments",
-          required: true,
-          align: "left",
-          field: "has_attachments",
-          sortable: false
-        }
-      ]
-    };
-  },
-  computed: {
-    selectedBucket: function() {
-      return this.$route.params.bucket;
-    },
-    selectedFolder: function() {
-      return "inbox";
-    }
-  },
-  watch: {
-    selectedBucket(newVal) {
-      this.fetchFiles();
-    }
-  },
-  methods: {
-    rowClass: function(prop) {
-      return prop.row.customMetadata.read === "true" ? "email-read" : "email-unread";
-    },
-    rowClick: function(evt, row, index) {
-      const file = row.key.replace(/^.*[\\/]/, "");
-      // const folder = row.key.replace(file, '')
+	name: "EmailFolderPage",
+	data: () => ({
+		timeInterval: null,
+		indexCursors: null,
+		loading: false,
+		loadMoreAutomatically: true,
+		hasMorePages: true,
+		rows: [],
+		columns: [
+			{
+				name: "sender",
+				required: true,
+				field: "sender",
+				align: "left",
+				sortable: false,
+			},
+			{
+				name: "subject",
+				required: true,
+				field: "subject",
+				align: "left",
+				sortable: false,
+			},
+			{
+				name: "lastModified",
+				required: true,
+				align: "left",
+				field: "lastModified",
+				sortable: false,
+			},
+			{
+				name: "has_attachments",
+				required: true,
+				align: "left",
+				field: "has_attachments",
+				sortable: false,
+			},
+		],
+	}),
+	computed: {
+		selectedBucket: function () {
+			return this.$route.params.bucket;
+		},
+		selectedFolder: () => "inbox",
+	},
+	watch: {
+		selectedBucket(newVal) {
+			this.fetchFiles();
+		},
+	},
+	methods: {
+		rowClass: (prop) =>
+			prop.row.customMetadata.read === "true" ? "email-read" : "email-unread",
+		rowClick: function (evt, row, index) {
+			const file = row.key.replace(/^.*[\\/]/, "");
+			// const folder = row.key.replace(file, '')
 
-      this.$router.push({
-        name: `email-file`,
-        params: { bucket: this.selectedBucket, folder: this.selectedFolder, file: encode(file) }
-      });
-    },
-    createOrUpdateIndex: async function(currentIndex) {
-      let truncated = true;
+			this.$router.push({
+				name: "email-file",
+				params: {
+					bucket: this.selectedBucket,
+					folder: this.selectedFolder,
+					file: encode(file),
+				},
+			});
+		},
+		createOrUpdateIndex: async function (currentIndex) {
+			let truncated = true;
 
-      // fallback when there's no previous index
-      let cursor = null;
-      let pageNum = 0;
-      let indexData = {
-        version: 1,
-        cursors: []
-      };
+			// fallback when there's no previous index
+			let cursor = null;
+			let pageNum = 0;
+			let indexData = {
+				version: 1,
+				cursors: [],
+			};
 
-      if (currentIndex) {
-        // There is a previous index
-        indexData = currentIndex;
-        if (currentIndex.cursors.length > 0) {
-          // Pop last page, as its going to be updated
-          const lastPage = currentIndex.cursors.pop();
-          pageNum = lastPage.page;
-          cursor = lastPage.cursor;
-        }
-      }
+			if (currentIndex) {
+				// There is a previous index
+				indexData = currentIndex;
+				if (currentIndex.cursors.length > 0) {
+					// Pop last page, as its going to be updated
+					const lastPage = currentIndex.cursors.pop();
+					pageNum = lastPage.page;
+					cursor = lastPage.cursor;
+				}
+			}
 
-      while (truncated) {
-        console.log(`Updating index page ${pageNum}`);
-        const response = await api.get(`/buckets/${this.selectedBucket}?include=customMetadata&include=httpMetadata`, {
-          params: {
-            delimiter: "/",
-            prefix: encode(`.r2-explorer/emails/${this.selectedFolder}/`),
-            cursor: cursor
-          }
-        });
+			while (truncated) {
+				console.log(`Updating index page ${pageNum}`);
+				const response = await api.get(
+					`/buckets/${this.selectedBucket}?include=customMetadata&include=httpMetadata`,
+					{
+						params: {
+							delimiter: "/",
+							prefix: encode(`.r2-explorer/emails/${this.selectedFolder}/`),
+							cursor: cursor,
+						},
+					},
+				);
 
-        indexData.cursors.push({
-          page: pageNum,
-          cursor: cursor,
-          items: response.data.objects.length
-        });
+				indexData.cursors.push({
+					page: pageNum,
+					cursor: cursor,
+					items: response.data.objects.length,
+				});
 
-        // update cursor for next page
-        cursor = response.data.cursor;
-        truncated = response.data.truncated;
-        pageNum++;
-      }
+				// update cursor for next page
+				cursor = response.data.cursor;
+				truncated = response.data.truncated;
+				pageNum++;
+			}
 
-      return indexData;
-    },
-    getOrCreateIndex: async function() {
-      const indexKey = `.r2-explorer/emails/index-${this.selectedFolder}.json`;
-      const fileData = await apiHandler.downloadFile(this.selectedBucket, indexKey, {}).then((obj) => obj.data).catch((obj) => null);
+			return indexData;
+		},
+		getOrCreateIndex: async function () {
+			const indexKey = `.r2-explorer/emails/index-${this.selectedFolder}.json`;
+			const fileData = await apiHandler
+				.downloadFile(this.selectedBucket, indexKey, {})
+				.then((obj) => obj.data)
+				.catch((obj) => null);
 
-      const updatedIndex = await this.createOrUpdateIndex(fileData);
+			const updatedIndex = await this.createOrUpdateIndex(fileData);
 
-      const blob = new Blob([JSON.stringify(updatedIndex)], {
-        type: "application/json"
-      });
-      try {
-        await apiHandler.uploadObjects(blob, indexKey, this.selectedBucket);
-      } catch (e) {}
+			const blob = new Blob([JSON.stringify(updatedIndex)], {
+				type: "application/json",
+			});
+			try {
+				await apiHandler.uploadObjects(blob, indexKey, this.selectedBucket);
+			} catch (e) {}
 
-      return updatedIndex;
-    },
-    loadNextPage: async function(index, done) {
-      const page = this.indexCursors[index];
+			return updatedIndex;
+		},
+		loadNextPage: async function (index, done) {
+			const page = this.indexCursors[index];
 
-      if (page) {
-        await this.loadIndexPage(page);
-      } else {
-        // No more pages to load
-        this.loadMoreAutomatically = true;
-        this.hasMorePages = false;
-      }
+			if (page) {
+				await this.loadIndexPage(page);
+			} else {
+				// No more pages to load
+				this.loadMoreAutomatically = true;
+				this.hasMorePages = false;
+			}
 
-      done();
-    },
-    fetchFiles: async function() {
-      this.loading = true;
-      this.rows = []
+			done();
+		},
+		fetchFiles: async function () {
+			this.loading = true;
+			this.rows = [];
 
-      const indexData = await this.getOrCreateIndex();
+			const indexData = await this.getOrCreateIndex();
 
-      this.indexCursors = indexData.cursors.reverse();
+			this.indexCursors = indexData.cursors.reverse();
 
-      await this.loadNextPage(0, () => {
-      });
-      await this.$refs.infScroll.setIndex(0);  // First page is 0
-      await this.$refs.infScroll.poll();
+			await this.loadNextPage(0, () => {});
+			await this.$refs.infScroll.setIndex(0); // First page is 0
+			await this.$refs.infScroll.poll();
 
-      this.loadMoreAutomatically = false;
+			this.loadMoreAutomatically = false;
 
-      this.loading = false;
-    },
-    loadIndexPage: async function(page) {
-      const response = await apiHandler.listObjects(
-        this.selectedBucket,
-        `.r2-explorer/emails/${this.selectedFolder}/`,
-        "/",
-        page.cursor
-      );
+			this.loading = false;
+		},
+		loadIndexPage: async function (page) {
+			const response = await apiHandler.listObjects(
+				this.selectedBucket,
+				`.r2-explorer/emails/${this.selectedFolder}/`,
+				"/",
+				page.cursor,
+			);
 
-      if (response.data.objects) {
-        const files = response.data.objects.filter(function(obj) {
-          return !obj.key.endsWith("/");  // Remove selected folder
-        }).map(function(obj) {
-          const date = new Date(parseInt(obj.customMetadata.timestamp));
+			if (response.data.objects) {
+				const files = response.data.objects
+					.filter((obj) => {
+						return !obj.key.endsWith("/"); // Remove selected folder
+					})
+					.map((obj) => {
+						const date = new Date(
+							Number.parseInt(obj.customMetadata.timestamp),
+						);
 
-          return {
-            ...obj,
-            sender: obj.customMetadata.from_name || obj.customMetadata.from_address,
-            subject: obj.customMetadata.subject,
-            has_attachments: obj.customMetadata.has_attachments === "true",
-            read: obj.customMetadata.read,
-            lastModified: timeSince(date),
-            timestamp: parseInt(obj.customMetadata.timestamp)
-          };
-        });
+						return {
+							...obj,
+							sender:
+								obj.customMetadata.from_name || obj.customMetadata.from_address,
+							subject: obj.customMetadata.subject,
+							has_attachments: obj.customMetadata.has_attachments === "true",
+							read: obj.customMetadata.read,
+							lastModified: timeSince(date),
+							timestamp: Number.parseInt(obj.customMetadata.timestamp),
+						};
+					});
 
-        for (const f of files.reverse()) {
-          this.rows.push(f);
-        }
-      }
-    }
-  },
-  unmounted () {
-    clearInterval(this.timeInterval)
-    this.timeInterval = null
-  },
-  mounted () {
-    const self = this
-
-    this.timeInterval = setInterval(() => {
-      self.fetchFiles()
-    }, 300000) // 5 minutes
-  },
-  created() {
-    this.fetchFiles();
-  },
-  setup() {
-    return {
-      mainStore: useMainStore()
-    };
-  }
+				for (const f of files.reverse()) {
+					this.rows.push(f);
+				}
+			}
+		},
+	},
+	unmounted() {
+		clearInterval(this.timeInterval);
+		this.timeInterval = null;
+	},
+	mounted() {
+		this.timeInterval = setInterval(() => {
+			this.fetchFiles();
+		}, 300000); // 5 minutes
+	},
+	created() {
+		this.fetchFiles();
+	},
+	setup() {
+		return {
+			mainStore: useMainStore(),
+		};
+	},
 });
 </script>
 

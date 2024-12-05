@@ -24,54 +24,58 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { ROOT_FOLDER, apiHandler, decode } from "src/appUtils";
 import { useMainStore } from "stores/main-store";
-import { apiHandler, decode, ROOT_FOLDER } from "src/appUtils";
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: "CreateFolder",
-  data: function() {
-    return {
-      modal: false,
-      newFolderName: "",
-      loading: false
-    };
-  },
-  methods: {
-    cancel: function() {
-      this.modal = false;
-      this.newFolderName = "";
-      this.loading = false
-    },
-    onSubmit: async function() {
-      this.loading = true
-      await apiHandler.createFolder(this.selectedFolder + this.newFolderName + "/", this.selectedBucket);
-      this.$bus.emit("fetchFiles");
-      this.loading = false
-      this.modal = false;
-      this.newFolderName = "";
-    },
-    open: function() {
-      this.modal = true;
-    }
-  },
-  computed: {
-    selectedBucket: function() {
-      return this.$route.params.bucket;
-    },
-    selectedFolder: function() {
-      if (this.$route.params.folder && this.$route.params.folder !== ROOT_FOLDER) {
-        return decode(this.$route.params.folder);
-      }
-      return "";
-    }
-  },
-  setup() {
-    const mainStore = useMainStore();
+	name: "CreateFolder",
+	data: () => ({
+		modal: false,
+		newFolderName: "",
+		loading: false,
+	}),
+	methods: {
+		cancel: function () {
+			this.modal = false;
+			this.newFolderName = "";
+			this.loading = false;
+		},
+		onSubmit: async function () {
+			this.loading = true;
+			await apiHandler.createFolder(
+				`${this.selectedFolder + this.newFolderName}/`,
+				this.selectedBucket,
+			);
+			this.$bus.emit("fetchFiles");
+			this.loading = false;
+			this.modal = false;
+			this.newFolderName = "";
+		},
+		open: function () {
+			this.modal = true;
+		},
+	},
+	computed: {
+		selectedBucket: function () {
+			return this.$route.params.bucket;
+		},
+		selectedFolder: function () {
+			if (
+				this.$route.params.folder &&
+				this.$route.params.folder !== ROOT_FOLDER
+			) {
+				return decode(this.$route.params.folder);
+			}
+			return "";
+		},
+	},
+	setup() {
+		const mainStore = useMainStore();
 
-    return {
-      mainStore
-    };
-  }
+		return {
+			mainStore,
+		};
+	},
 });
 </script>

@@ -45,37 +45,37 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { useAuthStore } from 'stores/auth-store';
-const authStore = useAuthStore()
+import { useAuthStore } from "stores/auth-store";
+import { defineComponent } from "vue";
+const authStore = useAuthStore();
 
 export default defineComponent({
-  name: 'login-page',
-  components: {},
-  data() {
-    return {
-      loading: false,
-      showError: '',
-      form: {
-        username: '',
-        password: '',
-        remind: true
-      }
-    };
-  },
-  methods: {
-    async onSubmit() {
-      this.loading = true
-      try {
-        await authStore.LogIn(this.$router, this.form)
-        this.showError = '';
-      } catch (error) {
-        this.showError = error.message;
-        throw error;
-      } finally {
-        this.loading = false
-      }
-    }
-  }
+	name: "login-page",
+	components: {},
+	data() {
+		return {
+			loading: false,
+			showError: "",
+			form: {
+				username: "",
+				password: "",
+				remind: true,
+			},
+		};
+	},
+	methods: {
+		async onSubmit() {
+			this.loading = true;
+			try {
+				await authStore.LogIn(this.$router, this.form);
+				this.showError = "";
+			} catch (error) {
+				this.showError = error.message;
+				throw error;
+			} finally {
+				this.loading = false;
+			}
+		},
+	},
 });
 </script>
