@@ -400,7 +400,7 @@ export default {
 			const notif = this.q.notify({
 				group: false,
 				spinner: true,
-				message: `Updating file...`,
+				message: "Updating file...",
 				caption: "0%",
 				timeout: 0,
 			});

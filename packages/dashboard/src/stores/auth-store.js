@@ -16,7 +16,7 @@ export const useAuthStore = defineStore("auth", {
 	actions: {
 		async LogIn(router, form) {
 			const mainStore = useMainStore();
-			const token = btoa(form.username + ":" + form.password);
+			const token = btoa(`${form.username}:${form.password}`);
 
 			api.defaults.headers.common["Authorization"] = `Basic ${token}`;
 			try {

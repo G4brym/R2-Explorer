@@ -1,5 +1,5 @@
 // @ts-ignore
-const fs = require("fs");
+const fs = require("node:fs");
 
 const WORKERS_CI = process.env.WORKERS_CI;
 let R2EXPLORER_WORKER_NAME = process.env.R2EXPLORER_WORKER_NAME;
@@ -8,15 +8,15 @@ const R2EXPLORER_CONFIG = process.env.R2EXPLORER_CONFIG;
 const R2EXPLORER_DOMAIN = process.env.R2EXPLORER_DOMAIN;
 const CF_API_TOKEN = process.env.CF_API_TOKEN;
 
-let baseDir = __dirname
-if (WORKERS_CI === '1') {
-  baseDir = process.env.PWD
-  R2EXPLORER_WORKER_NAME = R2EXPLORER_WORKER_NAME || 'r2-explorer'
+let baseDir = __dirname;
+if (WORKERS_CI === "1") {
+	baseDir = process.env.PWD;
+	R2EXPLORER_WORKER_NAME = R2EXPLORER_WORKER_NAME || "r2-explorer";
 } else {
-  if (!CF_API_TOKEN) {
-    console.error("CF_API_TOKEN variable is required to continue!");
-    process.exit(1);
-  }
+	if (!CF_API_TOKEN) {
+		console.error("CF_API_TOKEN variable is required to continue!");
+		process.exit(1);
+	}
 }
 
 if (!R2EXPLORER_WORKER_NAME) {
@@ -70,10 +70,10 @@ preview_bucket_name = '${split[1]}'
 }
 
 console.log(wranglerConfig);
-fs.writeFileSync(baseDir + "/wrangler.toml", wranglerConfig);
+fs.writeFileSync(`${baseDir}/wrangler.toml`, wranglerConfig);
 
-if (!fs.existsSync(baseDir + "/src/")) {
-	fs.mkdirSync(baseDir + "/src/");
+if (!fs.existsSync(`${baseDir}/src/`)) {
+	fs.mkdirSync(`${baseDir}/src/`);
 }
 
 console.log(`
@@ -82,7 +82,7 @@ import { R2Explorer } from "r2-explorer";
 export default R2Explorer(${R2EXPLORER_CONFIG});
 `);
 fs.writeFileSync(
-  baseDir + "/src/index.ts",
+	`${baseDir}/src/index.ts`,
 	`
 import { R2Explorer } from "r2-explorer";
 

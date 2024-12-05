@@ -28,7 +28,7 @@ function isPDFDocumentLoadingTask(obj) {
 }
 
 export function createLoadingTask(src, options) {
-	var source;
+	let source;
 	if (typeof src === "string")
 		source = {
 			url: src,
@@ -37,14 +37,12 @@ export function createLoadingTask(src, options) {
 		source = Object.assign({}, src);
 	else throw new TypeError("invalid src type");
 
-	var loadingTask = getDocument(source).promise;
+	const loadingTask = getDocument(source).promise;
 	loadingTask.__PDFDocumentLoadingTask = true; // since PDFDocumentLoadingTask is not public
 
-	if (options && options.onPassword)
-		loadingTask.onPassword = options.onPassword;
+	if (options?.onPassword) loadingTask.onPassword = options.onPassword;
 
-	if (options && options.onProgress)
-		loadingTask.onProgress = options.onProgress;
+	if (options?.onProgress) loadingTask.onProgress = options.onProgress;
 
 	return loadingTask;
 }
@@ -94,7 +92,7 @@ export default {
 	},
 	watch: {
 		pdf: function (val) {
-			var pdfInfo = val.pdfInfo || val._pdfInfo;
+			const pdfInfo = val.pdfInfo || val._pdfInfo;
 			this.$emit("numpages", pdfInfo.numPages);
 		},
 		page: function (val) {
@@ -119,8 +117,8 @@ export default {
 			this.$emit("loading", true);
 		}
 
-		var container = this.$refs.container;
-		var eventBus = new EventBus();
+		const container = this.$refs.container;
+		const eventBus = new EventBus();
 
 		// (Optionally) enable hyperlinks within PDF files.
 		this.pdfLinkService = new PDFLinkService({
@@ -134,8 +132,8 @@ export default {
 			linkService: this.pdfLinkService,
 		});
 
-		let annotationLayer = undefined,
-			textLayer = undefined;
+		let annotationLayer = undefined;
+		let textLayer = undefined;
 
 		if (this.annotation) {
 			annotationLayer = new DefaultAnnotationLayerFactory();
@@ -166,7 +164,7 @@ export default {
 				// Associates the actual page with the view, and drawing it
 				this.pdfViewer.setPdfPage(pdfPage);
 				// Set up a scrollPageIntoView function for our links
-				var viewer = {
+				const viewer = {
 					scrollPageIntoView: (params) => {
 						// Send an event when clicking internal links so we can handle loading/scrolling to the correct page
 						this.$emit("link-clicked", params);
@@ -203,8 +201,8 @@ export default {
 		},
 		calculateScaleHeight: function () {
 			this.pdfViewer.update(1, this.rotate); // Reset scaling to 1 so that "this.pdfViewer.viewport.width" gives proper width;
-			var height = this.$refs.container.offsetHeight;
-			var parentel = this.$refs.container.parentElement.parentElement;
+			const height = this.$refs.container.offsetHeight;
+			const parentel = this.$refs.container.parentElement.parentElement;
 			return parentel.offsetHeight / height;
 		},
 		drawScaled: function (newScale) {

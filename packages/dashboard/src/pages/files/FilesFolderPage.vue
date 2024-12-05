@@ -107,17 +107,16 @@ export default defineComponent({
 						if (rowB.type === "folder") {
 							// both are folders
 							return a.localeCompare(b);
-						} else {
-							// only first is folder
-							return 1;
 						}
-					} else if (rowB.type === "folder") {
+						// only first is folder
+						return 1;
+					}
+					if (rowB.type === "folder") {
 						// only second is folder
 						return -1;
-					} else {
-						// none is folder
-						return a.localeCompare(b);
 					}
+					// none is folder
+					return a.localeCompare(b);
 				},
 			},
 			{
@@ -175,22 +174,20 @@ export default defineComponent({
 						.map((item, index, arr) => {
 							return {
 								name: item,
-								path:
-									arr
-										.slice(0, index + 1)
-										.join("/")
-										.replace("Home/", "") + "/",
+								path: `${arr
+									.slice(0, index + 1)
+									.join("/")
+									.replace("Home/", "")}/`,
 							};
 						}),
 				];
-			} else {
-				return [
-					{
-						name: this.selectedBucket,
-						path: "/",
-					},
-				];
 			}
+			return [
+				{
+					name: this.selectedBucket,
+					path: "/",
+				},
+			];
 		},
 	},
 	watch: {
@@ -212,14 +209,14 @@ export default defineComponent({
 		},
 		breadcrumbsClick: function (obj) {
 			this.$router.push({
-				name: `files-folder`,
+				name: "files-folder",
 				params: { bucket: this.selectedBucket, folder: encode(obj.path) },
 			});
 		},
 		rowClick: function (evt, row) {
 			if (row.type === "folder") {
 				this.$router.push({
-					name: `files-folder`,
+					name: "files-folder",
 					params: { bucket: this.selectedBucket, folder: encode(row.key) },
 				});
 			} else {
@@ -230,7 +227,7 @@ export default defineComponent({
 		openObject: function (row) {
 			if (row.type === "folder") {
 				this.$router.push({
-					name: `files-folder`,
+					name: "files-folder",
 					params: { bucket: this.selectedBucket, folder: encode(row.key) },
 				});
 			} else {
@@ -241,7 +238,7 @@ export default defineComponent({
 		renameObject: function (row) {
 			if (row.type === "folder") {
 				this.$router.push({
-					name: `files-folder`,
+					name: "files-folder",
 					params: { bucket: this.selectedBucket, folder: encode(row.key) },
 				});
 			} else {

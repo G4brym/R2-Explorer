@@ -1,17 +1,14 @@
 {
-  "compilerOptions": {
-    "target": "esNext",
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": false,
-    "skipLibCheck": true,
-    "noUncheckedIndexedAccess": true,
-    "noEmit": true,
-    "types": [
-      "@types/node",
-      "@cloudflare/workers-types"
-    ]
-  },
-  "include": ["src/*.ts", "src/**/*.ts"]
+	"compilerOptions": {
+		"target": "esNext",
+		"module": "commonjs",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": false,
+		"skipLibCheck": true,
+		"noUncheckedIndexedAccess": true,
+		"noEmit": true,
+		"types": ["@types/node", "@cloudflare/workers-types"]
+	},
+	"include": ["src/*.ts", "src/**/*.ts"]
 }

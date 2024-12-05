@@ -120,7 +120,7 @@ export default {
 				// }
 
 				if (folder !== "") {
-					const folderKey = this.selectedFolder + folder + "/";
+					const folderKey = `${this.selectedFolder + folder}/`;
 
 					await apiHandler.createFolder(folderKey, this.selectedBucket);
 				}
@@ -259,7 +259,7 @@ export default {
 
 				await filePromise;
 			} else if (item.isDirectory) {
-				const newPath = path ? path + "/" + item.name : item.name;
+				const newPath = path ? `${path}/${item.name}` : item.name;
 				if (folders[newPath] === undefined) {
 					folders[newPath] = [];
 				}

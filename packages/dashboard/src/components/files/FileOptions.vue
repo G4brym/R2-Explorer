@@ -152,7 +152,7 @@ export default defineComponent({
 		},
 		onSubmit: async function () {
 			await apiHandler.createFolder(
-				this.selectedFolder + this.newFolderName + "/",
+				`${this.selectedFolder + this.newFolderName}/`,
 				this.selectedBucket,
 			);
 			this.$bus.emit("fetchFiles");

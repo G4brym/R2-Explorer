@@ -18,33 +18,21 @@ const orderedListRegex = /(\n\s*([0-9]+\.)\s.*)+/g;
 const paragraphRegex =
 	/\n+(?!<pre>)(?!<h)(?!<ul>)(?!<blockquote)(?!<hr)(?!\t)([^\n]+)\n/g;
 // Replacer functions for Markdown
-const codeBlockReplacer = (fullMatch) => "\n<pre>" + fullMatch + "</pre>";
+const codeBlockReplacer = (fullMatch) => `\n<pre>${fullMatch}</pre>`;
 const inlineCodeReplacer = (fullMatch, tagStart, tagContents) =>
-	"<code>" + tagContents + "</code>";
+	`<code>${tagContents}</code>`;
 const imageReplacer = (fullMatch, tagTitle, tagURL) =>
-	'<img src="' + tagURL + '" alt="' + tagTitle + '" />';
+	`<img src="${tagURL}" alt="${tagTitle}" />`;
 const linkReplacer = (fullMatch, tagTitle, tagURL) =>
-	'<a href="' + tagURL + '">' + tagTitle + "</a>";
+	`<a href="${tagURL}">${tagTitle}</a>`;
 const headingReplacer = (fullMatch, tagStart, tagContents) =>
-	"\n<h" +
-	tagStart.trim().length +
-	">" +
-	tagContents +
-	"</h" +
-	tagStart.trim().length +
-	">";
+	`\n<h${tagStart.trim().length}>${tagContents}</h${tagStart.trim().length}>`;
 const boldItalicsReplacer = (fullMatch, tagStart, tagContents) =>
-	"<" +
-	(tagStart.trim().length == 1 ? "em" : "strong") +
-	">" +
-	tagContents +
-	"</" +
-	(tagStart.trim().length == 1 ? "em" : "strong") +
-	">";
+	`<${tagStart.trim().length === 1 ? "em" : "strong"}>${tagContents}</${tagStart.trim().length === 1 ? "em" : "strong"}>`;
 const strikethroughReplacer = (fullMatch, tagStart, tagContents) =>
-	"<del>" + tagContents + "</del>";
+	`<del>${tagContents}</del>`;
 const blockquoteReplacer = (fullMatch, tagStart, tagContents) =>
-	"\n<blockquote>" + tagContents + "</blockquote>";
+	`\n<blockquote>${tagContents}</blockquote>`;
 const horizontalRuleReplacer = (fullMatch) => "\n<hr />";
 const unorderedListReplacer = (fullMatch) => {
 	let items = "";
@@ -52,9 +40,9 @@ const unorderedListReplacer = (fullMatch) => {
 		.trim()
 		.split("\n")
 		.forEach((item) => {
-			items += "<li>" + item.substring(2) + "</li>";
+			items += `<li>${item.substring(2)}</li>`;
 		});
-	return "\n<ul>" + items + "</ul>";
+	return `\n<ul>${items}</ul>`;
 };
 const orderedListReplacer = (fullMatch) => {
 	let items = "";
@@ -62,12 +50,11 @@ const orderedListReplacer = (fullMatch) => {
 		.trim()
 		.split("\n")
 		.forEach((item) => {
-			items += "<li>" + item.substring(item.indexOf(".") + 2) + "</li>";
+			items += `<li>${item.substring(item.indexOf(".") + 2)}</li>`;
 		});
-	return "\n<ol>" + items + "</ol>";
+	return `\n<ol>${items}</ol>`;
 };
-const paragraphReplacer = (fullMatch, tagContents) =>
-	"<p>" + tagContents + "</p>";
+const paragraphReplacer = (fullMatch, tagContents) => `<p>${tagContents}</p>`;
 // Rules for Markdown parsing (use in order of appearance for best results)
 const replaceCodeBlocks = replaceRegex(codeBlockRegex, codeBlockReplacer);
 const replaceInlineCodes = replaceRegex(inlineCodeRegex, inlineCodeReplacer);
@@ -101,7 +88,7 @@ const codeBlockFixer = (
 ) => {
 	let lines = "";
 	tagContents.split("\n").forEach((line) => {
-		lines += line.substring(1) + "\n";
+		lines += `${line.substring(1)}\n`;
 	});
 	return tagStart + lines + tagEnd;
 };
@@ -131,4 +118,4 @@ const replaceMarkdown = (str) =>
 // Parser for Markdown (fixes code, adds empty lines around for parsing)
 // Usage: parseMarkdown(strVar)
 export const parseMarkdown = (str) =>
-	fixCodeBlocks(replaceMarkdown("\n" + str + "\n")).trim();
+	fixCodeBlocks(replaceMarkdown(`\n${str}\n`)).trim();

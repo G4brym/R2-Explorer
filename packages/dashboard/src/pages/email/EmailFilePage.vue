@@ -124,7 +124,7 @@ export default defineComponent({
 	watch: {
 		selectedBucket(newVal) {
 			this.$router.push({
-				name: `email-folder`,
+				name: "email-folder",
 				params: { bucket: newVal, folder: encode(this.selectedFolder) },
 			});
 		},
@@ -139,9 +139,10 @@ export default defineComponent({
 		},
 		resizeIframe() {
 			if (this.$refs.renderWindow) {
-				this.$refs.renderWindow.style.height =
+				this.$refs.renderWindow.style.height = `${
 					this.$refs.renderWindow.contentWindow.document.documentElement
-						.scrollHeight + "px";
+						.scrollHeight
+				}px`;
 			}
 		},
 

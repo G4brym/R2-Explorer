@@ -1,21 +1,21 @@
 {
-  "name": "r2-explorer-root",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "prepare": "husky",
-    "workers-ci": "export WORKERS_CI=1 && node packages/github-action/prepareDeploy.js",
-    "lint": "npx @biomejs/biome check template/ packages/dashboard/src packages/worker/src || (npx @biomejs/biome check --write template/ packages/dashboard/src packages/worker/src/; exit 1)",
-    "build-dashboard": "pnpm run --filter r2-explorer-dashboard build",
-    "build-worker": "pnpm run --filter r2-explorer build",
-    "build": "pnpm build-dashboard && pnpm build-worker",
-    "deploy-dashboard": "pnpm run --filter r2-explorer-dashboard deploy",
-    "deploy-dashboard-dev": "pnpm run --filter r2-explorer-dashboard deploy-dev",
-    "deploy-dev-worker": "pnpm run --filter r2-explorer-dev-worker deploy",
-    "publish-npm": "pnpm run --filter worker publish"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "husky": "^9.1.7"
-  }
+	"name": "r2-explorer-root",
+	"version": "0.0.0",
+	"private": true,
+	"scripts": {
+		"prepare": "husky",
+		"workers-ci": "export WORKERS_CI=1 && node packages/github-action/prepareDeploy.js",
+		"lint": "npx @biomejs/biome check template/ packages/dashboard/src packages/worker/src || (npx @biomejs/biome check --write template/ packages/dashboard/src packages/worker/src/; exit 1)",
+		"build-dashboard": "pnpm run --filter r2-explorer-dashboard build",
+		"build-worker": "pnpm run --filter r2-explorer build",
+		"build": "pnpm build-dashboard && pnpm build-worker",
+		"deploy-dashboard": "pnpm run --filter r2-explorer-dashboard deploy",
+		"deploy-dashboard-dev": "pnpm run --filter r2-explorer-dashboard deploy-dev",
+		"deploy-dev-worker": "pnpm run --filter r2-explorer-dev-worker deploy",
+		"publish-npm": "pnpm run --filter worker publish"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"husky": "^9.1.7"
+	}
 }

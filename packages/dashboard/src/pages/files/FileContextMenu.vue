@@ -87,7 +87,7 @@ export default {
 				});
 			} catch (err) {
 				this.q.notify({
-					message: "Failed to copy: " + err,
+					message: `Failed to copy: ${err}`,
 					timeout: 5000,
 					type: "negative",
 				});

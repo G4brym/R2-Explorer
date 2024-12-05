@@ -39,7 +39,7 @@ export default {
 		mainStore.loadUserDisks().then((buckets) => {
 			if (this.$route.path === "/") {
 				this.$router.push({
-					name: `files-home`,
+					name: "files-home",
 					params: { bucket: buckets[0].name },
 				});
 			}

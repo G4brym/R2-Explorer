@@ -167,7 +167,7 @@ export default defineComponent({
 			// const folder = row.key.replace(file, '')
 
 			this.$router.push({
-				name: `email-file`,
+				name: "email-file",
 				params: {
 					bucket: this.selectedBucket,
 					folder: this.selectedFolder,

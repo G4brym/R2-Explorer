@@ -44,7 +44,7 @@ export default defineComponent({
 		onSubmit: async function () {
 			this.loading = true;
 			await apiHandler.createFolder(
-				this.selectedFolder + this.newFolderName + "/",
+				`${this.selectedFolder + this.newFolderName}/`,
 				this.selectedBucket,
 			);
 			this.$bus.emit("fetchFiles");
