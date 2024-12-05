@@ -1,39 +1,39 @@
-import {
-	Int,
-	OpenAPIRoute,
-	Path,
-	Query,
-} from "@cloudflare/itty-router-openapi";
+
 
 import { z } from "zod";
-import type { Context } from "../../../interfaces";
 import { AppContext } from "../../../types";
+import { OpenAPIRoute } from "chanfana";
 
 export class CompleteUpload extends OpenAPIRoute {
 	schema = {
 		operationId: "post-multipart-complete-upload",
 		tags: ["Multipart"],
 		summary: "Complete upload",
-		parameters: {
-			bucket: Path(String),
-		},
-		requestBody: {
-			uploadId: String,
-			key: z.string().describe("base64 encoded file key"),
-			parts: [
-				{
-					etag: String,
-					partNumber: Int,
-				},
-			],
-		},
+    request: {
+      params: z.object({
+        bucket: z.string()
+      }),
+      body: {
+        content: {
+          "application/json": {
+            schema: z.object({
+              uploadId: z.string(),
+              parts: z.object({
+                  etag: z.string(),
+                  partNumber: z.number().int(),
+                }).array(),
+              key: z.string().describe("base64 encoded file key")
+            })
+          }
+        }
+      }
+    }
 	};
 
 	async handle(c: AppContext) {
-		if (context.config.readonly === true)
-			return Response.json({ msg: "unauthorized" }, { status: 401 });
+    const data = await this.getValidatedData<typeof this.schema>()
 
-		const bucket = env[data.params.bucket];
+		const bucket = c.env[data.params.bucket];
 
 		const uploadId = data.body.uploadId;
 		const key = decodeURIComponent(escape(atob(data.body.key)));

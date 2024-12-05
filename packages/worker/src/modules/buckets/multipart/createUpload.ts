@@ -1,31 +1,29 @@
-import { OpenAPIRoute, Path, Query } from "@cloudflare/itty-router-openapi";
 
 import { z } from "zod";
-import type { Context } from "../../../interfaces";
 import { AppContext } from "../../../types";
+import { OpenAPIRoute } from "chanfana";
 
 export class CreateUpload extends OpenAPIRoute {
 	schema = {
 		operationId: "post-multipart-create-upload",
 		tags: ["Multipart"],
 		summary: "Create upload",
-		parameters: {
-			bucket: Path(String),
-			key: Query(z.string().describe("base64 encoded file key")),
-			customMetadata: Query(
-				z.string().nullable().optional().describe("base64 encoded json string"),
-			),
-			httpMetadata: Query(
-				z.string().nullable().optional().describe("base64 encoded json string"),
-			),
-		},
+    request: {
+      params: z.object({
+        bucket: z.string()
+      }),
+      query: z.object({
+        key: z.string().describe("base64 encoded file key"),
+        customMetadata: z.string().nullable().optional().describe("base64 encoded json string"),
+        httpMetadata: z.string().nullable().optional().describe("base64 encoded json string"),
+      })
+    },
 	};
 
 	async handle(c: AppContext) {
-		if (context.config.readonly === true)
-			return Response.json({ msg: "unauthorized" }, { status: 401 });
+    const data = await this.getValidatedData<typeof this.schema>()
 
-		const bucket = env[data.params.bucket];
+		const bucket = c.env[data.params.bucket];
 
 		const key = decodeURIComponent(escape(atob(data.query.key)));
 

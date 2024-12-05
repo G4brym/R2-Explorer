@@ -1,7 +1,7 @@
 import { ExecutionContext, Hono } from "hono";
 import { cors } from "hono/cors";
 import { AppContext, AppEnv, AppVariables, BasicAuth, R2ExplorerConfig } from "./types";
-import { fromHono, OpenAPIObjectConfigV31 } from "chanfana";
+import { extendZodWithOpenApi, fromHono, OpenAPIObjectConfigV31 } from "chanfana";
 import { basicAuth } from "hono/basic-auth";
 import { readOnlyMiddleware } from "./foundation/middlewares/readonly";
 import { accessMiddleware } from "./foundation/middlewares/authentication";
@@ -22,13 +22,16 @@ import { PutMetadata } from "./modules/buckets/putMetadata";
 import { SendEmail } from "./modules/emails/sendEmail";
 import { dashboardProxy } from "./foundation/dashbord";
 import { receiveEmail } from "./modules/emails/receiveEmail";
+import { z } from "zod";
 
 export function R2Explorer(config?: R2ExplorerConfig) {
+
+  extendZodWithOpenApi(z);
 	config = config || {};
 	if (config.readonly !== false) config.readonly = true;
 
 	const openapiSchema: OpenAPIObjectConfigV31 = {
-    openapi: "3.1",
+    openapi: "3.1.0",
     info: {
 			title: "R2 Explorer API",
 			version: settings.version,
@@ -44,6 +47,11 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	}
 
   const app = new Hono<{ Bindings: AppEnv, Variables: AppVariables }>();
+  app.use('*', async (c, next) => {
+    c.set('config', config)
+    await next()
+  })
+
   const openapi = fromHono(app, {
     schema: openapiSchema,
     raiseUnknownParameters: true,
@@ -106,7 +114,7 @@ export function R2Explorer(config?: R2ExplorerConfig) {
   openapi.post("/api/buckets/:bucket/multipart/upload", PartUpload);
   openapi.post("/api/buckets/:bucket/multipart/complete", CompleteUpload);
   openapi.post("/api/buckets/:bucket/delete", DeleteObject);
-  openapi.head("/api/buckets/:bucket/:key", HeadObject);
+  openapi.on("head", "/api/buckets/:bucket/:key", HeadObject);
   openapi.get("/api/buckets/:bucket/:key/head", HeadObject); // There are some issues with calling the head method
   openapi.get("/api/buckets/:bucket/:key", GetObject);
   openapi.post("/api/buckets/:bucket/:key", PutMetadata);
@@ -125,6 +133,7 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 			await receiveEmail(event, env, context, config);
 		},
 		async fetch(request: Request, env: AppEnv, context: ExecutionContext) {
+
 			return app.fetch(request, env, context)
 		},
 	};

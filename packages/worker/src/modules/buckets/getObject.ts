@@ -1,18 +1,19 @@
-import { OpenAPIRoute, Path } from "@cloudflare/itty-router-openapi";
 
 import { z } from "zod";
-import type { Context } from "../../interfaces";
 import { AppContext } from "../../types";
+import { OpenAPIRoute } from "chanfana";
 
 export class GetObject extends OpenAPIRoute {
 	schema = {
 		operationId: "get-bucket-object",
 		tags: ["Buckets"],
 		summary: "Get Object",
-		parameters: {
-			bucket: Path(String),
-			key: Path(z.string().describe("base64 encoded file key")),
-		},
+    request: {
+      params: z.object({
+        bucket: z.string(),
+        key: z.string().describe("base64 encoded file key")
+      }),
+    },
 		responses: {
 			"200": {
 				description: "File binary",
@@ -22,7 +23,9 @@ export class GetObject extends OpenAPIRoute {
 	};
 
 	async handle(c: AppContext) {
-		const bucket = env[data.params.bucket];
+    const data = await this.getValidatedData<typeof this.schema>();
+
+		const bucket = c.env[data.params.bucket];
 
 		let filePath;
 		try {

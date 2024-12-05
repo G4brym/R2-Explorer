@@ -1,12 +1,12 @@
-import type { Context } from "./interfaces";
-import { AppContext } from "./types";
+import { AppContext } from "../types";
+
 
 export async function dashboardProxy(c: AppContext) {
 	// Initialize the default cache
 	//@ts-ignore
 	const cache = caches.default;
 
-	let path = new URL(request.url).pathname;
+	let path = new URL(c.req.raw.url).pathname;
 
 	// Support page navigation
 	if (!path.includes(".")) {
@@ -14,21 +14,22 @@ export async function dashboardProxy(c: AppContext) {
 	}
 
 	let result;
+  const config = c.get('config')
 
-	if (context.config.cacheAssets !== false) {
+	if (config.cacheAssets !== false) {
 		// use .match() to see if we have a cache hit, if so return the caches response early
-		result = await cache.match(request);
+		result = await cache.match(c.req.raw);
 		if (result) {
 			return result;
 		}
 	}
 
 	let dashboardUrl = "https://demo.r2explorer.dev";
-	if (context.config?.dashboardUrl) {
-		if (context.config.dashboardUrl.endsWith("/")) {
-			dashboardUrl = context.config.dashboardUrl.slice(0, -1);
+	if (config.dashboardUrl) {
+		if (config.dashboardUrl.endsWith("/")) {
+			dashboardUrl = config.dashboardUrl.slice(0, -1);
 		} else {
-			dashboardUrl = context.config.dashboardUrl;
+			dashboardUrl = config.dashboardUrl;
 		}
 	}
 
@@ -46,9 +47,9 @@ export async function dashboardProxy(c: AppContext) {
 		},
 	});
 
-	if (response.status === 200 && context.config.cacheAssets !== false) {
+	if (response.status === 200 && config.cacheAssets !== false) {
 		// before returning the response we put a clone of our response object into the cache so it can be resolved later
-		context.executionContext.waitUntil(cache.put(request, result.clone()));
+    c.executionCtx.waitUntil(cache.put(c.req.raw, result.clone()));
 	}
 
 	return result;

@@ -5,5 +5,8 @@
 	},
 	"scripts": {
 		"deploy": "wrangler deploy"
+	},
+	"dependencies": {
+		"chanfana": "https://prerelease-registry.devprod.cloudflare.dev/chanfana/runs/12189183779/npm-package-chanfana-208"
 	}
 }
