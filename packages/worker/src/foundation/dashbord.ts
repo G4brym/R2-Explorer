@@ -1,5 +1,4 @@
-import { AppContext } from "../types";
-
+import type { AppContext } from "../types";
 
 export async function dashboardProxy(c: AppContext) {
 	// Initialize the default cache
@@ -14,7 +13,7 @@ export async function dashboardProxy(c: AppContext) {
 	}
 
 	let result;
-  const config = c.get('config')
+	const config = c.get("config");
 
 	if (config.cacheAssets !== false) {
 		// use .match() to see if we have a cache hit, if so return the caches response early
@@ -49,7 +48,7 @@ export async function dashboardProxy(c: AppContext) {
 
 	if (response.status === 200 && config.cacheAssets !== false) {
 		// before returning the response we put a clone of our response object into the cache so it can be resolved later
-    c.executionCtx.waitUntil(cache.put(c.req.raw, result.clone()));
+		c.executionCtx.waitUntil(cache.put(c.req.raw, result.clone()));
 	}
 
 	return result;

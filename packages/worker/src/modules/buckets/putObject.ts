@@ -1,36 +1,44 @@
-import { z } from "zod";
 import { OpenAPIRoute } from "chanfana";
-import { AppContext } from "../../types";
+import { z } from "zod";
+import type { AppContext } from "../../types";
 
 export class PutObject extends OpenAPIRoute {
 	schema = {
 		operationId: "post-bucket-upload-object",
 		tags: ["Buckets"],
 		summary: "Upload object",
-    request: {
-      body: {
-        content: {
-          'application/octet-stream': {
-            schema: {
-              type: "string",
-              format: "binary",
-            }
-          },
-        },
-      },
-      params: z.object({
-        bucket: z.string()
-      }),
-      query: z.object({
-        key: z.string().describe("base64 encoded file key"),
-        customMetadata: z.string().nullable().optional().describe("base64 encoded json string"),
-        httpMetadata: z.string().nullable().optional().describe("base64 encoded json string"),
-      })
-    },
+		request: {
+			body: {
+				content: {
+					"application/octet-stream": {
+						schema: {
+							type: "string",
+							format: "binary",
+						},
+					},
+				},
+			},
+			params: z.object({
+				bucket: z.string(),
+			}),
+			query: z.object({
+				key: z.string().describe("base64 encoded file key"),
+				customMetadata: z
+					.string()
+					.nullable()
+					.optional()
+					.describe("base64 encoded json string"),
+				httpMetadata: z
+					.string()
+					.nullable()
+					.optional()
+					.describe("base64 encoded json string"),
+			}),
+		},
 	};
 
 	async handle(c: AppContext) {
-    const data = await this.getValidatedData<typeof this.schema>()
+		const data = await this.getValidatedData<typeof this.schema>();
 
 		const bucket = c.env[data.params.bucket];
 

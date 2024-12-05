@@ -1,19 +1,18 @@
-
-import { z } from "zod";
-import { AppContext } from "../../types";
 import { OpenAPIRoute } from "chanfana";
+import { z } from "zod";
+import type { AppContext } from "../../types";
 
 export class GetObject extends OpenAPIRoute {
 	schema = {
 		operationId: "get-bucket-object",
 		tags: ["Buckets"],
 		summary: "Get Object",
-    request: {
-      params: z.object({
-        bucket: z.string(),
-        key: z.string().describe("base64 encoded file key")
-      }),
-    },
+		request: {
+			params: z.object({
+				bucket: z.string(),
+				key: z.string().describe("base64 encoded file key"),
+			}),
+		},
 		responses: {
 			"200": {
 				description: "File binary",
@@ -23,7 +22,7 @@ export class GetObject extends OpenAPIRoute {
 	};
 
 	async handle(c: AppContext) {
-    const data = await this.getValidatedData<typeof this.schema>();
+		const data = await this.getValidatedData<typeof this.schema>();
 
 		const bucket = c.env[data.params.bucket];
 

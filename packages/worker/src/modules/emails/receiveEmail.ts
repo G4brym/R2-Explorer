@@ -1,7 +1,7 @@
+import type { ExecutionContext } from "hono";
 import PostalMime from "postal-mime";
-import { ExecutionContext } from "hono";
-import { AppEnv, R2ExplorerConfig } from "../../types";
 import { getCurrentTimestampMilliseconds } from "../../foundation/dates";
+import type { AppEnv, R2ExplorerConfig } from "../../types";
 
 async function streamToArrayBuffer(stream, streamSize) {
 	const result = new Uint8Array(streamSize);
@@ -18,7 +18,12 @@ async function streamToArrayBuffer(stream, streamSize) {
 	return result;
 }
 
-export async function receiveEmail(event: {raw: unknown, rawSize: unknown}, env: AppEnv, ctx: ExecutionContext, config: R2ExplorerConfig) {
+export async function receiveEmail(
+	event: { raw: unknown; rawSize: unknown },
+	env: AppEnv,
+	ctx: ExecutionContext,
+	config: R2ExplorerConfig,
+) {
 	let bucket;
 
 	if (

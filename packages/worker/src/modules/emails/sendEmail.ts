@@ -1,38 +1,41 @@
-
-import { AppContext } from "../../types";
 import { OpenAPIRoute, Str } from "chanfana";
 import { z } from "zod";
+import type { AppContext } from "../../types";
 
 export class SendEmail extends OpenAPIRoute {
-  schema = {
+	schema = {
 		operationId: "post-email-send",
 		tags: ["Emails"],
 		summary: "Send Email",
-    request: {
-      body: {
-        content: {
-          'application/json': {
-            schema: z.object({
-              subject: Str({example: "Look! No servers"}),
-              from: z.object({
-                email: Str({example: "sender@example.com"}),
-                name: Str({example: "Workers - MailChannels integration"}),
-              }),
-              to: z.object({ email: Str({example: "test@example.com"}), name: Str({example: "Test Recipient"}) }).array(),
-              content: z.object({
-              }).catchall(z.string()),
-            }),
-          },
-        },
-      },
-    },
+		request: {
+			body: {
+				content: {
+					"application/json": {
+						schema: z.object({
+							subject: Str({ example: "Look! No servers" }),
+							from: z.object({
+								email: Str({ example: "sender@example.com" }),
+								name: Str({ example: "Workers - MailChannels integration" }),
+							}),
+							to: z
+								.object({
+									email: Str({ example: "test@example.com" }),
+									name: Str({ example: "Test Recipient" }),
+								})
+								.array(),
+							content: z.object({}).catchall(z.string()),
+						}),
+					},
+				},
+			},
+		},
 	};
 
 	async handle(c: AppContext) {
-		if (c.get('config').readonly === true)
+		if (c.get("config").readonly === true)
 			return Response.json({ msg: "unauthorized" }, { status: 401 });
 
-    // TODO: re-enable this with cloudflare workers
+		// TODO: re-enable this with cloudflare workers
 		// const emailResp = await fetch("https://api.mailchannels.net/tx/v1/send", {
 		// 	method: "POST",
 		// 	headers: {
@@ -55,10 +58,10 @@ export class SendEmail extends OpenAPIRoute {
 		// 	}),
 		// });
 
-    return {
-      success: false,
-      error: 'unavailable'
-    }
+		return {
+			success: false,
+			error: "unavailable",
+		};
 
 		// return { msg: await emailResp.text() };
 	}

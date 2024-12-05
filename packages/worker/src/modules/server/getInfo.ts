@@ -1,7 +1,6 @@
 import { OpenAPIRoute } from "chanfana";
-import { AppContext } from "../../types";
 import { settings } from "../../foundation/settings";
-
+import type { AppContext } from "../../types";
 
 export class GetInfo extends OpenAPIRoute {
 	schema = {
@@ -11,13 +10,13 @@ export class GetInfo extends OpenAPIRoute {
 	};
 
 	async handle(c: AppContext) {
-		const {basicAuth, ...config} = c.get('config')
+		const { basicAuth, ...config } = c.get("config");
 
 		return {
 			version: settings.version,
 			config: config,
 			user: {
-				username: c.get('username'),
+				username: c.get("username"),
 			},
 		};
 	}

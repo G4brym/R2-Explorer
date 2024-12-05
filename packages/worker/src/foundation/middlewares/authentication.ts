@@ -1,6 +1,5 @@
+import type { AppContext } from "../../types";
 import { getCurrentTimestampSeconds } from "../dates";
-import { AppContext } from "../../types";
-
 
 // This var will hold already imported jwt keys, this reduces the load of importing the key on every request
 let builtJWTKeys: Record<string, CryptoKey> = {};
@@ -11,25 +10,24 @@ function getAccessHost(teamName: string): string {
 }
 
 export async function accessMiddleware(c: AppContext, next: CallableFunction) {
-  const encodedToken = getJwt(c);
+	const encodedToken = getJwt(c);
 
-  if (encodedToken === null) {
-    return Response.json(
-      {
-        success: false,
-        errors: [
-          {
-            code: 10000,
-            message:
-              "Authentication error: Missing bearer token",
-          },
-        ],
-      },
-      { status: 401 },
-    );
-  }
+	if (encodedToken === null) {
+		return Response.json(
+			{
+				success: false,
+				errors: [
+					{
+						code: 10000,
+						message: "Authentication error: Missing bearer token",
+					},
+				],
+			},
+			{ status: 401 },
+		);
+	}
 
-  const cfAccessTeamName = c.get('config').cfAccessTeamName as string
+	const cfAccessTeamName = c.get("config").cfAccessTeamName as string;
 	let decodedJwt: any = false;
 	try {
 		decodedJwt = await isValidJwt(encodedToken, cfAccessTeamName);
@@ -42,8 +40,7 @@ export async function accessMiddleware(c: AppContext, next: CallableFunction) {
 				errors: [
 					{
 						code: 10001,
-						message:
-							"Authentication error: Unable to decode Bearer token",
+						message: "Authentication error: Unable to decode Bearer token",
 					},
 				],
 			},
@@ -51,11 +48,13 @@ export async function accessMiddleware(c: AppContext, next: CallableFunction) {
 		);
 	}
 
-  c.set('username', decodedJwt.payload.email)
-  await next()
+	c.set("username", decodedJwt.payload.email);
+	await next();
 }
 
-async function getPublicKeys(cfAccessTeamName: string): Promise<Record<string, CryptoKey>> {
+async function getPublicKeys(
+	cfAccessTeamName: string,
+): Promise<Record<string, CryptoKey>> {
 	const jwtUrl = `${getAccessHost(cfAccessTeamName)}/cdn-cgi/access/certs`;
 
 	const result = await fetch(jwtUrl, {
@@ -90,8 +89,11 @@ async function getPublicKeys(cfAccessTeamName: string): Promise<Record<string, C
 	return importedKeys;
 }
 
-export async function isValidJwt(encodedToken: string, cfAccessTeamName: string) {
-  // Load jwt keys if they are not in memory or already expired
+export async function isValidJwt(
+	encodedToken: string,
+	cfAccessTeamName: string,
+) {
+	// Load jwt keys if they are not in memory or already expired
 	if (
 		Object.keys(builtJWTKeys).length === 0 ||
 		Math.floor(Date.now() / 1000) < JWTExpiration
@@ -104,70 +106,67 @@ export async function isValidJwt(encodedToken: string, cfAccessTeamName: string)
 	try {
 		token = decodeJwt(encodedToken);
 	} catch (err) {
-    return Response.json(
-      {
-        success: false,
-        errors: [
-          {
-            code: 10001,
-            message:
-              "Authentication error: Unable to decode Bearer token",
-          },
-        ],
-      },
-      { status: 401 },
-    );
+		return Response.json(
+			{
+				success: false,
+				errors: [
+					{
+						code: 10001,
+						message: "Authentication error: Unable to decode Bearer token",
+					},
+				],
+			},
+			{ status: 401 },
+		);
 	}
 
 	// Is the token expired?
 	const expiryDate = new Date(token.payload.exp * 1000);
 	const currentDate = new Date(Date.now());
 	if (expiryDate <= currentDate) {
-    return Response.json(
-      {
-        success: false,
-        errors: [
-          {
-            code: 10002,
-            message:
-              "Authentication error: Token is expired",
-          },
-        ],
-      },
-      { status: 401 },
-    );
+		return Response.json(
+			{
+				success: false,
+				errors: [
+					{
+						code: 10002,
+						message: "Authentication error: Token is expired",
+					},
+				],
+			},
+			{ status: 401 },
+		);
 	}
 
 	if (token.payload?.iss !== getAccessHost(cfAccessTeamName)) {
-    return Response.json(
-      {
-        success: false,
-        errors: [
-          {
-            code: 10003,
-            message:
-              `Authentication error: Expected team name ${cfAccessTeamName}, but received ${token.payload?.iss}`,
-          },
-        ],
-      },
-      { status: 401 },
-    );
+		return Response.json(
+			{
+				success: false,
+				errors: [
+					{
+						code: 10003,
+						message: `Authentication error: Expected team name ${cfAccessTeamName}, but received ${token.payload?.iss}`,
+					},
+				],
+			},
+			{ status: 401 },
+		);
 	}
 
 	// Check is token is valid against all public keys
-	if (!await isValidJwtSignature(token)) {
-    return Response.json(
-      {
-        success: false,
-        errors: [
-          {
-            code: 10004,
-            message: "Authentication error: Invalid Token",
-          },
-        ],
-      },
-      { status: 401 },
-    );
+	if (!(await isValidJwtSignature(token))) {
+		return Response.json(
+			{
+				success: false,
+				errors: [
+					{
+						code: 10004,
+						message: "Authentication error: Invalid Token",
+					},
+				],
+			},
+			{ status: 401 },
+		);
 	}
 
 	// All good, return payload
@@ -199,21 +198,23 @@ function getJwt(c: AppContext) {
  * 3. Retain the raw Bas64 encoded strings to verify the signature
  */
 type DecodedToken = {
-  header: object,
-  payload: {iss?: string, exp: number},
-  signature: string,
-  raw: { header?: string, payload?: string, signature?: string },
-}
+	header: object;
+	payload: { iss?: string; exp: number };
+	signature: string;
+	raw: { header?: string; payload?: string; signature?: string };
+};
 
 function decodeJwt(token: string): DecodedToken {
 	const parts = token.split(".");
-  if (parts.length !== 3) {
-    throw new Error('Invalid token')
-  }
+	if (parts.length !== 3) {
+		throw new Error("Invalid token");
+	}
 
-	const header = JSON.parse(atob((parts[0] as string)));
-	const payload = JSON.parse(atob((parts[1] as string)));
-	const signature = atob((parts[2] as string).replace(/_/g, "/").replace(/-/g, "+"));
+	const header = JSON.parse(atob(parts[0] as string));
+	const payload = JSON.parse(atob(parts[1] as string));
+	const signature = atob(
+		(parts[2] as string).replace(/_/g, "/").replace(/-/g, "+"),
+	);
 
 	return {
 		header: header,
@@ -248,6 +249,10 @@ async function isValidJwtSignature(token: DecodedToken) {
 	return false;
 }
 
-async function validateSingleKey(key: CryptoKey, signature: Uint8Array, data: Uint8Array): Promise<boolean> {
+async function validateSingleKey(
+	key: CryptoKey,
+	signature: Uint8Array,
+	data: Uint8Array,
+): Promise<boolean> {
 	return crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, signature, data);
 }
