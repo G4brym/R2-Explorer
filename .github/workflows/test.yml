@@ -33,5 +33,7 @@ jobs:
         run: npm install -g pnpm
       - name: Install dependencies
         run: pnpm install
+      - name: Check Lint
+        run: pnpm lint
       - name: Build everything
         run: pnpm build

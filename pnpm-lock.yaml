@@ -18,8 +18,8 @@ importers:
   packages/dashboard:
     dependencies:
       '@quasar/extras':
-        specifier: ^1.16.9
-        version: 1.16.14
+        specifier: ^1.16.15
+        version: 1.16.15
       axios:
         specifier: ^1.2.1
         version: 1.7.8
@@ -29,6 +29,9 @@ importers:
       html-to-text:
         specifier: ^9.0.5
         version: 9.0.5
+      pdfjs-dist:
+        specifier: 2.5.207
+        version: 2.5.207
       pdfvuer:
         specifier: ^2.0.1
         version: 2.0.1(pdfjs-dist@2.5.207)(vue@3.5.13(typescript@5.7.2))
@@ -677,8 +680,8 @@ packages:
       workbox-build:
         optional: true
 
-  '@quasar/extras@1.16.14':
-    resolution: {integrity: sha512-kXVCX9GAV2l/av9EQJFRhJ3yp/sshOvc6quo+hGJYnCYj47061sxHXP6amw1vCIlVnyCFjBPeqZP2WcKmGwsOw==}
+  '@quasar/extras@1.16.15':
+    resolution: {integrity: sha512-ZM8rUAagZ3Gm7Thu6DjKdGfkyFBv61RaCeVSIWdve6+q300yN+6aouxttf2RmxCk12RsSqEyzBnIg7BlF1s7MA==}
 
   '@quasar/render-ssr-error@1.0.3':
     resolution: {integrity: sha512-A8RF99q6/sOSe1Ighnh5syEIbliD3qUYEJd2HyfFyBPSMF+WYGXon5dmzg4nUoK662NgOggInevkDyBDJcZugg==}
@@ -3010,7 +3013,7 @@ snapshots:
       - stylus
       - supports-color
 
-  '@quasar/extras@1.16.14': {}
+  '@quasar/extras@1.16.15': {}
 
   '@quasar/render-ssr-error@1.0.3':
     dependencies:
