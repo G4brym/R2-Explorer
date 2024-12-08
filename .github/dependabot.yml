@@ -2,7 +2,9 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directories:
+      - "/"
       - "/packages/worker"
+      - "/packages/worker/dev"
       - "/packages/github-action"
     schedule:
       interval: "weekly"
