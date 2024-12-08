@@ -2,7 +2,7 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directories:
-      - "/"
+      - "/pnpm-lock.yaml"
       - "/packages/worker"
       - "/packages/worker/dev"
       - "/packages/github-action"
