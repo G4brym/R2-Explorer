@@ -2,7 +2,7 @@ const fs = require("node:fs");
 
 // Apply version numbers
 const files = [
-	"packages/worker/src/settings.ts",
+	"packages/worker/src/foundation/settings.ts",
 	"packages/worker/package.json",
 ];
 

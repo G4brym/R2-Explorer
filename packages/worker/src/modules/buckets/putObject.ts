@@ -11,10 +11,10 @@ export class PutObject extends OpenAPIRoute {
 			body: {
 				content: {
 					"application/octet-stream": {
-						schema: {
+						schema: z.object({}).openapi({
 							type: "string",
 							format: "binary",
-						},
+						}),
 					},
 				},
 			},
