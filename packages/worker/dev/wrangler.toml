@@ -9,12 +9,3 @@ binding = 'teste'
 bucket_name = 'teste'
 preview_bucket_name = 'teste'
 
-[[r2_buckets]]
-binding = 'storage'
-bucket_name = 'storage'
-preview_bucket_name = 'storage'
-
-[[r2_buckets]]
-binding = 'drive'
-bucket_name = 'drive'
-preview_bucket_name = 'drive'

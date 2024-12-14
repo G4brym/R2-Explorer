@@ -19,6 +19,7 @@ export type R2ExplorerConfig = {
 };
 
 export type AppEnv = {
+	ASSETS: Fetcher;
 	[key: string]: R2Bucket;
 };
 export type AppVariables = {

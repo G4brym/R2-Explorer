@@ -15,17 +15,17 @@ jobs:
         with:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
-      - name: Set RELEASE_VERSION
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-      - name: Apply new version
-        run: node packages/worker/config/preparePublish.js
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Install dependencies
         run: pnpm install
+      - name: Check Lint
+        run: pnpm lint
       - name: Build everything
         run: pnpm build
+      - name: Package artifact
+        run: pnpm package
       - name: Publish to npm
-        run: pnpm publish-npm
+        run: pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
