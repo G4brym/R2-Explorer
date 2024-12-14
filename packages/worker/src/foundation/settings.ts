@@ -1,3 +1,5 @@
+import * as packageJson from "../../package.json";
+
 export const settings = {
-	version: "0.0.1",
+	version: packageJson.version,
 };

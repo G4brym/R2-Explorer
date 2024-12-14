@@ -1,16 +1,20 @@
 {
 	"name": "r2-explorer",
-	"version": "0.0.1",
+	"version": "1.1.0",
 	"description": "A Google Drive Interface for your Cloudflare R2 Buckets",
-	"main": "./dist/index.js",
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.ts",
-	"files": ["dist", "LICENSE", "README.md"],
+	"main": "./index.js",
+	"module": "./index.mjs",
+	"types": "./index.d.ts",
+	"files": [
+		"dashboard",
+		"dist",
+		"LICENSE",
+		"README.md"
+	],
 	"scripts": {
-		"build": "tsup src/index.ts --format cjs,esm --dts",
+		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
 		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
 		"test": "vitest run --root tests",
-		"prepare": "husky",
 		"package": "npm run build && npm pack"
 	},
 	"publishConfig": {
@@ -54,9 +58,10 @@
 		"wrangler": "^3.91.0"
 	},
 	"dependencies": {
-		"chanfana": "^2.4.2",
-		"hono": "^4.6.12",
+		"@hono/cloudflare-access": "^0.1.0",
+		"chanfana": "^2.5.1",
+		"hono": "^4.6.14",
 		"postal-mime": "^2.3.2",
-		"zod": "^3.23.8"
+		"zod": "^3.24.1"
 	}
 }

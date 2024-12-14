@@ -15,9 +15,12 @@ export class GetInfo extends OpenAPIRoute {
 		return {
 			version: settings.version,
 			config: config,
-			user: {
-				username: c.get("username"),
-			},
+			auth: c.get("authentication_type")
+				? {
+						authentication_type: c.get("authentication_type"),
+						authentication_username: c.get("authentication_username"),
+					}
+				: undefined,
 		};
 	}
 }

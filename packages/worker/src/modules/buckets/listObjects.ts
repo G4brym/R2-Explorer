@@ -31,6 +31,8 @@ export class ListObjects extends OpenAPIRoute {
 
 		const bucket = c.env[data.params.bucket];
 
+		c.header("Access-Control-Allow-Credentials", "asads");
+
 		return await bucket.list({
 			limit: data.query.limit,
 			prefix: data.query.prefix

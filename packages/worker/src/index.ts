@@ -1,3 +1,4 @@
+import { cloudflareAccess } from "@hono/cloudflare-access";
 import {
 	type OpenAPIObjectConfigV31,
 	extendZodWithOpenApi,
@@ -7,8 +8,6 @@ import { type ExecutionContext, Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { z } from "zod";
-import { dashboardProxy } from "./foundation/dashbord";
-import { accessMiddleware } from "./foundation/middlewares/authentication";
 import { readOnlyMiddleware } from "./foundation/middlewares/readonly";
 import { settings } from "./foundation/settings";
 import { CreateFolder } from "./modules/buckets/createFolder";
@@ -23,6 +22,7 @@ import { CreateUpload } from "./modules/buckets/multipart/createUpload";
 import { PartUpload } from "./modules/buckets/multipart/partUpload";
 import { PutMetadata } from "./modules/buckets/putMetadata";
 import { PutObject } from "./modules/buckets/putObject";
+import { dashboardIndex, dashboardRedirect } from "./modules/dashboard";
 import { receiveEmail } from "./modules/emails/receiveEmail";
 import { SendEmail } from "./modules/emails/sendEmail";
 import { GetInfo } from "./modules/server/getInfo";
@@ -79,11 +79,16 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	}
 
 	if (config.readonly === true) {
-		app.use(readOnlyMiddleware);
+		app.use("*", readOnlyMiddleware);
 	}
 
 	if (config.cfAccessTeamName) {
-		app.use(accessMiddleware);
+		app.use("*", cloudflareAccess(config.cfAccessTeamName));
+		app.use("*", async (c, next) => {
+			c.set("authentication_type", "cloudflare-access");
+			c.set("authentication_username", c.get("accessPayload").email);
+			await next();
+		});
 	}
 
 	if (config.basicAuth) {
@@ -92,6 +97,7 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 			scheme: "basic",
 		});
 		app.use(
+			"*",
 			basicAuth({
 				verifyUser: (username, password, c: AppContext) => {
 					const users = (
@@ -102,7 +108,8 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
 					for (const user of users) {
 						if (user.username === username && user.password === password) {
-							c.set("username", username);
+							c.set("authentication_type", "basic-auth");
+							c.set("authentication_username", username);
 							return true;
 						}
 					}
@@ -131,7 +138,8 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
 	openapi.post("/api/emails/send", SendEmail);
 
-	app.get("*", dashboardProxy);
+	openapi.get("/", dashboardIndex);
+	openapi.get("*", dashboardRedirect);
 
 	app.all("*", () =>
 		Response.json({ msg: "404, not found!" }, { status: 404 }),

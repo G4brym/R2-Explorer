@@ -5,9 +5,9 @@ export const useMainStore = defineStore("main", {
 	state: () => ({
 		// Config
 		apiReadonly: true,
-		username: "",
+		authentication_type: "",
+		authentication_username: "",
 		version: "",
-		dashboardUrl: "",
 		showHiddenFiles: false,
 
 		// Frontend data
@@ -37,9 +37,11 @@ export const useMainStore = defineStore("main", {
 				});
 
 				this.apiReadonly = response.data.config.readonly;
-				this.username = response.data.config.user?.username;
+				this.authentication_type =
+					response.data.config.auth?.authentication_type;
+				this.authentication_username =
+					response.data.config.auth?.authentication_username;
 				this.version = response.data.config.version;
-				this.dashboardUrl = response.data.config.dashboardUrl;
 				this.showHiddenFiles = response.data.config.showHiddenFiles;
 			} catch (error) {
 				console.log(error);
