@@ -46,7 +46,7 @@
 	"homepage": "https://r2explorer.dev",
 	"repository": {
 		"type": "git",
-		"url": "git@github.com:G4brym/R2-Explorer.git"
+		"url": "https://github.com/G4brym/R2-Explorer.git"
 	},
 	"bugs": {
 		"url": "https://github.com/G4brym/R2-Explorer/issues"
