@@ -72,18 +72,21 @@ importers:
 
   packages/worker:
     dependencies:
+      '@hono/cloudflare-access':
+        specifier: ^0.1.0
+        version: 0.1.0(hono@4.6.14)
       chanfana:
-        specifier: ^2.4.2
-        version: 2.4.2
+        specifier: ^2.5.1
+        version: 2.5.1
       hono:
-        specifier: ^4.6.12
-        version: 4.6.12
+        specifier: ^4.6.14
+        version: 4.6.14
       postal-mime:
         specifier: ^2.3.2
         version: 2.3.2
       zod:
-        specifier: ^3.23.8
-        version: 3.23.8
+        specifier: ^3.24.1
+        version: 3.24.1
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20241127.0
@@ -518,6 +521,11 @@ packages:
   '@fastify/busboy@2.1.1':
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
+
+  '@hono/cloudflare-access@0.1.0':
+    resolution: {integrity: sha512-W3LjtQBb2w5rIttN46iTyh7ku5kKWsh1vzVfH4SGKiafek1JmUxLscAh53x8FCijgG+RLCnezP4Igu/yh+aZ9w==}
+    peerDependencies:
+      hono: '*'
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -1044,8 +1052,8 @@ packages:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
 
-  chanfana@2.4.2:
-    resolution: {integrity: sha512-EM78Nj6dXKQECyRxUveEqSS+HCmVMJXp6UByn8j0kNs0g6NtByE0cbe9I419gpFiOrxnHgPpj1rL8oL9JMpx7w==}
+  chanfana@2.5.1:
+    resolution: {integrity: sha512-VpYnEY/5bHWp73emMMB4bKvjgOeeUnnaJSzvR7iDcGGMFMLOWzkO+hDBA7sUfU2xBorvmutMV7Oc2RpbwwTzzA==}
 
   chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
@@ -1603,8 +1611,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.6.12:
-    resolution: {integrity: sha512-eHtf4kSDNw6VVrdbd5IQi16r22m3s7mWPLd7xOMhg1a/Yyb1A0qpUFq8xYMX4FMuDe1nTKeMX5rTx7Nmw+a+Ag==}
+  hono@4.6.14:
+    resolution: {integrity: sha512-j4VkyUp2xazGJ8eCCLN1Vm/bxdvm/j5ZuU9AIjLu9vapn2M44p9L3Ktr9Vnb2RN2QtcR/wVjZVMlT5k7GJQgPw==}
     engines: {node: '>=16.9.0'}
 
   html-minifier-terser@7.2.0:
@@ -2608,15 +2616,15 @@ packages:
     resolution: {integrity: sha512-9qv4rlDiopXg4E69k+vMHjNN63YFMe9sZMrdlvKnCjlCRWeCBswPPMPUfx+ipsAWq1LXHe70RcbaHdJJpS6hyQ==}
     engines: {node: '>= 10'}
 
-  zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+  zod@3.24.1:
+    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
 snapshots:
 
-  '@asteasolutions/zod-to-openapi@7.2.0(zod@3.23.8)':
+  '@asteasolutions/zod-to-openapi@7.2.0(zod@3.24.1)':
     dependencies:
       openapi3-ts: 4.4.0
-      zod: 3.23.8
+      zod: 3.24.1
 
   '@babel/helper-string-parser@7.25.9': {}
 
@@ -2688,7 +2696,7 @@ snapshots:
   '@cloudflare/workers-shared@0.9.0':
     dependencies:
       mime: 3.0.0
-      zod: 3.23.8
+      zod: 3.24.1
 
   '@cloudflare/workers-types@4.20241202.0': {}
 
@@ -2845,6 +2853,10 @@ snapshots:
     optional: true
 
   '@fastify/busboy@2.1.1': {}
+
+  '@hono/cloudflare-access@0.1.0(hono@4.6.14)':
+    dependencies:
+      hono: 4.6.14
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -3417,12 +3429,12 @@ snapshots:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
 
-  chanfana@2.4.2:
+  chanfana@2.5.1:
     dependencies:
-      '@asteasolutions/zod-to-openapi': 7.2.0(zod@3.23.8)
+      '@asteasolutions/zod-to-openapi': 7.2.0(zod@3.24.1)
       js-yaml: 4.1.0
       openapi3-ts: 4.4.0
-      zod: 3.23.8
+      zod: 3.24.1
 
   chardet@0.7.0: {}
 
@@ -3970,7 +3982,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.6.12: {}
+  hono@4.6.14: {}
 
   html-minifier-terser@7.2.0:
     dependencies:
@@ -4197,7 +4209,7 @@ snapshots:
       workerd: 1.20241106.1
       ws: 8.18.0
       youch: 3.3.4
-      zod: 3.23.8
+      zod: 3.24.1
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -4966,4 +4978,4 @@ snapshots:
       compress-commons: 4.1.2
       readable-stream: 3.6.2
 
-  zod@3.23.8: {}
+  zod@3.24.1: {}

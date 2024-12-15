@@ -1,4 +1,4 @@
-name: Test Build
+name: Build
 
 on:
   push:
@@ -17,7 +17,7 @@ on:
       - '.editorconfig'
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,10 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-      - name: Set RELEASE_VERSION
-        run: echo "RELEASE_VERSION=0.0.1" >> $GITHUB_ENV
-      - name: Apply new version
-        run: node packages/worker/config/preparePublish.js
       - name: Install pnpm
         run: npm install -g pnpm
       - name: Install dependencies
@@ -37,3 +33,10 @@ jobs:
         run: pnpm lint
       - name: Build everything
         run: pnpm build
+      - name: Package artifact
+        run: pnpm package
+      - name: Archive package
+        uses: actions/upload-artifact@v4
+        with:
+          name: r2-explorer-npm-package
+          path: packages/worker/r2-explorer-*

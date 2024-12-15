@@ -1,3 +1,4 @@
+import type { CloudflareAccessVariables } from "@hono/cloudflare-access";
 import type { Context } from "hono";
 
 export type BasicAuth = {
@@ -14,15 +15,16 @@ export type R2ExplorerConfig = {
 		targetBucket: string;
 	};
 	showHiddenFiles?: boolean;
-	cacheAssets?: boolean;
 	basicAuth?: BasicAuth | BasicAuth[];
 };
 
 export type AppEnv = {
+	ASSETS: Fetcher;
 	[key: string]: R2Bucket;
 };
 export type AppVariables = {
 	config: R2ExplorerConfig;
-	username?: string;
-};
+	authentication_type?: string;
+	authentication_username?: string;
+} & CloudflareAccessVariables;
 export type AppContext = Context<{ Bindings: AppEnv; Variables: AppVariables }>;

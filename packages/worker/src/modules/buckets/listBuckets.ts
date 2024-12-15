@@ -12,8 +12,12 @@ export class ListBuckets extends OpenAPIRoute {
 		const buckets = [];
 
 		for (const [key, value] of Object.entries(c.env)) {
-			// @ts-ignore - check if the field in Env is actually a R2 bucket by its properties
-			if (value.get && value.put) {
+			if (
+				value.get &&
+				value.put &&
+				value.get.toString().includes("function") &&
+				value.put.toString().includes("function")
+			) {
 				buckets.push({ name: key });
 			}
 		}

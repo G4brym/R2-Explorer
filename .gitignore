@@ -29,6 +29,9 @@ my-r2-explorer
 packages/worker/bin
 packages/worker/README.md
 packages/worker/LICENSE
+packages/worker/dist
+packages/worker/dashboard
+packages/worker/r2-explorer-*
 
 packages/worker/dev/.wrangler
 

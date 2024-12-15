@@ -45,62 +45,35 @@
       <q-btn class="q-mb-sm" @click="gotoFiles" color="blue" icon="folder_copy" label="Files" stack />
       <q-btn class="q-mb-sm" @click="gotoEmail" color="blue" icon="email" label="Email" stack />
 
-<!--      <q-btn class="q-mb-sm q-mt-auto q-mb-0" @click="settingsPopup=true" color="secondary" icon="settings" label="Server"-->
-<!--             stack />-->
-      <q-btn class="q-mb-sm q-mt-auto q-mb-0" @click="upgradePopup=true" color="secondary" icon="question_mark" label="Info"
+      <q-btn class="q-mb-sm q-mt-auto q-mb-0" @click="infoPopup=true" color="secondary" icon="question_mark"
+             label="Info"
              stack />
     </div>
   </div>
 
-  <q-dialog v-model="upgradePopup" persistent no-esc-dismiss no-route-dismiss no-backdrop-dismiss>
+  <q-dialog v-model="infoPopup" persistent no-route-dismiss>
     <q-card>
       <q-card-section>
-        <div class="text-h6">🎉 Welcome to the new Dashboard v2! 🚀</div>
+        <div class="text-h6">🎉 Thank you for using R2-Explorer! 🚀</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        We're thrilled to introduce our revamped interface, designed to enhance your experience and productivity. As you
-        explore the new features and improvements, feel free to provide feedback or report any issues you encounter.
-        Your input helps us fine-tune the dashboard to meet your needs better.<br>
+        You are running version <b>{{ mainStore.version }}</b><br>
+        <template v-if="updateAvailable">
+          Latest version is <b>{{latestVersion}}</b>, learn how to <a href="https://r2explorer.dev/getting-started/updating-your-project/" target="_blank">update your instance here</a>.<br>
+        </template>
         <br>
-        To revisit this message in the future, simply click on the question mark icon located in the left corner. Your
-        feedback is invaluable to us, so don't hesitate to reach out with any thoughts or concerns.<br>
-        <br>
-        Please report issues here: <a href="https://github.com/G4brym/R2-Explorer/issues" target="_blank">https://github.com/G4brym/R2-Explorer/issues</a><br>
-        <br>
-        If you would like to continue using the old Dashboard, please follow this <a
-        href="https://r2explorer.dev/guides/continue-using-legacy-dashboard/" target="_blank">guide from the
-        documentation</a><br>
-        <br>
-        Thank you for being a part of our journey towards excellence! 🌟<br>
-        <br>
-        Best regards<br>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn flat label="OK" color="primary" v-close-popup />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
-
-  <q-dialog v-model="settingsPopup">
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">Your server configurations</div>
-      </q-card-section>
-
-      <q-card-section class="q-pt-none">
-        <q-input
-          filled
-          disable
-          v-if="mainStore.username"
-          v-model="mainStore.username"
-        />
-        <q-input
-          filled
-          disable
-          :model-value="mainStore.version"
-        />
+        <template v-if="mainStore.auth">
+          <b>Authentication</b><br>
+          Method: {{ mainStore.auth.type }}<br>
+          Username: {{ mainStore.auth.username }}
+        </template>
+        <template v-else>
+          Not authenticated
+        </template>
+        <br><br>
+        <b>Server Configuration</b><br>
+        {{ JSON.stringify(mainStore.config, null, 2) }}
       </q-card-section>
 
       <q-card-actions align="right">
@@ -122,8 +95,9 @@ import { defineComponent } from "vue";
 export default defineComponent({
 	name: "LeftSidebar",
 	data: () => ({
-		upgradePopup: false,
-		settingsPopup: false,
+		infoPopup: false,
+		updateAvailable: false,
+		latestVersion: "",
 	}),
 	components: { CreateFolder, CreateFile },
 	methods: {
@@ -139,6 +113,24 @@ export default defineComponent({
 				params: { bucket: this.selectedBucket },
 			});
 		},
+		isUpdateAvailable: (currentVersion, latestVersion) => {
+			// Split versions into parts and convert to numbers
+			const current = currentVersion.split(".").map(Number);
+			const latest = latestVersion.split(".").map(Number);
+
+			// Compare major version
+			if (latest[0] > current[0]) return true;
+			if (latest[0] < current[0]) return false;
+
+			// Compare minor version
+			if (latest[1] > current[1]) return true;
+			if (latest[1] < current[1]) return false;
+
+			// Compare patch version
+			if (latest[2] > current[2]) return true;
+
+			return false;
+		},
 	},
 	computed: {
 		selectedBucket: function () {
@@ -148,12 +140,15 @@ export default defineComponent({
 			return this.$route.name.split("-")[0];
 		},
 	},
-	mounted: function () {
-		const alertSeen = localStorage.getItem("DASH_V2_ALERT");
-
-		if (!alertSeen) {
-			this.upgradePopup = true;
-			localStorage.setItem("DASH_V2_ALERT", true);
+	async mounted() {
+		const resp = await fetch(
+			"https://api.github.com/repos/G4brym/R2-Explorer/releases/latest",
+		);
+		const parsed = await resp.json();
+		const latestVersion = parsed.tag_name.replace("v", "");
+		if (this.isUpdateAvailable(this.mainStore.version, latestVersion)) {
+			this.latestVersion = latestVersion;
+			this.updateAvailable = true;
 		}
 	},
 	setup() {
