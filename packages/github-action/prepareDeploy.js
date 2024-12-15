@@ -36,8 +36,9 @@ if (!R2EXPLORER_CONFIG) {
 
 let wranglerConfig = `
 name = "${R2EXPLORER_WORKER_NAME}"
-compatibility_date = "2023-05-12"
+compatibility_date = "2024-11-06"
 main = "src/index.ts"
+assets = { directory = "node_modules/r2-explorer/dashboard", binding = "ASSETS", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
 `;
 
 if (R2EXPLORER_DOMAIN) {
@@ -57,7 +58,7 @@ for (const bucket of R2EXPLORER_BUCKETS.split("\n")) {
 	const split = bucket.trim().split(":");
 	if (split.length !== 2) {
 		console.error("R2EXPLORER_BUCKETS is not set correctly!");
-		console.error(`"${split}" is not in the correct format`);
+		console.error(`"${split}" is not in the correct format => ALIAS:BUCKET_NAME`);
 		process.exit(1);
 	}
 
