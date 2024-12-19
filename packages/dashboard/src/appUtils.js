@@ -133,14 +133,15 @@ export const apiHandler = {
 			newKey: encode(newKey),
 		});
 	},
-	updateMetadata: async (bucket, key, metadata) => {
+	updateMetadata: async (bucket, key, customMetadata, httpMetadata = {}) => {
 		let prefix = "";
 		if (key.includes("/")) {
 			prefix = key.replace(key.split("/").pop(), "");
 		}
 
 		const resp = await api.post(`/buckets/${bucket}/${encode(key)}`, {
-			customMetadata: metadata,
+			customMetadata: customMetadata,
+			httpMetadata: httpMetadata,
 		});
 
 		if (resp.status === 200) {
