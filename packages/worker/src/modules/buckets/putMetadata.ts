@@ -18,6 +18,7 @@ export class PutMetadata extends OpenAPIRoute {
 						schema: z
 							.object({
 								customMetadata: z.record(z.string(), z.any()),
+								httpMetadata: z.record(z.string(), z.any()),
 							})
 							.openapi("Object metadata"),
 					},
@@ -43,6 +44,7 @@ export class PutMetadata extends OpenAPIRoute {
 		const object = await bucket.get(filePath);
 		return await bucket.put(filePath, object.body, {
 			customMetadata: data.body.customMetadata,
+			httpMetadata: data.body.httpMetadata,
 		});
 	}
 }

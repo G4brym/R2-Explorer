@@ -1,3 +1,8 @@
+import MainLayout from "layouts/MainLayout.vue";
+import HomePage from "pages/HomePage.vue";
+import EmailFolderPage from "pages/email/EmailFolderPage.vue";
+import FilesFolderPage from "pages/files/FilesFolderPage.vue";
+
 const routes = [
 	{
 		path: "/auth",
@@ -12,38 +17,38 @@ const routes = [
 	},
 	{
 		path: "/",
-		component: () => import("layouts/MainLayout.vue"),
+		component: MainLayout,
 		children: [
 			{
 				path: "/",
 				name: "home",
-				component: () => import("pages/HomePage.vue"),
+				component: HomePage,
 			},
 			{
 				path: "/:bucket/files",
 				name: "files-home",
-				component: () => import("pages/files/FilesFolderPage.vue"),
+				component: FilesFolderPage,
 			},
 			{
 				path: "/:bucket/files/:folder",
 				name: "files-folder",
-				component: () => import("pages/files/FilesFolderPage.vue"),
+				component: FilesFolderPage,
 			},
 			{
 				path: "/:bucket/files/:folder/:file",
 				name: "files-file",
-				component: () => import("pages/files/FilesFolderPage.vue"),
+				component: FilesFolderPage,
 			},
 
 			{
 				path: "/:bucket/email",
 				name: "email-home",
-				component: () => import("pages/email/EmailFolderPage.vue"),
+				component: EmailFolderPage,
 			},
 			{
 				path: "/:bucket/email/:folder",
 				name: "email-folder",
-				component: () => import("pages/email/EmailFolderPage.vue"),
+				component: EmailFolderPage,
 			},
 			{
 				path: "/:bucket/email/:folder/:file",
