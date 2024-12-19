@@ -5,18 +5,13 @@
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
-	"files": [
-		"dashboard",
-		"dist",
-		"LICENSE",
-		"README.md"
-	],
+	"files": ["dashboard", "dist", "LICENSE", "README.md"],
 	"scripts": {
 		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
 		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
 		"test": "vitest run --root tests",
 		"package": "npm run build && npm pack",
-    "publish": "npm publish"
+		"publish-npm": "npm publish"
 	},
 	"publishConfig": {
 		"access": "public"
@@ -46,7 +41,7 @@
 	"homepage": "https://r2explorer.dev",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/G4brym/R2-Explorer.git"
+		"url": "git+https://github.com/G4brym/R2-Explorer.git"
 	},
 	"bugs": {
 		"url": "https://github.com/G4brym/R2-Explorer/issues"

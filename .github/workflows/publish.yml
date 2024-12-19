@@ -26,6 +26,6 @@ jobs:
       - name: Package artifact
         run: pnpm package
       - name: Publish to npm
-        run: pnpm run publish
+        run: pnpm run publish-npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
