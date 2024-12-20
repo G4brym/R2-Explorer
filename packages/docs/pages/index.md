@@ -4,9 +4,11 @@ hide:
 #  - toc
 ---
 
+# R2 Explorer
+
 <div align="center">
   <a href="https://r2explorer.dev/">
-    <img src="https://raw.githubusercontent.com/G4brym/R2-explorer/refs/heads/main/docs/pages/assets/r2-explorer-logo.png" width="500" height="auto" alt="R2-Explorer"/>
+    <img src="https://raw.githubusercontent.com/G4brym/R2-explorer/refs/heads/main/packages/docs/pages/assets/r2-explorer-logo.png" width="500" height="auto" alt="R2-Explorer"/>
   </a>
 </div>
 
@@ -44,20 +46,23 @@ Read this in other languages: [Español](https://r2explorer-dev.translate.goog/?
 
 - Self-hosted/Deployed on your own Cloudflare Account
 - [Receive and read emails](https://r2explorer.dev/guides/setup-email-explorer/) (via Cloudflare Email Routing)
-- Security:
-  - [Basic Auth](https://r2explorer.dev/getting-started/security/#basic-auth)
-  - [Cloudflare Access](https://r2explorer.dev/getting-started/security/#authenticating-with-cloudflare-access)
-- Managing files:
-  - In-browser File preview (pdf, image, txt, markdown, csv, logpush...)
-  - In-browser File editing
-  - Drag-and-Drop upload
-  - Upload files or folders with files
-  - Multipart upload for big files
-  - HTTP/Custom metadata edit
-- Organization:
-  - Create folders
-  - Upload/Rename/Download/Delete files
-  - Right click in file for extra options
+
+##### Security:
+- [Basic Auth](https://r2explorer.dev/getting-started/security/#basic-auth)
+- [Cloudflare Access](https://r2explorer.dev/getting-started/security/#authenticating-with-cloudflare-access)
+
+##### Managing files:
+- In-browser File preview (pdf, image, txt, markdown, csv, logpush...)
+- In-browser File editing
+- Drag-and-Drop upload
+- Upload files or folders with files
+- Multipart upload for big files
+- HTTP/Custom metadata edit
+
+##### Organization:
+- Create folders
+- Upload/Rename/Download/Delete files
+- Right click in file for extra options
 
 ## Installation
 

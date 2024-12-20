@@ -60,10 +60,12 @@ nav:
       - guides/setup-email-explorer.md
       - guides/migrating-to-1.0.md
       - guides/migrating-to-1.1.md
-      - guides/continue-using-legacy-dashboard.md
   - Email explorer: https://r2explorer.dev/guides/setup-email-explorer/
   - Live demo: https://demo.r2explorer.dev/
 markdown_extensions:
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
   - attr_list
   - toc:
       permalink: true

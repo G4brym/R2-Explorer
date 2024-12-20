@@ -13,7 +13,7 @@ export default R2Explorer({ readonly: false, basicAuth: [{
   },{
     username: 'anotherUser',
     password: '123567'
-  }] 
+  }]
 });
 ```
 
@@ -46,7 +46,7 @@ You can find the team name, in the Zero trust dashboard -> Settings -> Custom Pa
 
 In my account the team name is `r2explorer`.
 
-![Cloudflare Zero Trust Dashboard](/assets/cloudflare-access.png)
+![Cloudflare Zero Trust Dashboard](../assets/cloudflare-access.png)
 
 ---
 
