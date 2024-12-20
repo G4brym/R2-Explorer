@@ -17,6 +17,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"husky": "^9.1.7"
+		"husky": "^9.1.7",
+		"wrangler": "^3.99.0"
 	}
 }
