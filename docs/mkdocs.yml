@@ -1,0 +1,90 @@
+site_name: R2 Explorer
+site_description: A Google Drive Interface for your Cloudflare R2 Buckets
+site_url: https://r2explorer.dev/
+docs_dir: pages
+theme:
+  name: material
+#  custom_dir: .overrides
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  font:
+    text: Source Sans 3
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: green
+      accent: orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: green
+      accent: orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.tooltips
+    - navigation.indexes
+    - navigation.tabs
+    - navigation.path
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+  language: en
+repo_name: G4brym/R2-Explorer
+repo_url: https://github.com/G4brym/R2-Explorer
+edit_uri: ''
+plugins:
+  - search
+#  - social
+  - termynal
+  - markdownextradata:
+      data: data
+nav:
+  - index.md
+  - Getting started:
+      - getting-started/creating-a-new-project.md
+      - getting-started/add-r2-buckets.md
+      - getting-started/configuration.md
+      - getting-started/security.md
+      - getting-started/deploying.md
+      - getting-started/updating-your-project.md
+      - guides/setup-email-explorer.md
+      - guides/migrating-to-1.0.md
+      - guides/migrating-to-1.1.md
+      - guides/continue-using-legacy-dashboard.md
+  - Email explorer: https://r2explorer.dev/guides/setup-email-explorer/
+  - Live demo: https://demo.r2explorer.dev/
+markdown_extensions:
+  - attr_list
+  - toc:
+      permalink: true
+  - markdown.extensions.codehilite:
+      guess_lang: false
+  - mdx_include:
+      base_path: pages
+  - admonition
+  - codehilite
+  - extra
+  - md_in_html
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format ''
+  - pymdownx.tabbed
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
