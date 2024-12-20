@@ -44,3 +44,5 @@ packages/dashboard/.quasar
 
 template/package-lock.json
 template/node_modules/
+
+packages/docs/site

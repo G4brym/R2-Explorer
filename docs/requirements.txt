@@ -1,6 +1,0 @@
-mkdocs==1.5.2
-mkdocs-material==9.1.21
-termynal==0.10.1
-mdx-include==1.4.2
-mkdocs-markdownextradata-plugin==0.2.5
-pyyaml==6.0.1
