@@ -1,3 +1,9 @@
+---
+hide:
+  - navigation
+#  - toc
+---
+
 <div align="center">
   <a href="https://r2explorer.dev/">
     <img src="https://raw.githubusercontent.com/G4brym/R2-explorer/refs/heads/main/docs/pages/assets/r2-explorer-logo.png" width="500" height="auto" alt="R2-Explorer"/>
