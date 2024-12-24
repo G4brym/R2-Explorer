@@ -5,7 +5,12 @@
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
-	"files": ["dashboard", "dist", "LICENSE", "README.md"],
+	"files": [
+		"dashboard",
+		"dist",
+		"LICENSE",
+		"README.md"
+	],
 	"scripts": {
 		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
 		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
@@ -54,7 +59,7 @@
 		"wrangler": "^3.91.0"
 	},
 	"dependencies": {
-		"@hono/cloudflare-access": "^0.1.0",
+		"@hono/cloudflare-access": "^0.2.0",
 		"chanfana": "^2.5.1",
 		"hono": "^4.6.14",
 		"postal-mime": "^2.3.2",

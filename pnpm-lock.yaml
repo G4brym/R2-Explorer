@@ -76,8 +76,8 @@ importers:
   packages/worker:
     dependencies:
       '@hono/cloudflare-access':
-        specifier: ^0.1.0
-        version: 0.1.0(hono@4.6.14)
+        specifier: ^0.2.0
+        version: 0.2.0(hono@4.6.14)
       chanfana:
         specifier: ^2.5.1
         version: 2.5.1
@@ -589,8 +589,8 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@hono/cloudflare-access@0.1.0':
-    resolution: {integrity: sha512-W3LjtQBb2w5rIttN46iTyh7ku5kKWsh1vzVfH4SGKiafek1JmUxLscAh53x8FCijgG+RLCnezP4Igu/yh+aZ9w==}
+  '@hono/cloudflare-access@0.2.0':
+    resolution: {integrity: sha512-pHjToMqvbrX5Q+8QE6bu7KabwmyVKdHqPgzo3uqRpCuUXndkY4Bt2m6/CwmrE9SKPAhgxFTLilOgiU/DKYhSUA==}
     peerDependencies:
       hono: '*'
 
@@ -2999,7 +2999,7 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/cloudflare-access@0.1.0(hono@4.6.14)':
+  '@hono/cloudflare-access@0.2.0(hono@4.6.14)':
     dependencies:
       hono: 4.6.14
 
