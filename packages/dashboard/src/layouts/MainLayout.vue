@@ -28,23 +28,11 @@
 import LeftSidebar from "components/main/LeftSidebar.vue";
 import RightSidebar from "components/main/RightSidebar.vue";
 import TopBar from "components/main/Topbar.vue";
-import { useMainStore } from "stores/main-store";
 import { ref } from "vue";
 
 export default {
 	name: "MainLayout",
 	components: { TopBar, RightSidebar, LeftSidebar },
-	created() {
-		const mainStore = useMainStore();
-		mainStore.loadUserDisks().then((buckets) => {
-			if (this.$route.path === "/") {
-				this.$router.push({
-					name: "files-home",
-					params: { bucket: buckets[0].name },
-				});
-			}
-		});
-	},
 	setup() {
 		const leftDrawerOpen = ref(false);
 		const rightDrawerOpen = ref(false);

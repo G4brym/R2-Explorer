@@ -22,13 +22,7 @@ export const useMainStore = defineStore("main", {
 		},
 	},
 	actions: {
-		async loadUserDisks() {
-			const response = await api.get("/buckets");
-
-			this.buckets = response.data.buckets;
-			return response.data.buckets;
-		},
-		async loadServerConfigs(router, handleError = false) {
+		async loadServerConfigs(router, q, handleError = false) {
 			// This is the initial requests to server, that also checks if user needs auth
 
 			try {
@@ -41,6 +35,19 @@ export const useMainStore = defineStore("main", {
 				this.auth = response.data.auth;
 				this.version = response.data.version;
 				this.showHiddenFiles = response.data.config.showHiddenFiles;
+				this.buckets = response.data.buckets;
+
+				const url = new URL(window.location.href);
+				if (url.searchParams.get("next")) {
+					await router.replace(url.searchParams.get("next"));
+				} else if (url.pathname === "/" || url.pathname === "/auth/login") {
+					await router.push({
+						name: "files-home",
+						params: { bucket: this.buckets[0].name },
+					});
+				}
+
+				return true;
 			} catch (error) {
 				console.log(error);
 				if (error.response.status === 302) {
@@ -52,17 +59,26 @@ export const useMainStore = defineStore("main", {
 				}
 
 				if (handleError) {
-					if (error.response?.status === 401) {
+					const respText = await error.response.data;
+					if (respText === "Authentication error: Basic Auth required") {
 						await router.push({
 							name: "login",
 							query: { next: router.currentRoute.value.fullPath },
 						});
 						return;
 					}
+
+					q.notify({
+						type: "negative",
+						message: respText,
+						timeout: 10000, // we will timeout it in 10s
+					});
 				} else {
 					throw error;
 				}
 			}
+
+			return false;
 		},
 	},
 });

@@ -1,7 +1,7 @@
 import type { CloudflareAccessVariables } from "@hono/cloudflare-access";
 import type { Context } from "hono";
 
-export type BasicAuth = {
+export type BasicAuthType = {
 	username: string;
 	password: string;
 };

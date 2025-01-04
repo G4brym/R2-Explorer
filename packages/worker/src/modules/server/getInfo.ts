@@ -12,6 +12,19 @@ export class GetInfo extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const { basicAuth, ...config } = c.get("config");
 
+		const buckets = [];
+
+		for (const [key, value] of Object.entries(c.env)) {
+			if (
+				value.get &&
+				value.put &&
+				value.get.toString().includes("function") &&
+				value.put.toString().includes("function")
+			) {
+				buckets.push({ name: key });
+			}
+		}
+
 		return {
 			version: settings.version,
 			config: config,
@@ -21,6 +34,7 @@ export class GetInfo extends OpenAPIRoute {
 						username: c.get("authentication_username"),
 					}
 				: undefined,
+			buckets: buckets,
 		};
 	}
 }
