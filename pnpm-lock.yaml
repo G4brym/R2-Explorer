@@ -80,13 +80,13 @@ importers:
     dependencies:
       '@hono/cloudflare-access':
         specifier: ^0.2.0
-        version: 0.2.0(hono@4.6.14)
+        version: 0.2.0(hono@4.6.15)
       chanfana:
         specifier: ^2.5.1
         version: 2.5.1
       hono:
-        specifier: ^4.6.14
-        version: 4.6.14
+        specifier: ^4.6.15
+        version: 4.6.15
       postal-mime:
         specifier: ^2.3.2
         version: 2.3.2
@@ -1848,8 +1848,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.6.14:
-    resolution: {integrity: sha512-j4VkyUp2xazGJ8eCCLN1Vm/bxdvm/j5ZuU9AIjLu9vapn2M44p9L3Ktr9Vnb2RN2QtcR/wVjZVMlT5k7GJQgPw==}
+  hono@4.6.15:
+    resolution: {integrity: sha512-OiQwvAOAaI2JrABBH69z5rsctHDzFzIKJge0nYXgtzGJ0KftwLWcBXm1upJC23/omNRtnqM0gjRMbtXshPdqhQ==}
     engines: {node: '>=16.9.0'}
 
   html-minifier-terser@7.2.0:
@@ -3421,9 +3421,9 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/cloudflare-access@0.2.0(hono@4.6.14)':
+  '@hono/cloudflare-access@0.2.0(hono@4.6.15)':
     dependencies:
-      hono: 4.6.14
+      hono: 4.6.15
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -4748,7 +4748,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.6.14: {}
+  hono@4.6.15: {}
 
   html-minifier-terser@7.2.0:
     dependencies:

@@ -14,7 +14,6 @@ import { CreateFolder } from "./modules/buckets/createFolder";
 import { DeleteObject } from "./modules/buckets/deleteObject";
 import { GetObject } from "./modules/buckets/getObject";
 import { HeadObject } from "./modules/buckets/headObject";
-import { ListBuckets } from "./modules/buckets/listBuckets";
 import { ListObjects } from "./modules/buckets/listObjects";
 import { MoveObject } from "./modules/buckets/moveObject";
 import { CompleteUpload } from "./modules/buckets/multipart/completeUpload";
@@ -30,7 +29,7 @@ import type {
 	AppContext,
 	AppEnv,
 	AppVariables,
-	BasicAuth,
+	BasicAuthType,
 	R2ExplorerConfig,
 } from "./types";
 
@@ -68,23 +67,16 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	});
 
 	if (config.cors === true) {
-		app.use(
-			"*",
-			cors({
-				origin: "*",
-				allowMethods: ["*"],
-				credentials: true,
-			}),
-		);
+		app.use("/api/*", cors());
 	}
 
 	if (config.readonly === true) {
-		app.use("*", readOnlyMiddleware);
+		app.use("/api/*", readOnlyMiddleware);
 	}
 
 	if (config.cfAccessTeamName) {
-		app.use("*", cloudflareAccess(config.cfAccessTeamName));
-		app.use("*", async (c, next) => {
+		app.use("/api/*", cloudflareAccess(config.cfAccessTeamName));
+		app.use("/api/*", async (c, next) => {
 			c.set("authentication_type", "cloudflare-access");
 			c.set("authentication_username", c.get("accessPayload").email);
 			await next();
@@ -97,14 +89,15 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 			scheme: "basic",
 		});
 		app.use(
-			"*",
+			"/api/*",
 			basicAuth({
+				invalidUserMessage: "Authentication error: Basic Auth required",
 				verifyUser: (username, password, c: AppContext) => {
 					const users = (
 						Array.isArray(c.get("config").basicAuth)
 							? c.get("config").basicAuth
 							: [c.get("config").basicAuth]
-					) as BasicAuth[];
+					) as BasicAuthType[];
 
 					for (const user of users) {
 						if (user.username === username && user.password === password) {
@@ -122,7 +115,6 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
 	openapi.get("/api/server/config", GetInfo);
 
-	openapi.get("/api/buckets", ListBuckets);
 	openapi.get("/api/buckets/:bucket", ListObjects);
 	openapi.post("/api/buckets/:bucket/move", MoveObject);
 	openapi.post("/api/buckets/:bucket/folder", CreateFolder);
