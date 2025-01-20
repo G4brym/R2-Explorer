@@ -128,7 +128,6 @@ We welcome contributions! Whether it's bug fixes, new features, or documentation
 
 - 📚 Documentation: [r2explorer.dev](https://r2explorer.dev)
 - 🐛 Issue Tracker: [GitHub Issues](https://github.com/G4brym/R2-Explorer/issues)
-- 💬 Discussions: [GitHub Discussions](https://github.com/G4brym/R2-Explorer/discussions)
 
 ## License
 
