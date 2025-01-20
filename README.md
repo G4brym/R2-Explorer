@@ -11,67 +11,125 @@
 <p align="center">
     <a href="https://github.com/G4brym/R2-Explorer/commits/main" target="_blank">
       <img src="https://img.shields.io/github/commit-activity/m/G4brym/R2-Explorer?label=Commits&style=social" alt="R2-Explorer Commits">
-  </a>
+    </a>
     <a href="https://github.com/G4brym/R2-Explorer/issues" target="_blank">
       <img src="https://img.shields.io/github/issues/G4brym/R2-Explorer?style=social" alt="Issues">
-  </a>
+    </a>
     <a href="https://github.com/G4brym/R2-Explorer/blob/main/LICENSE" target="_blank">
       <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=social" alt="Software License">
-  </a>
+    </a>
 </p>
 
-<hr />
+# R2-Explorer
 
-**Documentation**: <a href="https://r2explorer.dev/">r2explorer.dev</a>
+R2-Explorer brings a familiar Google Drive-like interface to your Cloudflare R2 storage buckets, making file management simple and intuitive.
 
-**Demo**: <a href="https://demo.r2explorer.dev/">demo.r2explorer.dev</a>
+## Quick Links
 
-**Source Code**: <a href="https://github.com/G4brym/R2-Explorer/">github.com/G4brym/R2-Explorer</a>
+- 📚 **Documentation**: [r2explorer.dev](https://r2explorer.dev)
+- 🎮 **Live Demo**: [demo.r2explorer.dev](https://demo.r2explorer.dev)
+- 💻 **Source Code**: [github.com/G4brym/R2-Explorer](https://github.com/G4brym/R2-Explorer)
 
-<hr />
+Available in multiple languages:
+[English](https://r2explorer.dev) |
+[Español](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=es) |
+[Português](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=pt-PT) |
+[Français](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=fr)
 
-Read this in other languages: [Español](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=wapp),
-[Português](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=pt-PT&_x_tr_hl=pt-PT&_x_tr_pto=wapp),
-[Français](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=fr&_x_tr_pto=wapp)
+## Overview
 
-## Features
+R2-Explorer transforms your Cloudflare R2 storage experience with a modern, user-friendly interface. It provides powerful file management capabilities while maintaining enterprise-grade security through Cloudflare's infrastructure.
 
-- Self-hosted/Deployed on your own Cloudflare Account
-- [Receive and read emails](https://r2explorer.dev/guides/setup-email-explorer/) (via Cloudflare Email Routing)
-- Security:
-  - [Basic Auth](https://r2explorer.dev/getting-started/security/#basic-auth)
-  - [Cloudflare Access](https://r2explorer.dev/getting-started/security/#authenticating-with-cloudflare-access)
-- Managing files:
-  - In-browser File preview (pdf, image, txt, markdown, csv, logpush...)
-  - In-browser File editing
-  - Drag-and-Drop upload
-  - Upload files or folders with files
-  - Multipart upload for big files
-  - HTTP/Custom metadata edit
-- Organization:
-  - Create folders
-  - Upload/Rename/Download/Delete files
-  - Right click in file for extra options
+## Key Features
 
-## Installation
+- **🔒 Security**
+  - Basic Authentication support
+  - Cloudflare Access integration
+  - Self-hosted on your Cloudflare account
 
-1. Method: [Github Action](https://r2explorer.dev/getting-started/creating-a-new-project/#1st-method-github-action-recommended)
-2. Method: [Create Cloudflare CLI](https://r2explorer.dev/getting-started/creating-a-new-project/#2nd-method-create-cloudflare)
-3. Method: [Template](https://github.com/G4brym/R2-Explorer/tree/main/template)
+- **📁 File Management**
+  - Drag-and-drop file upload
+  - Folder creation and organization
+  - Multi-part upload for large files
+  - Right-click context menu for advanced options
+  - HTTP/Custom metadata editing
 
-Learn more about keeping your instance updated in the [Updating your project docs](https://r2explorer.dev/getting-started/updating-your-project/).
+- **👀 File Handling**
+  - In-browser file preview
+    - PDF documents
+    - Images
+    - Text files
+    - Markdown
+    - CSV
+    - Logpush files
+  - In-browser file editing
+  - Folder upload support
+  
+- **📧 Email Integration**
+  - Receive and process emails via Cloudflare Email Routing
+  - View email attachments directly in the interface
 
-## Coming soon
+## Installation Methods
 
-- allow bucket names with spaces
-- Search files
-- Rename folders
-- Image thumbnail's ?
-- Object detection on images using workers-ai ?
-- Tooltip when hovering a file with absolute time in "x days time ago" format
-- support for responding to emails
-- More advanced file editing with more validations per file type
+Choose the method that best suits your needs:
 
-## Known issues
+1. **GitHub Action (Recommended)**
+   ```bash
+   # Follow the guide at:
+   https://r2explorer.dev/getting-started/creating-a-new-project/#1st-method-github-action-recommended
+   ```
 
-- Email inline images and assets don't load when using basic auth
+2. **Cloudflare CLI**
+   ```bash
+   # Follow the guide at:
+   https://r2explorer.dev/getting-started/creating-a-new-project/#2nd-method-create-cloudflare
+   ```
+
+3. **Template Repository**
+   ```bash
+   # Use our template at:
+   https://github.com/G4brym/R2-Explorer/tree/main/template
+   ```
+
+For detailed instructions on maintaining and updating your installation, visit our [update guide](https://r2explorer.dev/getting-started/updating-your-project/).
+
+## Roadmap
+
+We're actively working on these exciting features:
+
+- **File Management**
+  - Support for bucket names with spaces
+  - File search functionality
+  - Folder renaming capability
+  - Image thumbnails generation
+  
+- **AI Integration**
+  - Object detection using workers-ai
+  
+- **User Experience**
+  - Enhanced timestamp tooltips
+  - Email response capabilities
+  - Advanced file type-specific editing
+  
+## Known Issues
+
+- When using basic authentication, email inline images and assets don't load properly
+- Additional issues can be found and reported on our [GitHub Issues](https://github.com/G4brym/R2-Explorer/issues) page
+
+## Contributing
+
+We welcome contributions! Whether it's bug fixes, new features, or documentation improvements, please feel free to:
+
+1. Fork the repository
+2. Create a feature branch
+3. Submit a Pull Request
+
+## Support
+
+- 📚 Documentation: [r2explorer.dev](https://r2explorer.dev)
+- 🐛 Issue Tracker: [GitHub Issues](https://github.com/G4brym/R2-Explorer/issues)
+- 💬 Discussions: [GitHub Discussions](https://github.com/G4brym/R2-Explorer/discussions)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
