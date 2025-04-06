@@ -5,6 +5,6 @@ assets = { directory = "node_modules/r2-explorer/dashboard", binding = "ASSETS",
 
 # Bind R2 Buckets to your application.
 # Docs: https://r2explorer.dev/getting-started/add-r2-buckets/
-# [[r2_buckets]]
-# binding = "MY_BUCKET"
-# bucket_name = "my-bucket"
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "bucket"
