@@ -70,6 +70,12 @@ importers:
         specifier: ^8.4.14
         version: 8.4.49
 
+  packages/docs:
+    devDependencies:
+      wrangler:
+        specifier: ^4.7.2
+        version: 4.14.1
+
   packages/github-action:
     devDependencies:
       wrangler:
