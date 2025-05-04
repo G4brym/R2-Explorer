@@ -1,0 +1,1 @@
+import{b as o}from"./index.7b40bbd4.js";import{u as e}from"./auth-store.8ee5f19f.js";import{u as r}from"./main-store.718cb995.js";import"./axios.c4f749e1.js";var h=o(async({router:t,store:a})=>{await e(a).CheckLoginInStorage(t)===!1&&await r(a).loadServerConfigs(t,!0)});export{h as default};

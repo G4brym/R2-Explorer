@@ -1,0 +1,25 @@
+{
+	"compilerOptions": {
+		/* Base Options: */
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"target": "es2022",
+		"verbatimModuleSyntax": false,
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"moduleDetection": "force",
+		/* Strictness */
+		"noImplicitAny": false,
+		"noImplicitThis": true,
+		"strictNullChecks": false,
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		/* If NOT transpiling with TypeScript: */
+		"moduleResolution": "Bundler",
+		"module": "es2022",
+		"noEmit": true,
+		/* If your code runs in the DOM: */
+		"lib": ["es2022"]
+	},
+	"include": ["src"]
+}

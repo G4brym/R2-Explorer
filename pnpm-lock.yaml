@@ -76,6 +76,12 @@ importers:
         specifier: ^4.14.1
         version: 4.14.1
 
+  packages/legacy-assets:
+    devDependencies:
+      wrangler:
+        specifier: ^4.7.2
+        version: 4.14.1
+
   packages/worker:
     dependencies:
       '@hono/cloudflare-access':
