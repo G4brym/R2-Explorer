@@ -13,9 +13,9 @@
       <left-sidebar/>
     </q-drawer>
 
-    <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>
-      <right-sidebar @updateDrawer="updateRightDrawer" />
-    </q-drawer>
+<!--    <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>-->
+<!--      <right-sidebar @updateDrawer="updateRightDrawer" />-->
+<!--    </q-drawer>-->
 
     <q-page-container>
       <router-view />
