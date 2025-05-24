@@ -1,6 +1,6 @@
 {
 	"name": "r2-explorer",
-	"version": "1.1.4",
+	"version": "1.1.5",
 	"description": "A Google Drive Interface for your Cloudflare R2 Buckets",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
