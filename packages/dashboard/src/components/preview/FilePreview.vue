@@ -221,7 +221,7 @@ export default {
 		getType(filename) {
 			for (const config of this.previewConfig) {
 				for (const extension of config.extensions) {
-					if (filename.endsWith(extension)) {
+					if (filename.toLowerCase().endsWith(extension)) {
 						return { type: config.type, downloadType: config.downloadType };
 					}
 				}
