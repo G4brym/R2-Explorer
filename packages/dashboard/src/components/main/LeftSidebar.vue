@@ -60,7 +60,7 @@
       <q-card-section class="q-pt-none">
         You are running version <b>{{ mainStore.version }}</b><br>
         <template v-if="updateAvailable">
-          Latest version is <b>{{latestVersion}}</b>, learn how to <a href="https://r2explorer.dev/getting-started/updating-your-project/" target="_blank">update your instance here</a>.<br>
+          Latest version is <b>{{latestVersion}}</b>, learn how to <a href="https://r2explorer.com/getting-started/updating-your-project/" target="_blank">update your instance here</a>.<br>
         </template>
         <br>
         <template v-if="mainStore.auth">

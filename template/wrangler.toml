@@ -4,7 +4,7 @@ main = "src/index.ts"
 assets = { directory = "node_modules/r2-explorer/dashboard", binding = "ASSETS", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
 
 # Bind R2 Buckets to your application.
-# Docs: https://r2explorer.dev/getting-started/add-r2-buckets/
+# Docs: https://r2explorer.com/getting-started/add-r2-buckets/
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "bucket"

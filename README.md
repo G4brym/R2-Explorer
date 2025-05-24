@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://r2explorer.dev/">
+  <a href="https://r2explorer.com/">
     <img src="https://raw.githubusercontent.com/G4brym/R2-explorer/refs/heads/main/packages/docs/pages/assets/r2-explorer-logo.png" width="500" height="auto" alt="R2-Explorer"/>
   </a>
 </div>
@@ -26,15 +26,15 @@ R2-Explorer brings a familiar Google Drive-like interface to your Cloudflare R2 
 
 ## Quick Links
 
-- 📚 **Documentation**: [r2explorer.dev](https://r2explorer.dev)
-- 🎮 **Live Demo**: [demo.r2explorer.dev](https://demo.r2explorer.dev)
+- 📚 **Documentation**: [r2explorer.com](https://r2explorer.com)
+- 🎮 **Live Demo**: [demo.r2explorer.com](https://demo.r2explorer.com)
 - 💻 **Source Code**: [github.com/G4brym/R2-Explorer](https://github.com/G4brym/R2-Explorer)
 
 Available in multiple languages:
-[English](https://r2explorer.dev) |
-[Español](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=es) |
-[Português](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=pt-PT) |
-[Français](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=fr)
+[English](https://r2explorer.com) |
+[Español](https://r2explorer-com.translate.goog/?_x_tr_sl=en&_x_tr_tl=es) |
+[Português](https://r2explorer-com.translate.goog/?_x_tr_sl=en&_x_tr_tl=pt-PT) |
+[Français](https://r2explorer-com.translate.goog/?_x_tr_sl=en&_x_tr_tl=fr)
 
 ## Overview
 
@@ -64,7 +64,7 @@ R2-Explorer transforms your Cloudflare R2 storage experience with a modern, user
     - Logpush files
   - In-browser file editing
   - Folder upload support
-  
+
 - **📧 Email Integration**
   - Receive and process emails via Cloudflare Email Routing
   - View email attachments directly in the interface
@@ -76,13 +76,13 @@ Choose the method that best suits your needs:
 1. **GitHub Action (Recommended)**
    ```bash
    # Follow the guide at:
-   https://r2explorer.dev/getting-started/creating-a-new-project/#1st-method-github-action-recommended
+   https://r2explorer.com/getting-started/creating-a-new-project/#1st-method-github-action-recommended
    ```
 
 2. **Cloudflare CLI**
    ```bash
    # Follow the guide at:
-   https://r2explorer.dev/getting-started/creating-a-new-project/#2nd-method-create-cloudflare
+   https://r2explorer.com/getting-started/creating-a-new-project/#2nd-method-create-cloudflare
    ```
 
 3. **Template Repository**
@@ -91,7 +91,7 @@ Choose the method that best suits your needs:
    https://github.com/G4brym/R2-Explorer/tree/main/template
    ```
 
-For detailed instructions on maintaining and updating your installation, visit our [update guide](https://r2explorer.dev/getting-started/updating-your-project/).
+For detailed instructions on maintaining and updating your installation, visit our [update guide](https://r2explorer.com/getting-started/updating-your-project/).
 
 ## Roadmap
 
@@ -102,15 +102,15 @@ We're actively working on these exciting features:
   - File search functionality
   - Folder renaming capability
   - Image thumbnails generation
-  
+
 - **AI Integration**
   - Object detection using workers-ai
-  
+
 - **User Experience**
   - Enhanced timestamp tooltips
   - Email response capabilities
   - Advanced file type-specific editing
-  
+
 ## Known Issues
 
 - When using basic authentication, email inline images and assets don't load properly
@@ -126,7 +126,7 @@ We welcome contributions! Whether it's bug fixes, new features, or documentation
 
 ## Support
 
-- 📚 Documentation: [r2explorer.dev](https://r2explorer.dev)
+- 📚 Documentation: [r2explorer.com](https://r2explorer.com)
 - 🐛 Issue Tracker: [GitHub Issues](https://github.com/G4brym/R2-Explorer/issues)
 
 ## License

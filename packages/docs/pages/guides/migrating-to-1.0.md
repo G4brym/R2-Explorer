@@ -49,13 +49,13 @@ Then proceed to deploy your application:
 wrangler deploy
 ```
 
-## Why is the Dashboard no longer bundled in the worker? 
+## Why is the Dashboard no longer bundled in the worker?
 
 In the 0.x versions of R2 Explorer the UI/Dashboard was compiled and bundled with the worker in your personal account,
 but recently the dashboard has been getting bigger with each release. And max worker size is 1MB compressed
 (read more [here](https://developers.cloudflare.com/workers/platform/limits/#worker-size)).
 
-So it was decided that moving forward the project is getting split into Dashboard hosted on Cloudflare Pages and the 
+So it was decided that moving forward the project is getting split into Dashboard hosted on Cloudflare Pages and the
 API hosted in Cloudflare Workers. To keep the theme of the project as to be simple for everyone to deploy,
 the worker is going to proxy dashboard requests to the Pages project, so the casual user is still just going to
 just deploy the Worker and never think about the Pages project.
@@ -64,7 +64,7 @@ Advantages of this approach, as the Pages project is automatically deployed with
 R2 Explorer, users with the default settings are going to get new updates without having to update their worker (as
 long as the update didn't require an API change).
 
-For anyone wanting to deploy their own Pages project, all you need to do is to Fork the 
+For anyone wanting to deploy their own Pages project, all you need to do is to Fork the
 [github repo](https://github.com/G4brym/R2-Explorer), and create a new Cloudflare Pages project connected to your own
 Git repository and set the Root directory to `packages/dashboard`, then in your `R2Explorer()` configuration define the
-`dashboardUrl` setting to the url of your new project (ex: `https://demo.r2explorer.dev`).
+`dashboardUrl` setting to the url of your new project (ex: `https://demo.r2explorer.com`).

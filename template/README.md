@@ -2,7 +2,7 @@
 
 This is my personal [R2 Explorer](https://github.com/G4brym/R2-Explorer) application self hosted on my Cloudflare account.
 
-You can read the full [documentation here](https://r2explorer.dev/).
+You can read the full [documentation here](https://r2explorer.com/).
 
 ## Get started
 
@@ -14,8 +14,8 @@ You can read the full [documentation here](https://r2explorer.dev/).
 
 ### Optional Steps
 
-1. Read only mode is enabled by default, disable it in `src/index.ts`, [documentation here](https://r2explorer.dev/getting-started/configuration/#disabling-readonly-mode).
-2. Learn how to secure your R2 Explorer in the official [documentation here](https://r2explorer.dev/getting-started/security/).
+1. Read only mode is enabled by default, disable it in `src/index.ts`, [documentation here](https://r2explorer.com/getting-started/configuration/#disabling-readonly-mode).
+2. Learn how to secure your R2 Explorer in the official [documentation here](https://r2explorer.com/getting-started/security/).
 
 ## Updating the instance
 

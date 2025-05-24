@@ -1,6 +1,6 @@
 site_name: R2 Explorer
 site_description: A Google Drive Interface for your Cloudflare R2 Buckets
-site_url: https://r2explorer.dev/
+site_url: https://r2explorer.com/
 docs_dir: pages
 theme:
   name: material
@@ -60,8 +60,8 @@ nav:
       - guides/setup-email-explorer.md
       - guides/migrating-to-1.0.md
       - guides/migrating-to-1.1.md
-  - Email explorer: https://r2explorer.dev/guides/setup-email-explorer/
-  - Live demo: https://demo.r2explorer.dev/
+  - Email explorer: https://r2explorer.com/guides/setup-email-explorer/
+  - Live demo: https://demo.r2explorer.com/
 markdown_extensions:
   - def_list
   - pymdownx.tasklist:

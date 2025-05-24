@@ -7,7 +7,7 @@ hide:
 # R2 Explorer
 
 <div align="center">
-  <a href="https://r2explorer.dev/">
+  <a href="https://r2explorer.com/">
     <img src="https://raw.githubusercontent.com/G4brym/R2-explorer/refs/heads/main/packages/docs/pages/assets/r2-explorer-logo.png" width="500" height="auto" alt="R2-Explorer"/>
   </a>
 </div>
@@ -30,9 +30,9 @@ hide:
 
 <hr />
 
-**Documentation**: <a href="https://r2explorer.dev/">r2explorer.dev</a>
+**Documentation**: <a href="https://r2explorer.com/">r2explorer.com</a>
 
-**Demo**: <a href="https://demo.r2explorer.dev/">demo.r2explorer.dev</a>
+**Demo**: <a href="https://demo.r2explorer.com/">demo.r2explorer.com</a>
 
 **Source Code**: <a href="https://github.com/G4brym/R2-Explorer/">github.com/G4brym/R2-Explorer</a>
 
@@ -45,11 +45,11 @@ Read this in other languages: [Español](https://r2explorer-dev.translate.goog/?
 ## Features
 
 - Self-hosted/Deployed on your own Cloudflare Account
-- [Receive and read emails](https://r2explorer.dev/guides/setup-email-explorer/) (via Cloudflare Email Routing)
+- [Receive and read emails](https://r2explorer.com/guides/setup-email-explorer/) (via Cloudflare Email Routing)
 
 ##### Security:
-- [Basic Auth](https://r2explorer.dev/getting-started/security/#basic-auth)
-- [Cloudflare Access](https://r2explorer.dev/getting-started/security/#authenticating-with-cloudflare-access)
+- [Basic Auth](https://r2explorer.com/getting-started/security/#basic-auth)
+- [Cloudflare Access](https://r2explorer.com/getting-started/security/#authenticating-with-cloudflare-access)
 
 ##### Managing files:
 - In-browser File preview (pdf, image, txt, markdown, csv, logpush...)
@@ -66,11 +66,11 @@ Read this in other languages: [Español](https://r2explorer-dev.translate.goog/?
 
 ## Installation
 
-1. Method: [Github Action](https://r2explorer.dev/getting-started/creating-a-new-project/#1st-method-github-action-recommended)
-2. Method: [Create Cloudflare CLI](https://r2explorer.dev/getting-started/creating-a-new-project/#2nd-method-create-cloudflare)
+1. Method: [Github Action](https://r2explorer.com/getting-started/creating-a-new-project/#1st-method-github-action-recommended)
+2. Method: [Create Cloudflare CLI](https://r2explorer.com/getting-started/creating-a-new-project/#2nd-method-create-cloudflare)
 3. Method: [Template](https://github.com/G4brym/R2-Explorer/tree/main/template)
 
-Learn more about keeping your instance updated in the [Updating your project docs](https://r2explorer.dev/getting-started/updating-your-project/).
+Learn more about keeping your instance updated in the [Updating your project docs](https://r2explorer.com/getting-started/updating-your-project/).
 
 ## Coming soon
 

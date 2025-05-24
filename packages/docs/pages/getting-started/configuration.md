@@ -7,9 +7,9 @@ Here is all the available options:
 | `readonly`         | `boolean` or `undefined`  | Controls the write access globally, default: `true`                                                                                           | `true`                                                    |
 | `cors`             | `boolean` or `undefined`  | Enables or disables CORS access to the internal API, default: `false`                                                                         | `true`                                                    |
 | `cfAccessTeamName` | `string`  or `undefined`  | When set enforces Cloudflare Access in all requests                                                                                           | `radar`  (taken from https://radar.cloudflareaccess.com/) |
-| `dashboardUrl`     | `string`  or `undefined`  | Allows you to serve a custom dashboard, read more [here](../guides/migrating-to-1.0.md/#why-is-the-dashboard-no-longer-bundled-in-the-worker) | `https://demo.r2explorer.dev`                             |
-| `emailRouting`     | `object`  or `undefined`  | Customize Email Explorer, read more [here](../guides/setup-email-explorer.md)                                                                 | `https://demo.r2explorer.dev`                             |
-| `cacheAssets`      | `boolean`  or `undefined` | Cache dashboard assets by 5 minutes, default: `true`                                                                                          | `https://demo.r2explorer.dev`                             |
+| `dashboardUrl`     | `string`  or `undefined`  | Allows you to serve a custom dashboard, read more [here](../guides/migrating-to-1.0.md/#why-is-the-dashboard-no-longer-bundled-in-the-worker) | `https://demo.r2explorer.com`                             |
+| `emailRouting`     | `object`  or `undefined`  | Customize Email Explorer, read more [here](../guides/setup-email-explorer.md)                                                                 | `https://demo.r2explorer.com`                             |
+| `cacheAssets`      | `boolean`  or `undefined` | Cache dashboard assets by 5 minutes, default: `true`                                                                                          | `https://demo.r2explorer.com`                             |
 
 `emailRouting` options:
 
@@ -23,9 +23,9 @@ For security reasons, by default your application will be in read only mode, to 
 `src/index.ts` file, like this:
 
 ```ts title="src/index.ts"
-import {R2Explorer} from 'r2-explorer';
+import { R2Explorer } from 'r2-explorer';
 
-export default R2Explorer({readonly: false});
+export default R2Explorer({ readonly: false });
 ```
 
 After this, just deploy your application normally with:
@@ -42,7 +42,9 @@ wrangler deploy
 
 ## Setup Custom Domain
 
-To setup a custom domain, just open the [Cloudflare dashboard](https://dash.cloudflare.com/?to=/:account/workers/services/view/:worker/production/settings#domains) and go to Workers & Pages ->
+To setup a custom domain, just open
+the [Cloudflare dashboard](https://dash.cloudflare.com/?to=/:account/workers/services/view/:worker/production/settings#domains)
+and go to Workers & Pages ->
 your worker -> Triggers. And click "Add Custom Domain".
 
 ![Cloudflare Workers Dashboard](../assets/custom-domain.png)
@@ -53,12 +55,12 @@ By default emails will go to the 1º bucket configured in your `wrangler.toml` f
 in the `index.ts` file, like:
 
 ```ts title="src/index.ts"
-import {R2Explorer} from 'r2-explorer';
+import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({
-    readonly: false, emailRouting: {
-        targetBucket: 'my-email-bucket'
-    }
+  readonly: false, emailRouting: {
+    targetBucket: 'my-email-bucket'
+  }
 });
 ```
 
