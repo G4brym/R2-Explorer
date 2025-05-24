@@ -74,22 +74,13 @@ R2-Explorer transforms your Cloudflare R2 storage experience with a modern, user
 Choose the method that best suits your needs:
 
 1. **GitHub Action (Recommended)**
-   ```bash
-   # Follow the guide at:
-   https://r2explorer.com/getting-started/creating-a-new-project/#1st-method-github-action-recommended
-   ```
+   [Follow the guide at](https://r2explorer.com/getting-started/creating-a-new-project/#1st-method-github-action-recommended)
 
 2. **Cloudflare CLI**
-   ```bash
-   # Follow the guide at:
-   https://r2explorer.com/getting-started/creating-a-new-project/#2nd-method-create-cloudflare
-   ```
+   [Follow the guide at](https://r2explorer.com/getting-started/creating-a-new-project/#2nd-method-create-cloudflare)
 
 3. **Template Repository**
-   ```bash
-   # Use our template at:
-   https://github.com/G4brym/R2-Explorer/tree/main/template
-   ```
+   [Use our template at](https://github.com/G4brym/R2-Explorer/tree/main/template)
 
 For detailed instructions on maintaining and updating your installation, visit our [update guide](https://r2explorer.com/getting-started/updating-your-project/).
 
