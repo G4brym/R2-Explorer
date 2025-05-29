@@ -216,8 +216,8 @@ export const apiHandler = {
 	},
 	uploadObjects: async (file, key, bucket, callback) => {
 		return await retryWithBackoff(
-			async () =>
-				await api.post(`/buckets/${bucket}/upload`, file, {
+			async () => {
+				return await api.post(`/buckets/${bucket}/upload`, file, {
 					params: {
 						key: encode(key),
 						httpMetadata: encode(
@@ -230,7 +230,8 @@ export const apiHandler = {
 						"Content-Type": "multipart/form-data",
 					},
 					onUploadProgress: callback,
-				}),
+				});
+			},
 			5,
 			1000,
 			10000,
