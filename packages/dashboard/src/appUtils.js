@@ -21,6 +21,40 @@ function mapFile(obj, prefix) {
 	};
 }
 
+export async function retryWithBackoff(
+	operation,
+	maxAttempts = 3,
+	initialDelay = 1000,
+	maxDelay = 10000,
+	backoffFactor = 2,
+) {
+	let lastError = null;
+
+	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+		try {
+			return await operation();
+		} catch (error) {
+			lastError = error instanceof Error ? error : new Error(String(error));
+
+			if (attempt === maxAttempts) {
+				throw lastError;
+			}
+
+			// Calculate delay with exponential backoff
+			const delay = Math.min(
+				initialDelay * Math.pow(backoffFactor, attempt - 1),
+				maxDelay,
+			);
+
+			// Wait before next attempt
+			await new Promise((resolve) => setTimeout(resolve, delay));
+		}
+	}
+
+	// This line should never be reached due to the throw above
+	throw lastError || new Error("Unexpected error in retryWithBackoff");
+}
+
 export const timeSince = (date) => {
 	const seconds = Math.floor((new Date() - date) / 1000);
 
@@ -180,22 +214,28 @@ export const apiHandler = {
 			},
 		});
 	},
-	uploadObjects: (file, key, bucket, callback) => {
-		// console.log(key)
-		return api.post(`/buckets/${bucket}/upload`, file, {
-			params: {
-				key: encode(key),
-				httpMetadata: encode(
-					JSON.stringify({
-						contentType: file.type,
-					}),
-				),
-			},
-			headers: {
-				"Content-Type": "multipart/form-data",
-			},
-			onUploadProgress: callback,
-		});
+	uploadObjects: async (file, key, bucket, callback) => {
+		return await retryWithBackoff(
+			async () =>
+				await api.post(`/buckets/${bucket}/upload`, file, {
+					params: {
+						key: encode(key),
+						httpMetadata: encode(
+							JSON.stringify({
+								contentType: file.type,
+							}),
+						),
+					},
+					headers: {
+						"Content-Type": "multipart/form-data",
+					},
+					onUploadProgress: callback,
+				}),
+			5,
+			1000,
+			10000,
+			2,
+		);
 	},
 	listObjects: async (bucket, prefix, delimiter = "/", cursor = null) => {
 		return await api.get(

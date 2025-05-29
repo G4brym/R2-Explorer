@@ -25,7 +25,8 @@
 				"noImplicitAnyLet": "off"
 			},
 			"style": {
-				"noParameterAssign": "off"
+				"noParameterAssign": "off",
+        "useExponentiationOperator": "off"
 			},
 			"complexity": {
 				"noForEach": "off",
