@@ -24,7 +24,7 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { ROOT_FOLDER, apiHandler, decode } from "src/appUtils";
+import { ROOT_FOLDER, apiHandler, decode, sleep } from "src/appUtils";
 import { useMainStore } from "stores/main-store";
 
 export default {
@@ -236,6 +236,8 @@ export default {
 					}
 
 					uploadSize += file.size;
+
+					await sleep(200);
 				}
 			}
 
