@@ -24,7 +24,7 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { ROOT_FOLDER, apiHandler, decode } from "src/appUtils";
+import { ROOT_FOLDER, apiHandler, decode, sleep } from "src/appUtils";
 import { useMainStore } from "stores/main-store";
 
 export default {
@@ -168,69 +168,76 @@ export default {
 
 					const chunkSize = 95 * 1024 * 1024;
 					// Files bigger than 100MB require multipart upload
-					if (file.size > chunkSize) {
-						const { uploadId } = (
-							await apiHandler.multipartCreate(file, key, this.selectedBucket)
-						).data;
 
-						let partNumber = 1;
-						const parts = [];
-						// console.log('total: ', file.size)
-						// console.log('chunk: ', chunkSize)
+					try {
+						if (file.size > chunkSize) {
+							const { uploadId } = (
+								await apiHandler.multipartCreate(file, key, this.selectedBucket)
+							).data;
 
-						for (let start = 0; start < file.size; start += chunkSize) {
-							const end = Math.min(start + chunkSize, file.size);
-							const chunk = file.slice(start, end);
-							// console.log(`${start} -> ${end}`)
+							let partNumber = 1;
+							const parts = [];
+							// console.log('total: ', file.size)
+							// console.log('chunk: ', chunkSize)
 
-							const { data } = await apiHandler.multipartUpload(
-								uploadId,
-								partNumber,
-								this.selectedBucket,
+							for (let start = 0; start < file.size; start += chunkSize) {
+								const end = Math.min(start + chunkSize, file.size);
+								const chunk = file.slice(start, end);
+								// console.log(`${start} -> ${end}`)
+
+								const { data } = await apiHandler.multipartUpload(
+									uploadId,
+									partNumber,
+									this.selectedBucket,
+									key,
+									chunk,
+									(progressEvent) => {
+										//console.log((start + progressEvent.loaded) * 100 / file.size)
+										notif({
+											caption: `${Number.parseInt(((uploadSize + start + progressEvent.loaded) * 100) / totalSize)}%`,
+										});
+										// self.$store.dispatch('setUploadProgress', {
+										//   filename: file.name,
+										//   progress: (start + progressEvent.loaded) * 100 / file.size
+										// })  // TODO
+									},
+								);
+
+								parts.push(data);
+								partNumber += 1;
+							}
+
+							await apiHandler.multipartComplete(
+								file,
 								key,
-								chunk,
+								this.selectedBucket,
+								parts,
+								uploadId,
+							);
+						} else {
+							await apiHandler.uploadObjects(
+								file,
+								key,
+								this.selectedBucket,
 								(progressEvent) => {
-									//console.log((start + progressEvent.loaded) * 100 / file.size)
+									//console.log(progressEvent.loaded * 100 / file.size)
 									notif({
-										caption: `${Number.parseInt(((uploadSize + start + progressEvent.loaded) * 100) / totalSize)}%`,
+										caption: `${Number.parseInt(((uploadSize + progressEvent.loaded) * 100) / totalSize)}%`,
 									});
 									// self.$store.dispatch('setUploadProgress', {
 									//   filename: file.name,
-									//   progress: (start + progressEvent.loaded) * 100 / file.size
+									//   progress: progressEvent.loaded * 100 / file.size
 									// })  // TODO
 								},
 							);
-
-							parts.push(data);
-							partNumber += 1;
 						}
-
-						await apiHandler.multipartComplete(
-							file,
-							key,
-							this.selectedBucket,
-							parts,
-							uploadId,
-						);
-					} else {
-						await apiHandler.uploadObjects(
-							file,
-							key,
-							this.selectedBucket,
-							(progressEvent) => {
-								//console.log(progressEvent.loaded * 100 / file.size)
-								notif({
-									caption: `${Number.parseInt(((uploadSize + progressEvent.loaded) * 100) / totalSize)}%`,
-								});
-								// self.$store.dispatch('setUploadProgress', {
-								//   filename: file.name,
-								//   progress: progressEvent.loaded * 100 / file.size
-								// })  // TODO
-							},
-						);
+					} catch (e) {
+						console.error(`Unable to upload file ${file.name}: ${e.message}`);
 					}
 
 					uploadSize += file.size;
+
+					await sleep(200);
 				}
 			}
 
