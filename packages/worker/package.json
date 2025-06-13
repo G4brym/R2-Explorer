@@ -14,7 +14,7 @@
 	"scripts": {
 		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
 		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
-		"test": "vitest run --root tests",
+		"test": "vitest run",
 		"package": "npm run build && npm pack",
 		"publish-npm": "npm publish"
 	},
@@ -54,6 +54,7 @@
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20241127.0",
 		"@types/node": "^22.10.1",
+		"miniflare": "^4.20250604.1",
 		"tsup": "^8.3.5",
 		"typescript": "^5.7.2",
 		"wrangler": "^3.91.0"

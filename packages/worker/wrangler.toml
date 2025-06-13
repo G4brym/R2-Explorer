@@ -1,0 +1,4 @@
+name = "r2-explorer-worker-miniflare-test"
+compatibility_date = "2023-12-01"
+# main = "src/index.ts" # Not directly used by Miniflare when `fetch` is provided
+compatibility_flags = ["nodejs_compat"]
