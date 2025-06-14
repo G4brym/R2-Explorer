@@ -44,43 +44,7 @@ export class HeadObject extends OpenAPIRoute {
 			throw new HTTPException(404, { message: "Object Not Found" });
 		}
 
-		// For HEAD requests, return a new Response with no body, but with headers from the R2ObjectMeta
-		const responseHeaders = new Headers();
-		responseHeaders.set("Accept-Ranges", "bytes"); // Common for R2
-		responseHeaders.set("ETag", objectMeta.httpEtag);
-		if (objectMeta.httpMetadata?.contentType) {
-			responseHeaders.set("Content-Type", objectMeta.httpMetadata.contentType);
-		}
-		if (objectMeta.httpMetadata?.cacheControl) {
-			responseHeaders.set(
-				"Cache-Control",
-				objectMeta.httpMetadata.cacheControl,
-			);
-		}
-		if (objectMeta.httpMetadata?.contentDisposition) {
-			responseHeaders.set(
-				"Content-Disposition",
-				objectMeta.httpMetadata.contentDisposition,
-			);
-		}
-		if (objectMeta.httpMetadata?.contentEncoding) {
-			responseHeaders.set(
-				"Content-Encoding",
-				objectMeta.httpMetadata.contentEncoding,
-			);
-		}
-		if (objectMeta.httpMetadata?.contentLanguage) {
-			responseHeaders.set(
-				"Content-Language",
-				objectMeta.httpMetadata.contentLanguage,
-			);
-		}
-		// Crucially, add Content-Length
-		responseHeaders.set("Content-Length", objectMeta.size.toString());
-		// Copy custom metadata too if desired, prefixed with x-amz-meta- or similar,
-		// though this is not standard for HEAD unless specifically implemented.
-		// For now, let's stick to standard HTTP headers derived from R2ObjectMeta.
-
-		return c.newResponse(null, { status: 200, headers: responseHeaders });
+		// Return the objectMeta, because the dashboard needs to read user defined metadata
+		return objectMeta;
 	}
 }
