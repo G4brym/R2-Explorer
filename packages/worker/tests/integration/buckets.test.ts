@@ -7,13 +7,10 @@ import { env, createExecutionContext } from "cloudflare:test"
 describe("Bucket Endpoints", () => {
 	let app: ReturnType<typeof createTestApp>;
 	let MY_TEST_BUCKET_1: R2Bucket;
-	// Add MY_TEST_BUCKET_2 if it's used in later tests
-	// let MY_TEST_BUCKET_2: R2Bucket;
 
 	beforeEach(async () => {
 		app = createTestApp(); // Create a new app instance for each test
 		MY_TEST_BUCKET_1 = env.MY_TEST_BUCKET_1;
-		// MY_TEST_BUCKET_2 = env.MY_TEST_BUCKET_2 as R2Bucket;
 
 		// Clean up bucket before each test
 		if (MY_TEST_BUCKET_1) {
@@ -131,7 +128,7 @@ describe("Bucket Endpoints", () => {
 				// Corrected formatting
 				"/api/buckets/MY_TEST_BUCKET_1?limit=2",
 			);
-			const response1 = await app.fetch(request, env, createExecutionContext());
+			const response1 = await app.fetch(request1, env, createExecutionContext());
 			expect(response1.status).toBe(200);
 			const body1 = (await response1.json()) as R2Objects;
 			expect(body1.objects.length).toBe(2);
@@ -141,7 +138,7 @@ describe("Bucket Endpoints", () => {
 			const request2 = createTestRequest(
 				`/api/buckets/MY_TEST_BUCKET_1?limit=2&cursor=${body1.cursor}`,
 			);
-			const response2 = await app.fetch(request, env, createExecutionContext());
+			const response2 = await app.fetch(request2, env, createExecutionContext());
 			expect(response2.status).toBe(200);
 			const body2 = (await response2.json()) as R2Objects;
 			expect(body2.objects.length).toBe(1);
@@ -372,6 +369,203 @@ describe("Bucket Endpoints", () => {
 
 			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(500); // Expecting 500 due to error accessing .delete on undefined
+		});
+	});
+
+	describe("MoveObject (POST /api/buckets/:bucket/move)", () => {
+		const BUCKET_NAME = "MY_TEST_BUCKET_1";
+		const SOURCE_KEY = "source-move.txt";
+		const DEST_KEY = "dest-move.txt";
+		const FOLDER_DEST_KEY = "folder/dest-move.txt";
+		const CONTENT = "Object to be moved";
+
+		beforeEach(async () => {
+			// Ensure source object exists before each move test
+			await MY_TEST_BUCKET_1.put(SOURCE_KEY, CONTENT);
+			// Ensure destination keys are clear if a previous test put something there
+			await MY_TEST_BUCKET_1.delete([DEST_KEY, FOLDER_DEST_KEY]);
+		});
+
+		it("should successfully move an object to a new key", async () => {
+			const base64SourceKey = btoa(SOURCE_KEY);
+			const base64DestKey = btoa(DEST_KEY);
+
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/move`,
+				"POST",
+				{ oldKey: base64SourceKey, newKey: base64DestKey },
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(200);
+
+			const sourceObject = await MY_TEST_BUCKET_1.get(SOURCE_KEY);
+			expect(sourceObject).toBeNull(); // Source should be deleted
+
+			const destObject = await MY_TEST_BUCKET_1.get(DEST_KEY);
+			expect(destObject).not.toBeNull();
+			expect(await destObject?.text()).toBe(CONTENT);
+		});
+
+		it("should successfully move an object to a different prefix (folder simulation)", async () => {
+			const base64SourceKey = btoa(SOURCE_KEY);
+			const base64FolderDestKey = btoa(FOLDER_DEST_KEY);
+
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/move`,
+				"POST",
+				{ oldKey: base64SourceKey, newKey: base64FolderDestKey },
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(200);
+
+			const sourceObject = await MY_TEST_BUCKET_1.get(SOURCE_KEY);
+			expect(sourceObject).toBeNull();
+
+			const destObject = await MY_TEST_BUCKET_1.get(FOLDER_DEST_KEY);
+			expect(destObject).not.toBeNull();
+			expect(await destObject?.text()).toBe(CONTENT);
+		});
+
+		it("should return 404 when attempting to move a non-existent source object", async () => {
+			const base64NonExistentKey = btoa("non-existent-source.txt");
+			const base64DestKey = btoa(DEST_KEY);
+
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/move`,
+				"POST",
+				{ oldKey: base64NonExistentKey, newKey: base64DestKey },
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(404);
+		});
+
+		it("should return 400 for missing sourceKey in request body", async () => {
+			const base64DestKey = btoa(DEST_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/move`,
+				"POST",
+				{ newKey: base64DestKey }, // oldKey is missing
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(400); // Zod validation should fail
+		});
+
+		it("should return 400 for missing destinationKey in request body", async () => {
+			const base64SourceKey = btoa(SOURCE_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/move`,
+				"POST",
+				{ oldKey: base64SourceKey }, // newKey is missing
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(400); // Zod validation should fail
+		});
+
+		it("should return 500 if bucket binding does not exist", async () => {
+			const base64SourceKey = btoa(SOURCE_KEY);
+			const base64DestKey = btoa(DEST_KEY);
+			const request = createTestRequest(
+				"/api/buckets/NON_EXISTENT_BUCKET/move",
+				"POST",
+				{ oldKey: base64SourceKey, newKey: base64DestKey },
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(500);
+			const bodyText = await response.text(); // Workaround for non-JSON response
+			expect(bodyText).toContain("Bucket binding not found: NON_EXISTENT_BUCKET");
+		});
+	});
+
+	describe("CreateFolder (POST /api/buckets/:bucket/folder)", () => {
+		const BUCKET_NAME = "MY_TEST_BUCKET_1";
+		const FOLDER_NAME = "my-new-folder"; // Will have / appended by handler
+		const FOLDER_NAME_WITH_SLASH = "my-other-folder/";
+
+		beforeEach(async () => {
+			// Clear potential folder keys before each test
+			await MY_TEST_BUCKET_1.delete([`${FOLDER_NAME}/`, FOLDER_NAME_WITH_SLASH]);
+		});
+
+		it("should successfully create a new folder (as a zero-byte object with trailing slash)", async () => {
+			const base64FolderName = btoa(FOLDER_NAME);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/folder`,
+				"POST",
+				{ key: base64FolderName },
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(200); // R2 put returns the R2Object
+
+			const folderObject = await MY_TEST_BUCKET_1.head(`${FOLDER_NAME}/`);
+			expect(folderObject).not.toBeNull();
+			expect(folderObject?.size).toBe(0);
+		});
+
+		it("should successfully create a folder if key already has trailing slash", async () => {
+			const base64FolderName = btoa(FOLDER_NAME_WITH_SLASH);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/folder`,
+				"POST",
+				{ key: base64FolderName },
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(200);
+
+			const folderObject = await MY_TEST_BUCKET_1.head(FOLDER_NAME_WITH_SLASH);
+			expect(folderObject).not.toBeNull();
+			expect(folderObject?.size).toBe(0);
+		});
+
+		it("should succeed if attempting to create a folder that already exists", async () => {
+			// Create it once
+			await MY_TEST_BUCKET_1.put(`${FOLDER_NAME}/`, "");
+
+			const base64FolderName = btoa(FOLDER_NAME);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/folder`,
+				"POST",
+				{ key: base64FolderName },
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(200); // Should still be successful (idempotent)
+
+			const folderObject = await MY_TEST_BUCKET_1.head(`${FOLDER_NAME}/`);
+			expect(folderObject).not.toBeNull();
+			expect(folderObject?.size).toBe(0);
+		});
+
+		it("should return 400 for missing key in request body", async () => {
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/folder`,
+				"POST",
+				{}, // key is missing
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(400); // Zod validation should fail
+		});
+
+		it("should return 500 if bucket binding does not exist", async () => {
+			const base64FolderName = btoa(FOLDER_NAME);
+			const request = createTestRequest(
+				"/api/buckets/NON_EXISTENT_BUCKET/folder",
+				"POST",
+				{ key: base64FolderName },
+				{ "Content-Type": "application/json" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(500);
+			const bodyText = await response.text(); // Workaround for non-JSON response
+			expect(bodyText).toContain("Bucket binding not found: NON_EXISTENT_BUCKET");
 		});
 	});
 });
