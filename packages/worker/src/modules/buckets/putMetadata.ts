@@ -1,4 +1,5 @@
 import { OpenAPIRoute } from "chanfana";
+import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import type { AppContext } from "../../types";
 
@@ -30,7 +31,14 @@ export class PutMetadata extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const data = await this.getValidatedData<typeof this.schema>();
 
-		const bucket = c.env[data.params.bucket];
+		const bucketName = data.params.bucket;
+		const bucket = c.env[bucketName] as R2Bucket | undefined;
+
+		if (!bucket) {
+			throw new HTTPException(500, {
+				message: `Bucket binding not found: ${bucketName}`,
+			});
+		}
 
 		let filePath;
 		try {
@@ -42,6 +50,13 @@ export class PutMetadata extends OpenAPIRoute {
 		}
 
 		const object = await bucket.get(filePath);
+
+		if (object === null) {
+			// Add this check
+			throw new HTTPException(404, { message: "Object not found" });
+		}
+
+		// object.body is now safe to access
 		return await bucket.put(filePath, object.body, {
 			customMetadata: data.body.customMetadata,
 			httpMetadata: data.body.httpMetadata,

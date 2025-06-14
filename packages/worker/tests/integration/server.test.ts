@@ -30,6 +30,7 @@ describe("Server Endpoints", () => {
 			expect.arrayContaining([
 				expect.objectContaining({ name: "MY_TEST_BUCKET_1" }),
 				expect.objectContaining({ name: "MY_TEST_BUCKET_2" }),
+				expect.objectContaining({ name: "teste" }),
 			]),
 		);
 		expect(body.buckets).not.toEqual(

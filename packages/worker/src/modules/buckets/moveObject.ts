@@ -1,4 +1,5 @@
 import { OpenAPIRoute } from "chanfana";
+import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import type { AppContext } from "../../types";
 
@@ -27,11 +28,26 @@ export class MoveObject extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const data = await this.getValidatedData<typeof this.schema>();
 
-		const bucket = c.env[data.params.bucket];
+		const bucketName = data.params.bucket;
+		const bucket = c.env[bucketName] as R2Bucket | undefined;
+
+		if (!bucket) {
+			throw new HTTPException(500, {
+				message: `Bucket binding not found: ${bucketName}`,
+			});
+		}
+
 		const oldKey = decodeURIComponent(escape(atob(data.body.oldKey)));
 		const newKey = decodeURIComponent(escape(atob(data.body.newKey)));
 
 		const object = await bucket.get(oldKey);
+
+		if (object === null) {
+			throw new HTTPException(404, {
+				message: `Source object not found: ${oldKey}`,
+			});
+		}
+
 		const resp = await bucket.put(newKey, object.body, {
 			customMetadata: object.customMetadata,
 			httpMetadata: object.httpMetadata,
