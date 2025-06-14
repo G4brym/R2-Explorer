@@ -1,5 +1,5 @@
-import { R2Explorer } from "../index";
-import type { R2ExplorerConfig } from "../types";
+import { R2Explorer } from "../../src";
+import type { R2ExplorerConfig } from "../../src/types";
 
 /**
  * Creates an instance of the R2Explorer application for testing.

@@ -1,15 +1,26 @@
 {
 	"compilerOptions": {
-		"target": "esNext",
-		"module": "commonjs",
+		/* Base Options: */
 		"esModuleInterop": true,
-		"resolveJsonModule": true,
-		"forceConsistentCasingInFileNames": true,
-		"strict": false,
 		"skipLibCheck": true,
+		"target": "es2022",
+		"verbatimModuleSyntax": false,
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"moduleDetection": "force",
+		/* Strictness */
+		"noImplicitAny": false,
+		"noImplicitThis": true,
+		"strictNullChecks": false,
+		"strict": true,
 		"noUncheckedIndexedAccess": true,
+		/* If NOT transpiling with TypeScript: */
+		"moduleResolution": "Bundler",
+		"module": "es2022",
 		"noEmit": true,
-		"types": ["@types/node", "@cloudflare/workers-types"]
+		/* If your code runs in the DOM: */
+		"lib": ["es2022"],
+		"types": ["@types/node", "@cloudflare/workers-types/experimental"]
 	},
-	"include": ["src/*.ts", "src/**/*.ts"]
+	"include": ["src"]
 }

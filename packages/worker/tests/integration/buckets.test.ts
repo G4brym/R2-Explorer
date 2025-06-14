@@ -1,13 +1,7 @@
 import { Buffer } from "node:buffer"; // For btoa with binary data if needed, and for creating ArrayBuffer
-import type {
-	R2Bucket,
-	R2CustomMetadata,
-	R2HTTPMetadata,
-	R2Object,
-	R2Objects,
-} from "@cloudflare/workers-types";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createTestApp, createTestRequest } from "./setup";
+import { env, createExecutionContext } from "cloudflare:test"
 
 // Main describe block for all bucket endpoints
 describe("Bucket Endpoints", () => {
@@ -18,8 +12,7 @@ describe("Bucket Endpoints", () => {
 
 	beforeEach(async () => {
 		app = createTestApp(); // Create a new app instance for each test
-		const { env } = await import("cloudflare:test");
-		MY_TEST_BUCKET_1 = env.MY_TEST_BUCKET_1 as R2Bucket;
+		MY_TEST_BUCKET_1 = env.MY_TEST_BUCKET_1;
 		// MY_TEST_BUCKET_2 = env.MY_TEST_BUCKET_2 as R2Bucket;
 
 		// Clean up bucket before each test
@@ -59,9 +52,7 @@ describe("Bucket Endpoints", () => {
 			await MY_TEST_BUCKET_1.put("test-object-2.txt", "Hello World 2");
 
 			const request = createTestRequest("/api/buckets/MY_TEST_BUCKET_1");
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 
 			expect(response.status).toBe(200);
 			const body = (await response.json()) as R2Objects;
@@ -78,9 +69,7 @@ describe("Bucket Endpoints", () => {
 				throw new Error("MY_TEST_BUCKET_1 binding not available");
 
 			const request = createTestRequest("/api/buckets/MY_TEST_BUCKET_1");
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 
 			expect(response.status).toBe(200);
 			const body = (await response.json()) as R2Objects;
@@ -100,9 +89,7 @@ describe("Bucket Endpoints", () => {
 			const request = createTestRequest(
 				`/api/buckets/MY_TEST_BUCKET_1?prefix=${encodeURIComponent(base64Prefix)}`,
 			);
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 
 			expect(response.status).toBe(200);
 			const body = (await response.json()) as R2Objects;
@@ -122,9 +109,7 @@ describe("Bucket Endpoints", () => {
 			const request = createTestRequest(
 				"/api/buckets/MY_TEST_BUCKET_1?delimiter=/",
 			);
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 
 			expect(response.status).toBe(200);
 			const body = (await response.json()) as R2Objects;
@@ -146,9 +131,7 @@ describe("Bucket Endpoints", () => {
 				// Corrected formatting
 				"/api/buckets/MY_TEST_BUCKET_1?limit=2",
 			);
-			const response1 = await app.fetch(request1, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response1 = await app.fetch(request, env, createExecutionContext());
 			expect(response1.status).toBe(200);
 			const body1 = (await response1.json()) as R2Objects;
 			expect(body1.objects.length).toBe(2);
@@ -158,9 +141,7 @@ describe("Bucket Endpoints", () => {
 			const request2 = createTestRequest(
 				`/api/buckets/MY_TEST_BUCKET_1?limit=2&cursor=${body1.cursor}`,
 			);
-			const response2 = await app.fetch(request2, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response2 = await app.fetch(request, env, createExecutionContext());
 			expect(response2.status).toBe(200);
 			const body2 = (await response2.json()) as R2Objects;
 			expect(body2.objects.length).toBe(1);
@@ -169,9 +150,7 @@ describe("Bucket Endpoints", () => {
 
 		it("GET /api/buckets/NON_EXISTENT_BUCKET - should return 500 if bucket binding does not exist", async () => {
 			const request = createTestRequest("/api/buckets/NON_EXISTENT_BUCKET");
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(500);
 		});
 	});
@@ -195,9 +174,7 @@ describe("Bucket Endpoints", () => {
 				{ "Content-Type": "application/octet-stream" },
 			);
 
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(200);
 
 			const responseBody = (await response.json()) as R2Object;
@@ -236,9 +213,7 @@ describe("Bucket Endpoints", () => {
 				{ "Content-Type": "application/octet-stream" },
 			);
 
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(200);
 			const responseBody = (await response.json()) as R2Object;
 			expect(responseBody.key).toBe(objectKey);
@@ -280,9 +255,7 @@ describe("Bucket Endpoints", () => {
 				blobBody,
 				{ "Content-Type": "application/octet-stream" },
 			);
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(200);
 
 			const r2Object = await MY_TEST_BUCKET_1.get(objectKey);
@@ -300,9 +273,7 @@ describe("Bucket Endpoints", () => {
 				blobBody,
 				{ "Content-Type": "application/octet-stream" },
 			);
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(500);
 		});
 	});
@@ -328,9 +299,7 @@ describe("Bucket Endpoints", () => {
 				{ "Content-Type": "application/json" },
 			);
 
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(200);
 			const body = await response.json();
 			expect(body).toEqual({ success: true });
@@ -358,9 +327,7 @@ describe("Bucket Endpoints", () => {
 				{ "Content-Type": "application/json" },
 			);
 
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(200);
 			const body = await response.json();
 			expect(body).toEqual({ success: true });
@@ -385,9 +352,7 @@ describe("Bucket Endpoints", () => {
 				{ "Content-Type": "application/json" },
 			);
 
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(200);
 			const body = await response.json();
 			expect(body).toEqual({ success: true });
@@ -405,9 +370,7 @@ describe("Bucket Endpoints", () => {
 				{ "Content-Type": "application/json" },
 			);
 
-			const response = await app.fetch(request, {}, {
-				waitUntil: async (p) => p,
-			} as any);
+			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(500); // Expecting 500 due to error accessing .delete on undefined
 		});
 	});

@@ -5,11 +5,16 @@
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
-	"files": ["dashboard", "dist", "LICENSE", "README.md"],
+	"files": [
+		"dashboard",
+		"dist",
+		"LICENSE",
+		"README.md"
+	],
 	"scripts": {
 		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
 		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
-		"test": "vitest run --root tests",
+		"test": "npx vitest run --config tests/vitest.config.mts",
 		"package": "npm run build && npm pack",
 		"publish-npm": "npm publish"
 	},
@@ -50,6 +55,7 @@
 		"@cloudflare/vitest-pool-workers": "^0.8.38",
 		"@cloudflare/workers-types": "^4.20241127.0",
 		"@types/node": "^22.10.1",
+		"@vitest/coverage-istanbul": "^3.2.3",
 		"hono": "^4.6.15",
 		"tsup": "^8.3.5",
 		"typescript": "^5.7.2",
