@@ -3,7 +3,7 @@ import { R2Explorer } from "../src";
 const baseConfig = {
 	readonly: false,
 	cors: true,
-	showHiddenFiles: true
+	showHiddenFiles: true,
 };
 
 export default {

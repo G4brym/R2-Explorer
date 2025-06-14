@@ -58,7 +58,9 @@ for (const bucket of R2EXPLORER_BUCKETS.split("\n")) {
 	const split = bucket.trim().split(":");
 	if (split.length !== 2) {
 		console.error("R2EXPLORER_BUCKETS is not set correctly!");
-		console.error(`"${split}" is not in the correct format => ALIAS:BUCKET_NAME`);
+		console.error(
+			`"${split}" is not in the correct format => ALIAS:BUCKET_NAME`,
+		);
 		process.exit(1);
 	}
 
