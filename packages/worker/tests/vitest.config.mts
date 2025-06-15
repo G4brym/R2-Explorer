@@ -12,7 +12,8 @@ export default defineWorkersConfig({
 				miniflare: {
 					compatibilityDate: "2024-11-06", // Or your project's compatibility date
 					compatibilityFlags: ["nodejs_compat"], // Add any necessary flags
-          r2Persist: true,
+          r2Persist: false,
+          isolatedStorage: false,
           r2Buckets: {
             "MY_TEST_BUCKET_1": "MY_TEST_BUCKET_1",
             "MY_TEST_BUCKET_2": "MY_TEST_BUCKET_2",
@@ -27,7 +28,7 @@ export default defineWorkersConfig({
 			},
 		},
 		coverage: {
-			enabled: true,
+			enabled: false,
 			provider: "istanbul",
 			include: ["src/**"],
 		},

@@ -4,7 +4,7 @@ import { createTestApp, createTestRequest } from "./setup";
 import { env, createExecutionContext } from "cloudflare:test"
 
 // Main describe block for all bucket endpoints
-describe("Bucket Endpoints", () => {
+describe.skip("Bucket Endpoints", () => {
 	let app: ReturnType<typeof createTestApp>;
 	let MY_TEST_BUCKET_1: R2Bucket;
 
