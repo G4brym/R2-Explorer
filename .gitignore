@@ -46,3 +46,4 @@ template/package-lock.json
 template/node_modules/
 
 packages/docs/site
+packages/worker/coverage

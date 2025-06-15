@@ -1,4 +1,5 @@
 import { OpenAPIRoute } from "chanfana";
+import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import type { AppContext } from "../../types";
 
@@ -18,7 +19,14 @@ export class HeadObject extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const data = await this.getValidatedData<typeof this.schema>();
 
-		const bucket = c.env[data.params.bucket];
+		const bucketName = data.params.bucket;
+		const bucket = c.env[bucketName] as R2Bucket | undefined;
+
+		if (!bucket) {
+			throw new HTTPException(500, {
+				message: `Bucket binding not found: ${bucketName}`,
+			});
+		}
 
 		let filePath;
 		try {
@@ -29,12 +37,14 @@ export class HeadObject extends OpenAPIRoute {
 			);
 		}
 
-		const object = await bucket.head(filePath);
+		const objectMeta = await bucket.head(filePath);
 
-		if (object === null) {
-			return Response.json({ msg: "Object Not Found" }, { status: 404 });
+		if (objectMeta === null) {
+			// Return a Response object for 404, consistent with Hono best practices
+			throw new HTTPException(404, { message: "Object Not Found" });
 		}
 
-		return object;
+		// Return the objectMeta, because the dashboard needs to read user defined metadata
+		return objectMeta;
 	}
 }

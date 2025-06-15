@@ -1,4 +1,5 @@
 import { OpenAPIRoute } from "chanfana";
+import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import type { AppContext } from "../../types";
 
@@ -29,7 +30,14 @@ export class ListObjects extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const data = await this.getValidatedData<typeof this.schema>();
 
-		const bucket = c.env[data.params.bucket];
+		const bucketName = data.params.bucket;
+		const bucket = c.env[bucketName] as R2Bucket | undefined;
+
+		if (!bucket) {
+			throw new HTTPException(500, {
+				message: `Bucket binding not found: ${bucketName}`,
+			});
+		}
 
 		c.header("Access-Control-Allow-Credentials", "asads");
 
