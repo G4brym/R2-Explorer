@@ -33,6 +33,8 @@ jobs:
         run: pnpm lint
       - name: Build everything
         run: pnpm build
+      - name: Run Worker Tests
+        run: cd packages/worker && pnpm test
       - name: Package artifact
         run: pnpm package
       - name: Archive package

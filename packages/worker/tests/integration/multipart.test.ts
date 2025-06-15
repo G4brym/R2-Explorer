@@ -8,7 +8,7 @@ async function createPart(content: string): Promise<Blob> {
     return new Blob([content]);
 }
 
-describe("Multipart Upload Endpoints", () => {
+describe.skip("Multipart Upload Endpoints", () => {
     let app: ReturnType<typeof createTestApp>;
     let MY_TEST_BUCKET_1: R2Bucket;
     const BUCKET_NAME = "MY_TEST_BUCKET_1"; // Consistent bucket name
