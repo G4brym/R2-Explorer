@@ -7,6 +7,7 @@ Email Explorer is a feature, that allows you and your team to see and open email
 
 It works by catching the emails you configure to send to your R2 Explorer instance, saving theses
 in a R2 bucket and then exposing a UI built around the R2 API.
+Currently, Email Explorer focuses on receiving and viewing emails. Functionality to send emails is planned for a future update.
 
 
 ## Are there new features coming to Email Explorer?
