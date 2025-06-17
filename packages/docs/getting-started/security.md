@@ -1,10 +1,12 @@
+# Security
+
 ## Basic Auth
 
 Basic Auth was added in the `v1.0.2`, with support for multiple users.
 
 To enable this feature, update your `src/index.ts` file with the desired usernames and passwords.
 
-```ts title="src/index.ts"
+```ts:src/index.ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({ readonly: false, basicAuth: [{
@@ -27,7 +29,7 @@ wrangler deploy
 
 You can also define just a single user like this:
 
-```ts title="src/index.ts"
+```ts:src/index.ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({ readonly: false, basicAuth: {
@@ -46,13 +48,13 @@ You can find the team name, in the Zero trust dashboard -> Settings -> Custom Pa
 
 In my account the team name is `r2explorer`.
 
-![Cloudflare Zero Trust Dashboard](../assets/cloudflare-access.png)
+![Cloudflare Zero Trust Dashboard](/assets/cloudflare-access.png)
 
 ---
 
 Now update your `src/index.ts` file with the team name, like this:
 
-```ts title="src/index.ts"
+```ts:src/index.ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({ readonly: false, cfAccessTeamName: 'r2explorer' });

@@ -1,3 +1,5 @@
+# Deploy your instance
+
 To deploy your application is just need to be in its root folder, in the same level as the `wrangler.toml` file.
 
 To deploy, run the `wrangler deploy` command, wrangler will then start to build and deploy your application.

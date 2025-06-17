@@ -1,7 +1,9 @@
+# Update your project
+
 R2 Explorer receives updates regularly, you will be prompted to update your application inside your
 instance, in the bottom left connor, like this:
 
-![Update available](../assets/update-available.png)
+![Update available](/assets/update-available.png)
 
 ## Manual update
 
@@ -25,10 +27,8 @@ To start the update, just click sync fork and then click update branch.
 
 This will update your fork and trigger an automatic deploy to update your Cloudflare worker.
 
-!!! warning
+:::warning
+Update using github actions, **requires** you to setup your instance following this [tutorial here](./creating-a-new-project.html).
+:::
 
-    Update using github actions, **requires** you to setup your instance following this [tutorial here](./creating-a-new-project.md).
-
-
-![update](../assets/github-action/update-available.png)
-
+![update](/assets/github-action/update-available.png)

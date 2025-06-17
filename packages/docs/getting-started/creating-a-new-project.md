@@ -1,18 +1,20 @@
+# Create a new project
+
 ## 1st Method (Github Action - Recommended)
 
 Start by creating a new fork of the [github repository here](https://github.com/G4brym/R2-Explorer/fork).
 
-![Fork](../assets/github-action/fork.png)
+![Fork](/assets/github-action/fork.png)
 
 Create a new API Token as described in the [official Cloudflare Docs](https://developers.cloudflare.com/workers/wrangler/migration/v1-to-v2/wrangler-legacy/authentication/#api-token).
 
 Then, in your new repository go to Settings -> Secret and variables -> Actions -> New repository secret.
 
-![new secret](../assets/github-action/new-secret.png)
+![new secret](/assets/github-action/new-secret.png)
 
 Create a new secret with the name `CF_API_TOKEN` and the value as the newly created token.
 
-![add cf token](../assets/github-action/add-cf-token.png)
+![add cf token](/assets/github-action/add-cf-token.png)
 
 Now switch to the variables tab and create the following variables:
 
@@ -30,12 +32,12 @@ Example variables:
 - `R2EXPLORER_DOMAIN => my-domain.com`
 
 
-![add variables](../assets/github-action/add-variables.png)
+![add variables](/assets/github-action/add-variables.png)
 
 
 Now go to the github repository and click Actions -> I understand my workflows, go ahead and enable them.
 
-![enable actions](../assets/github-action/enable-actions.png)
+![enable actions](/assets/github-action/enable-actions.png)
 
 
 After enabling actions, go ahead and trigger a new deploy, you can use this flow at any time to re-deploy
@@ -43,7 +45,7 @@ your application.
 
 Click Actions -> Deploy -> Run workflow -> Run workflow.
 
-![trigger update](../assets/github-action/trigger-update.png)
+![trigger update](/assets/github-action/trigger-update.png)
 
 
 ## 2nd Method (create-cloudflare)
@@ -58,9 +60,9 @@ npm create cloudflare@latest r2-explorer -- --template "G4brym/R2-Explorer/templ
 This command with automatically create the project files locally and install all dependencies.
 
 
-!!! note
-
-    This uses the official create-cloudflare package, your wrangler informations are never shared with r2-explorer!
+:::info
+This uses the official create-cloudflare package, your wrangler informations are never shared with r2-explorer!
+:::
 
 
 ## 3rd Method (manual template)

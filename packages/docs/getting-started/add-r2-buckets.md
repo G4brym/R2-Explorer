@@ -7,7 +7,7 @@ After creating the buckets you want in the [Cloudflare dashboard](https://dash.c
 Update your `wrangler.toml` file, and add the binding for all the buckets you want to access. In this example i'm
 adding 2 buckets to my application called `personal-files` and `server-backups`:
 
-```ts title="wrangler.toml"
+```ts:wrangler.toml
 name = "my-r2-explorer"
 main = "src/index.ts"
 compatibility_date = "2023-05-12"
@@ -29,8 +29,7 @@ After this, just deploy your application normally with:
 wrangler deploy
 ```
 
-!!! note
-
-    Notice that you can customize the `binding` name to be whatever you would like and that name is used inside the 
-    dashboard to access the bucket.
-    
+:::info
+Notice that you can customize the `binding` name to be whatever you would like and that name is used inside the
+dashboard to access the bucket.
+:::

@@ -1,3 +1,5 @@
+# Configuration
+
 All customizations are applied in the `src/index.ts` file.
 
 Here is all the available options:
@@ -7,8 +9,8 @@ Here is all the available options:
 | `readonly`         | `boolean` or `undefined`  | Controls the write access globally, default: `true`                                                                                           | `true`                                                    |
 | `cors`             | `boolean` or `undefined`  | Enables or disables CORS access to the internal API, default: `false`                                                                         | `true`                                                    |
 | `cfAccessTeamName` | `string`  or `undefined`  | When set enforces Cloudflare Access in all requests                                                                                           | `radar`  (taken from https://radar.cloudflareaccess.com/) |
-| `dashboardUrl`     | `string`  or `undefined`  | Allows you to serve a custom dashboard, read more [here](../guides/migrating-to-1.0.md/#why-is-the-dashboard-no-longer-bundled-in-the-worker) | `https://demo.r2explorer.com`                             |
-| `emailRouting`     | `object`  or `undefined`  | Customize Email Explorer, read more [here](../guides/setup-email-explorer.md)                                                                 | `https://demo.r2explorer.com`                             |
+| `dashboardUrl`     | `string`  or `undefined`  | Allows you to serve a custom dashboard, read more [here](/guides/migrating-to-1.0.html#why-is-the-dashboard-no-longer-bundled-in-the-worker) | `https://demo.r2explorer.com`                             |
+| `emailRouting`     | `object`  or `undefined`  | Customize Email Explorer, read more [here](/guides/setup-email-explorer.html)                                                                 | `https://demo.r2explorer.com`                             |
 | `cacheAssets`      | `boolean`  or `undefined` | Cache dashboard assets by 5 minutes, default: `true`                                                                                          | `https://demo.r2explorer.com`                             |
 
 `emailRouting` options:
@@ -22,7 +24,7 @@ Here is all the available options:
 For security reasons, by default your application will be in read only mode, to disable this, just update your
 `src/index.ts` file, like this:
 
-```ts title="src/index.ts"
+```ts:src/index.ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({ readonly: false });
@@ -34,11 +36,11 @@ After this, just deploy your application normally with:
 wrangler deploy
 ```
 
-!!! danger
+:::danger
+Disabling read only mode, allows **anyone** to upload and change your bucket!
 
-    Disabling read only mode, allows **anyone** to upload and change your bucket!
-
-    It is highly recommended to enable authentication in your application, read more [here](./security.md)
+It is highly recommended to enable authentication in your application, read more [here](./security.html)
+:::
 
 ## Setup Custom Domain
 
@@ -47,14 +49,14 @@ the [Cloudflare dashboard](https://dash.cloudflare.com/?to=/:account/workers/ser
 and go to Workers & Pages ->
 your worker -> Triggers. And click "Add Custom Domain".
 
-![Cloudflare Workers Dashboard](../assets/custom-domain.png)
+![Cloudflare Workers Dashboard](/assets/custom-domain.png)
 
 ## Configuring Email Explorer target bucket
 
 By default emails will go to the 1º bucket configured in your `wrangler.toml` file, but you can overwrite it
 in the `index.ts` file, like:
 
-```ts title="src/index.ts"
+```ts:src/index.ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({

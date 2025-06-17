@@ -3,7 +3,6 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"prepare": "husky",
 		"workers-ci": "export WORKERS_CI=1 && node packages/github-action/prepareDeploy.js",
 		"lint": "npx @biomejs/biome check template/ packages/dashboard/src packages/worker/src || (npx @biomejs/biome check --write template/ packages/dashboard/src packages/worker/src/; exit 1)",
 		"build-dashboard": "pnpm run --filter r2-explorer-dashboard build",
@@ -17,7 +16,6 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
-		"husky": "^9.1.7",
-		"wrangler": "^3.99.0"
+		"wrangler": "^4.20.1"
 	}
 }
