@@ -41,7 +41,7 @@ export default defineConfig({
     ],
     footer: {
       message: 'Released under the MIT License.',
-      copyright: 'Copyright © 2024-present Gabriel Massadas'
+      copyright: 'Copyright © 2023-present Gabriel Massadas'
     },
     editLink: {
       pattern: 'https://github.com/G4brym/R2-Explorer/edit/main/packages/docs/:path',

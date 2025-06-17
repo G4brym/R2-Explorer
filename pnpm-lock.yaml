@@ -69,12 +69,6 @@ importers:
 
   packages/docs:
     devDependencies:
-      wrangler:
-        specifier: ^4.7.2
-        version: 4.14.1
-
-  packages/docs-new:
-    devDependencies:
       vitepress:
         specifier: ^1.6.3
         version: 1.6.3(@algolia/client-search@5.27.0)(@types/node@22.10.1)(axios@1.7.8)(postcss@8.5.5)(sass@1.81.1)(search-insights@2.17.3)(terser@5.36.0)(typescript@5.7.2)

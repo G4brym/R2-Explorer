@@ -33,37 +33,29 @@ Read this in other languages: [Español](https://r2explorer-com.translate.goog/?
 
 ## Features
 
-- Self-hosted/Deployed on your own Cloudflare Account
-- [Receive and read emails](/guides/setup-email-explorer.html) (via Cloudflare Email Routing)
+- **🔒 Security**
+  - Basic Authentication support
+  - Cloudflare Access integration
+  - Self-hosted on your Cloudflare account
 
-### Security:
-- [Basic Auth](/getting-started/security.html#basic-auth)
-- [Cloudflare Access](/getting-started/security.html#authenticating-with-cloudflare-access)
+- **📁 File Management**
+  - Drag-and-drop file upload
+  - Folder creation and organization
+  - Multi-part upload for large files
+  - Right-click context menu for advanced options
+  - HTTP/Custom metadata editing
 
-### Managing files:
-- In-browser File preview (pdf, image, txt, markdown, csv, logpush...)
-- In-browser File editing
-- Drag-and-Drop upload
-- Upload files or folders with files
-- Multipart upload for big files
-- HTTP/Custom metadata edit
+- **👀 File Handling**
+  - In-browser file preview
+    - PDF documents
+    - Images
+    - Text files
+    - Markdown
+    - CSV
+    - Logpush files
+  - In-browser file editing
+  - Folder upload support
 
-### Organization:
-- Create folders
-- Upload/Rename/Download/Delete files
-- Right click in file for extra options
-
-## Coming soon
-
-- allow bucket names with spaces
-- Search files
-- Rename folders
-- Image thumbnail's ?
-- Object detection on images using workers-ai ?
-- Tooltip when hovering a file with absolute time in "x days time ago" format
-- support for responding to emails
-- More advanced file editing with more validations per file type
-
-## Known issues
-
-- Email inline images and assets don't load when using basic auth
+- **📧 Email Integration**
+  - Receive and process emails via Cloudflare Email Routing
+  - View email attachments directly in the interface
