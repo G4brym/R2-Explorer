@@ -59,3 +59,4 @@ Read this in other languages: [Español](https://r2explorer-com.translate.goog/?
 - **📧 Email Integration**
   - Receive and process emails via Cloudflare Email Routing
   - View email attachments directly in the interface
+          - (Sending email functionality is planned for a future release)

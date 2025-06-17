@@ -10,7 +10,7 @@ Here is all the available options:
 | `cors`             | `boolean` or `undefined`  | Enables or disables CORS access to the internal API, default: `false`         | `true`                                                    |
 | `cfAccessTeamName` | `string`  or `undefined`  | When set enforces Cloudflare Access in all requests                           | `radar`  (taken from https://radar.cloudflareaccess.com/) |
 | `emailRouting`     | `object`  or `undefined`  | Customize Email Explorer, read more [here](/guides/setup-email-explorer.html) | `https://demo.r2explorer.com`                             |
-| `cacheAssets`      | `boolean`  or `undefined` | Cache dashboard assets by 5 minutes, default: `true`                          | `https://demo.r2explorer.com`                             |
+| `cacheAssets`      | `boolean`  or `undefined` | Cache dashboard assets by 5 minutes, default: `true`                          | `true`                                                    |
 
 `emailRouting` options:
 
