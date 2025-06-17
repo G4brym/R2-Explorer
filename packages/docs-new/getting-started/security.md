@@ -1,3 +1,5 @@
+# Security
+
 ## Basic Auth
 
 Basic Auth was added in the `v1.0.2`, with support for multiple users.

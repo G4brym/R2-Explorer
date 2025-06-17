@@ -1,3 +1,5 @@
+# Update your project
+
 R2 Explorer receives updates regularly, you will be prompted to update your application inside your
 instance, in the bottom left connor, like this:
 

@@ -1,4 +1,4 @@
-## What is Email Explorer?
+# What is Email Explorer?
 
 Email Explorer is a feature, that allows you and your team to see and open email received using
 [Cloudflare Email routing](https://www.cloudflare.com/developer-platform/email-routing/).

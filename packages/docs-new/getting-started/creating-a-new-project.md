@@ -1,3 +1,5 @@
+# Create a new project
+
 ## 1st Method (Github Action - Recommended)
 
 Start by creating a new fork of the [github repository here](https://github.com/G4brym/R2-Explorer/fork).

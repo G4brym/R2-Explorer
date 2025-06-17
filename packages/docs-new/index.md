@@ -3,11 +3,9 @@ sidebar: false
 outline: false
 ---
 
-# R2 Explorer
-
 <div align="center">
   <a href="https://r2explorer.com/">
-    <img src="https://raw.githubusercontent.com/G4brym/R2-explorer/refs/heads/main/packages/docs/pages/assets/r2-explorer-logo.png" width="500" height="auto" alt="R2-Explorer"/>
+    <img src="/assets/r2-explorer-logo.png" width="500" height="auto" alt="R2-Explorer"/>
   </a>
 </div>
 
@@ -29,28 +27,20 @@ outline: false
 
 <hr />
 
-**Documentation**: <a href="/index.html">r2explorer.com</a>
-
-**Demo**: <a href="https://demo.r2explorer.com/">demo.r2explorer.com</a>
-
-**Source Code**: <a href="https://github.com/G4brym/R2-Explorer/">github.com/G4brym/R2-Explorer</a>
-
-<hr />
-
-Read this in other languages: [Español](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=wapp),
-[Português](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=pt-PT&_x_tr_hl=pt-PT&_x_tr_pto=wapp),
-[Français](https://r2explorer-dev.translate.goog/?_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=fr&_x_tr_pto=wapp)
+Read this in other languages: [Español](https://r2explorer-com.translate.goog/?_x_tr_sl=en&_x_tr_tl=es&_x_tr_hl=es&_x_tr_pto=wapp),
+[Português](https://r2explorer-com.translate.goog/?_x_tr_sl=en&_x_tr_tl=pt-PT&_x_tr_hl=pt-PT&_x_tr_pto=wapp),
+[Français](https://r2explorer-com.translate.goog/?_x_tr_sl=en&_x_tr_tl=fr&_x_tr_hl=fr&_x_tr_pto=wapp)
 
 ## Features
 
 - Self-hosted/Deployed on your own Cloudflare Account
 - [Receive and read emails](/guides/setup-email-explorer.html) (via Cloudflare Email Routing)
 
-##### Security:
+### Security:
 - [Basic Auth](/getting-started/security.html#basic-auth)
 - [Cloudflare Access](/getting-started/security.html#authenticating-with-cloudflare-access)
 
-##### Managing files:
+### Managing files:
 - In-browser File preview (pdf, image, txt, markdown, csv, logpush...)
 - In-browser File editing
 - Drag-and-Drop upload
@@ -58,18 +48,10 @@ Read this in other languages: [Español](https://r2explorer-dev.translate.goog/?
 - Multipart upload for big files
 - HTTP/Custom metadata edit
 
-##### Organization:
+### Organization:
 - Create folders
 - Upload/Rename/Download/Delete files
 - Right click in file for extra options
-
-## Installation
-
-1. Method: [Github Action](/getting-started/creating-a-new-project.html#1st-method-github-action-recommended)
-2. Method: [Create Cloudflare CLI](/getting-started/creating-a-new-project.html#2nd-method-create-cloudflare)
-3. Method: [Template](https://github.com/G4brym/R2-Explorer/tree/main/template)
-
-Learn more about keeping your instance updated in the [Updating your project docs](/getting-started/updating-your-project.html).
 
 ## Coming soon
 

@@ -1,3 +1,5 @@
+# Configuration
+
 All customizations are applied in the `src/index.ts` file.
 
 Here is all the available options:
