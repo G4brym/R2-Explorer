@@ -28,8 +28,7 @@ the domain you want to setup.
 :::warning
 Email Explorer requires that you have at least R2 Explorer `v1.0.0`.
 
-Follow the [create a new project](/getting-started/creating-a-new-project.html) or
-[migrate to 1.0](./migrating-to-1.0.html) guides!
+Follow the [create a new project](/getting-started/creating-a-new-project.html)
 :::
 
 Open the Email -> Email Routing

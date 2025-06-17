@@ -1,0 +1,7 @@
+name = "r2-explorer-docs"
+compatibility_date = "2025-06-06"
+assets = { directory = "./.vitepress/dist/" }
+account_id = "1491da2cccde0851501a6a5e63cfa82c"
+
+[build]
+command = "npm run build"

@@ -1,17 +1,13 @@
 {
   "name": "docs-new",
   "version": "1.0.0",
-  "description": "A VitePress site",
-  "main": "",
   "scripts": {
-    "docs:dev": "vitepress dev",
-    "docs:build": "vitepress build",
-    "docs:preview": "vitepress preview"
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
   },
-  "keywords": ["vitepress", "documentation"],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
-    "vitepress": "^1.6.3"
+    "vitepress": "^1.6.3",
+    "wrangler": "^4.20.1"
   }
 }
