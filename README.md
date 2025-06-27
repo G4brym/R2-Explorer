@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://r2explorer.com/">
-    <img src="https://raw.githubusercontent.com/G4brym/R2-explorer/refs/heads/main/packages/docs/pages/assets/r2-explorer-logo.png" width="500" height="auto" alt="R2-Explorer"/>
+    <img src="https://raw.githubusercontent.com/G4brym/R2-explorer/refs/heads/main/packages/docs/public/assets/r2-explorer-logo.png" width="500" height="auto" alt="R2-Explorer"/>
   </a>
 </div>
 
@@ -19,6 +19,8 @@
       <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=social" alt="Software License">
     </a>
 </p>
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/r2-explorer-template)
 
 # R2-Explorer
 
