@@ -11,9 +11,11 @@ export type R2ExplorerConfig = {
 	cors?: boolean;
 	cfAccessTeamName?: string;
 	dashboardUrl?: string;
-	emailRouting?: {
-		targetBucket: string;
-	};
+	emailRouting?:
+		| {
+				targetBucket: string;
+		  }
+		| false;
 	showHiddenFiles?: boolean;
 	basicAuth?: BasicAuth | BasicAuth[];
 };
