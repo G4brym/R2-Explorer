@@ -2,6 +2,9 @@ import {defineConfig} from 'vitepress'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
+  sitemap: {
+    hostname: 'https://r2explorer.com'
+  },
   title: 'R2 Explorer',
   description: 'A Google Drive Interface for your Cloudflare R2 Buckets',
   head: [['link', { rel: 'icon', href: '/assets/logo.svg' }]],
