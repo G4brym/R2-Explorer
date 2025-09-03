@@ -12,7 +12,8 @@
 		"README.md"
 	],
 	"scripts": {
-		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
+		"build": "tsup src/index.ts --format cjs,esm --dts",
+		"build-with-dashboard": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
 		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
 		"test": "npx vitest run --config tests/vitest.config.mts",
 		"package": "npm run build && npm pack",

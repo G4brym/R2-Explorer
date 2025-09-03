@@ -1,11 +1,14 @@
-name = "my-r2-explorer"
+name = "spendrule-doc-upload-dashboard"
 compatibility_date = "2024-11-06"
 main = "index.ts"
 workers_dev = true
+
+# SpendRule dashboard assets  
 assets = { directory = "../../dashboard/dist/spa", binding = "ASSETS", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
 
+# SpendRule R2 bucket
 [[r2_buckets]]
-binding = 'teste'
-bucket_name = 'teste'
-preview_bucket_name = 'teste'
+binding = 'secure-uploads'
+bucket_name = 'secure-uploads'
+preview_bucket_name = 'secure-uploads-preview'
 
