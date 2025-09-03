@@ -25,11 +25,5 @@ DEFAULT_BUCKET = "secure-uploads"
 command = "echo 'API-only worker - no dashboard build needed'"
 cwd = "."
 
-# Development configuration  
-[env.dev]
-name = "spendrule-doc-upload-dev"
-vars = { SPENDRULE_MODE = "true", DEFAULT_BUCKET = "secure-uploads" }
-
-[env.production] 
-name = "spendrule-doc-upload-prod"
-vars = { SPENDRULE_MODE = "true", DEFAULT_BUCKET = "secure-uploads" }
+# Remove environment configs to eliminate warning
+# Single production deployment
