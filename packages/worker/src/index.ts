@@ -76,12 +76,6 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 		app.use("/api/*", readOnlyMiddleware);
 	}
 
-	// SpendRule: Add health group isolation middleware after authentication
-	if (config.basicAuth) {
-		app.use("/api/buckets/*", healthGroupIsolationMiddleware);
-		app.use("/api/buckets/*", autoCategorizationMiddleware);
-	}
-
 	if (config.cfAccessTeamName) {
 		app.use("/api/*", cloudflareAccess(config.cfAccessTeamName));
 		app.use("/api/*", async (c, next) => {
@@ -119,6 +113,12 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 				},
 			}),
 		);
+	}
+
+	// SpendRule: Add health group isolation middleware after authentication
+	if (config.basicAuth) {
+		app.use("/api/buckets/*", healthGroupIsolationMiddleware);
+		app.use("/api/buckets/*", autoCategorizationMiddleware);
 	}
 
 	openapi.get("/api/server/config", GetInfo);

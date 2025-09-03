@@ -46,13 +46,18 @@ export const useAuthStore = defineStore("auth", {
 			const mainStore = useMainStore();
 			api.defaults.headers.common["Authorization"] = `Basic ${token}`;
 
-			authed = await mainStore.loadServerConfigs(router, q, true);
-			if (!authed) {
+			try {
+				authed = await mainStore.loadServerConfigs(router, q, true);
+				if (!authed) {
+					delete api.defaults.headers.common["Authorization"];
+					return false;
+				}
+				return true; // Return true when authentication succeeds
+			} catch (error) {
+				console.log("Auth check failed:", error);
 				delete api.defaults.headers.common["Authorization"];
 				return false;
 			}
-
-			return false;
 		},
 		async LogOut(router) {
 			localStorage.removeItem(SESSION_KEY);
