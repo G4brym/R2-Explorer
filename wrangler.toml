@@ -19,12 +19,10 @@ preview_bucket_name = "secure-uploads-preview"
 SPENDRULE_MODE = "true"
 DEFAULT_BUCKET = "secure-uploads"
 
-# SpendRule dashboard assets
-assets = { directory = "packages/dashboard/dist/spa", binding = "ASSETS", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
-
-# Build configuration  
+# No assets - dashboard deployed separately on Cloudflare Pages
+# Build configuration - API only
 [build]
-command = "pnpm build-dashboard && echo 'Dashboard built successfully'"
+command = "echo 'API-only worker - no dashboard build needed'"
 cwd = "."
 
 # Development configuration  

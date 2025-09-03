@@ -28,9 +28,52 @@ const spendRuleConfig = {
 
 export default {
 	async email(event, env, context) {
-		await R2Explorer(spendRuleConfig).email(event, env, context);
+		const explorer = R2Explorer(spendRuleConfig);
+		return await explorer.email(event, env, context);
 	},
 	async fetch(request, env, context) {
-		return R2Explorer(spendRuleConfig).fetch(request, env, context);
+		const url = new URL(request.url);
+		
+		// Handle CORS preflight requests
+		if (request.method === 'OPTIONS') {
+			return new Response(null, {
+				headers: {
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+					'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+				},
+			});
+		}
+		
+		// Only handle API routes, let dashboard be served separately
+		if (url.pathname.startsWith('/api/')) {
+			const explorer = R2Explorer(spendRuleConfig);
+			const response = await explorer.fetch(request, env, context);
+			
+			// Add CORS headers to API responses
+			response.headers.set('Access-Control-Allow-Origin', '*');
+			response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+			response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+			
+			return response;
+		}
+		
+		// For non-API routes, return info about the API
+		return new Response(JSON.stringify({
+			message: "SpendRule Document Management API",
+			version: "1.0.0",
+			endpoints: {
+				server_config: "/api/server/config",
+				list_files: "/api/buckets/secure-uploads",
+				upload_file: "/api/buckets/secure-uploads/upload",
+			},
+			dashboard: "Deploy dashboard separately on Cloudflare Pages",
+			authentication: "Basic Auth required for all API endpoints"
+		}), {
+			headers: {
+				'Content-Type': 'application/json',
+				'Access-Control-Allow-Origin': '*',
+			},
+		});
 	},
 };

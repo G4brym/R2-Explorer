@@ -18,7 +18,8 @@ export const useMainStore = defineStore("main", {
 			if (process.env.NODE_ENV === "development") {
 				return process.env.VUE_APP_SERVER_URL || "http://localhost:8787";
 			}
-			return window.location.origin;
+			// SpendRule: Point to the worker API URL
+			return "https://spendrule-doc-upload-dashboard.oluwamakinwa.workers.dev";
 		},
 	},
 	actions: {
