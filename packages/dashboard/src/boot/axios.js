@@ -7,7 +7,8 @@ import { boot } from "quasar/wrappers";
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-let url = window.location.origin;
+// SpendRule: Point to the worker API URL
+let url = "https://spendrule-doc-upload-dashboard.oluwamakinwa.workers.dev";
 if (process.env.NODE_ENV === "development") {
 	url = process.env.VUE_APP_SERVER_URL || "http://localhost:8787";
 }

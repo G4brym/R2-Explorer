@@ -47,15 +47,32 @@ export default {
 		
 		// Only handle API routes, let dashboard be served separately
 		if (url.pathname.startsWith('/api/')) {
-			const explorer = R2Explorer(spendRuleConfig);
-			const response = await explorer.fetch(request, env, context);
-			
-			// Add CORS headers to API responses
-			response.headers.set('Access-Control-Allow-Origin', '*');
-			response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-			response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-			
-			return response;
+			try {
+				const explorer = R2Explorer(spendRuleConfig);
+				const response = await explorer.fetch(request, env, context);
+				
+				// Add CORS headers to API responses
+				response.headers.set('Access-Control-Allow-Origin', '*');
+				response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+				response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+				
+				return response;
+			} catch (error) {
+				// Return error with CORS headers
+				return new Response(JSON.stringify({
+					error: error.message,
+					path: url.pathname,
+					method: request.method
+				}), {
+					status: 500,
+					headers: {
+						'Content-Type': 'application/json',
+						'Access-Control-Allow-Origin': '*',
+						'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+						'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+					},
+				});
+			}
 		}
 		
 		// For non-API routes, return info about the API
@@ -66,6 +83,10 @@ export default {
 				server_config: "/api/server/config",
 				list_files: "/api/buckets/secure-uploads",
 				upload_file: "/api/buckets/secure-uploads/upload",
+			},
+			test_endpoints: {
+				"GET /api/server/config": "Server configuration and auth info",
+				"GET /api/buckets/secure-uploads": "List files (requires auth)",
 			},
 			dashboard: "Deploy dashboard separately on Cloudflare Pages",
 			authentication: "Basic Auth required for all API endpoints"
