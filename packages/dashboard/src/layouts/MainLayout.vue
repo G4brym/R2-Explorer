@@ -6,7 +6,7 @@
         <!-- SpendRule Logo/Brand -->
         <q-toolbar-title class="text-h6 q-mr-md">
           <q-icon name="health_and_safety" size="sm" class="q-mr-xs" />
-          SpendRule Document Manager
+          SpendRule Doc Upload
         </q-toolbar-title>
 
         <top-bar @toggle="toggleLeftDrawer"/>

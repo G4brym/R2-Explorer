@@ -1,7 +1,7 @@
 # SpendRule Document Management System Configuration
 # Based on R2-Explorer framework
 
-name = "spendrule-document-system"
+name = "spendrule-doc-upload"
 main = "packages/worker/dist/index.js"
 compatibility_date = "2024-11-01"
 
@@ -26,9 +26,9 @@ cwd = "."
 
 # Development configuration  
 [env.dev]
-name = "spendrule-document-system-dev"
+name = "spendrule-doc-upload-dev"
 vars = { SPENDRULE_MODE = "true", DEFAULT_BUCKET = "secure-uploads" }
 
 [env.production] 
-name = "spendrule-document-system-prod"
+name = "spendrule-doc-upload-prod"
 vars = { SPENDRULE_MODE = "true", DEFAULT_BUCKET = "secure-uploads" }
