@@ -1,8 +1,8 @@
 # SpendRule Document Management System Configuration
 # Based on R2-Explorer framework
 
-name = "spendrule-doc-upload"
-main = "packages/worker/dist/index.js"
+name = "spendrule-doc-upload-dashboard"
+main = "packages/worker/dev/index.ts"
 compatibility_date = "2024-11-01"
 
 # SpendRule R2 bucket binding
@@ -19,9 +19,12 @@ preview_bucket_name = "secure-uploads-preview"
 SPENDRULE_MODE = "true"
 DEFAULT_BUCKET = "secure-uploads"
 
+# SpendRule dashboard assets
+assets = { directory = "packages/dashboard/dist/spa", binding = "ASSETS", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
+
 # Build configuration
 [build]
-command = "pnpm build-worker"
+command = "pnpm build-dashboard"
 cwd = "."
 
 # Development configuration  
