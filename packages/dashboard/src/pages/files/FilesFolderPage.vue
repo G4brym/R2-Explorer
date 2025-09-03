@@ -5,6 +5,9 @@
         <q-breadcrumbs-el style="cursor: pointer" v-for="obj in breadcrumbs" :key="obj.name" :label="obj.name" @click="breadcrumbsClick(obj)" />
       </q-breadcrumbs>
 
+      <!-- SpendRule Document Category Hint -->
+      <document-category-hint />
+
       <drag-and-drop ref="uploader">
 
         <q-table
@@ -83,6 +86,8 @@ import FileOptions from "components/files/FileOptions.vue";
 import FilePreview from "components/preview/FilePreview.vue";
 import DragAndDrop from "components/utils/DragAndDrop.vue";
 import FileContextMenu from "pages/files/FileContextMenu.vue";
+import DocumentCategoryHint from "components/spendrule/DocumentCategoryHint.vue";
+import SpendRuleUploadStatus from "components/spendrule/SpendRuleUploadStatus.vue";
 import { useQuasar } from "quasar";
 import { useMainStore } from "stores/main-store";
 import { defineComponent } from "vue";
@@ -90,7 +95,14 @@ import { ROOT_FOLDER, apiHandler, decode, encode } from "../../appUtils";
 
 export default defineComponent({
 	name: "FilesIndexPage",
-	components: { FileContextMenu, FileOptions, DragAndDrop, FilePreview },
+	components: { 
+		FileContextMenu, 
+		FileOptions, 
+		DragAndDrop, 
+		FilePreview, 
+		DocumentCategoryHint, 
+		SpendRuleUploadStatus 
+	},
 	data: () => ({
 		loading: false,
 		rows: [],

@@ -1,8 +1,13 @@
 <template>
   <q-layout view="hHh LpR lFr">
 
-    <q-header reveal class="bg-green text-white">
+    <q-header reveal class="bg-blue-8 text-white">
       <q-toolbar>
+        <!-- SpendRule Logo/Brand -->
+        <q-toolbar-title class="text-h6 q-mr-md">
+          <q-icon name="health_and_safety" size="sm" class="q-mr-xs" />
+          SpendRule Document Manager
+        </q-toolbar-title>
 
         <top-bar @toggle="toggleLeftDrawer"/>
 

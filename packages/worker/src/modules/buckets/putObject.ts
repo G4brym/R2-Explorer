@@ -50,7 +50,20 @@ export class PutObject extends OpenAPIRoute {
 			});
 		}
 
-		const key = decodeURIComponent(escape(atob(data.query.key)));
+		let key = decodeURIComponent(escape(atob(data.query.key)));
+
+		// SpendRule: Check if auto-categorization suggested a different path
+		const suggestedPath = c.get("suggested_path");
+		if (suggestedPath) {
+			// Return the suggested path for the frontend to handle
+			return c.json({
+				success: false,
+				suggestedPath: suggestedPath,
+				documentType: c.get("document_type"),
+				message: `File should be uploaded to ${c.get("document_type")} folder`,
+				originalPath: key,
+			});
+		}
 
 		let customMetadata = undefined;
 		if (data.query.customMetadata) {
@@ -66,9 +79,27 @@ export class PutObject extends OpenAPIRoute {
 			);
 		}
 
-		return await bucket.put(key, c.req.raw.body, {
+		// SpendRule: Add document metadata
+		const documentMetadata = c.get("document_metadata");
+		if (documentMetadata) {
+			customMetadata = {
+				...customMetadata,
+				...documentMetadata,
+				fileSize: c.req.raw.body ? await c.req.raw.clone().arrayBuffer().then(buf => buf.byteLength) : 0,
+			};
+		}
+
+		const result = await bucket.put(key, c.req.raw.body, {
 			customMetadata: customMetadata,
 			httpMetadata: httpMetadata,
+		});
+
+		// SpendRule: Return enhanced response with metadata
+		return c.json({
+			success: true,
+			result: result,
+			metadata: customMetadata,
+			path: key,
 		});
 	}
 }

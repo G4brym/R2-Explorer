@@ -9,6 +9,8 @@ import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { z } from "zod";
 import { readOnlyMiddleware } from "./foundation/middlewares/readonly";
+import { healthGroupIsolationMiddleware } from "./foundation/middlewares/healthGroupIsolation";
+import { autoCategorizationMiddleware } from "./foundation/middlewares/autoCategorization";
 import { settings } from "./foundation/settings";
 import { CreateFolder } from "./modules/buckets/createFolder";
 import { DeleteObject } from "./modules/buckets/deleteObject";
@@ -72,6 +74,12 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
 	if (config.readonly === true) {
 		app.use("/api/*", readOnlyMiddleware);
+	}
+
+	// SpendRule: Add health group isolation middleware after authentication
+	if (config.basicAuth) {
+		app.use("/api/buckets/*", healthGroupIsolationMiddleware);
+		app.use("/api/buckets/*", autoCategorizationMiddleware);
 	}
 
 	if (config.cfAccessTeamName) {

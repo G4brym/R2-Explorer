@@ -28,5 +28,20 @@ export type AppVariables = {
 	config: R2ExplorerConfig;
 	authentication_type?: string;
 	authentication_username?: string;
+	// SpendRule-specific variables
+	user_health_group?: string;
+	health_group_filter?: string;
+	suggested_path?: string;
+	document_type?: string;
+	original_filename?: string;
+	sanitized_filename?: string;
+	document_metadata?: {
+		healthGroup: string;
+		documentType: string;
+		originalFilename: string;
+		sanitizedFilename: string;
+		uploadedAt: string;
+		fileSize?: number;
+	};
 } & CloudflareAccessVariables;
 export type AppContext = Context<{ Bindings: AppEnv; Variables: AppVariables }>;

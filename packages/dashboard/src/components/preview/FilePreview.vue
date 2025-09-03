@@ -110,6 +110,22 @@
             <email-viewer :filedata="fileData" />
           </template>
 
+          <template v-else-if="type === 'visio'">
+            <div class="text-center q-pa-md">
+              <q-icon name="description" size="4em" color="orange" class="q-mb-md" />
+              <div class="text-h6 q-mb-sm">Visio File</div>
+              <div class="text-body2 text-grey-6 q-mb-md">
+                Visio files cannot be previewed in the browser.
+              </div>
+              <q-btn 
+                color="primary"
+                icon="download"
+                label="Download File"
+                @click="downloadFile"
+              />
+            </div>
+          </template>
+
           <template v-else-if="fileData">
             <div class="flex column" style="height: 100%; flex-wrap: nowrap; max-width: 100%; line-break: anywhere;">
               <q-card class="bg-orange-2" flat square>
@@ -161,7 +177,7 @@ export default {
 
 		previewConfig: [
 			{
-				extensions: ["png", "jpg", "jpeg", "webp", "avif"],
+				extensions: ["png", "jpg", "jpeg", "webp", "avif", "gif", "bmp"],
 				type: "image",
 				downloadType: "objectUrl",
 			},
@@ -214,6 +230,11 @@ export default {
 				extensions: ["eml"],
 				type: "email",
 				downloadType: "text",
+			},
+			{
+				extensions: ["vsd", "vsdx", "vsdm"],
+				type: "visio",
+				downloadType: "objectUrl",
 			},
 		],
 	}),
@@ -360,6 +381,18 @@ export default {
 			}
 
 			return `<table class="table">${result}</table>`;
+		},
+		
+		// SpendRule: Download file for Visio and other non-previewable files
+		downloadFile() {
+			if (this.file) {
+				const link = document.createElement('a');
+				link.href = this.fileData;
+				link.download = this.filename;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
 		},
 
 		// Edit functions

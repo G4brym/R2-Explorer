@@ -1,0 +1,34 @@
+# SpendRule Document Management System Configuration
+# Based on R2-Explorer framework
+
+name = "spendrule-document-system"
+main = "packages/worker/dist/index.js"
+compatibility_date = "2024-11-01"
+
+# SpendRule R2 bucket binding
+[[r2_buckets]]
+binding = "secure-uploads"
+bucket_name = "secure-uploads"
+preview_bucket_name = "secure-uploads-preview"
+
+# Environment variables can be set via wrangler secrets
+# wrangler secret put BASIC_AUTH_USERS
+
+[vars]
+# SpendRule configuration
+SPENDRULE_MODE = "true"
+DEFAULT_BUCKET = "secure-uploads"
+
+# Build configuration
+[build]
+command = "pnpm build-worker"
+cwd = "."
+
+# Development configuration  
+[env.dev]
+name = "spendrule-document-system-dev"
+vars = { SPENDRULE_MODE = "true", DEFAULT_BUCKET = "secure-uploads" }
+
+[env.production] 
+name = "spendrule-document-system-prod"
+vars = { SPENDRULE_MODE = "true", DEFAULT_BUCKET = "secure-uploads" }
