@@ -22,9 +22,9 @@ DEFAULT_BUCKET = "secure-uploads"
 # SpendRule dashboard assets
 assets = { directory = "packages/dashboard/dist/spa", binding = "ASSETS", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
 
-# Build configuration
+# Build configuration  
 [build]
-command = "pnpm build-dashboard"
+command = "pnpm build-dashboard && echo 'Dashboard built successfully'"
 cwd = "."
 
 # Development configuration  
