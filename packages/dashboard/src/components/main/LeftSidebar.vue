@@ -55,7 +55,7 @@
   <q-dialog v-model="infoPopup" persistent no-route-dismiss>
     <q-card>
       <q-card-section>
-        <div class="text-h6">🎉 Thank you for using R2-Explorer! 🚀</div>
+        <div class="text-h6">🎉 Thank you for using Explorer! 🚀</div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
