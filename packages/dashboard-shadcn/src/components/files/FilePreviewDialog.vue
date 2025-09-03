@@ -49,12 +49,13 @@
         </div>
         
         <!-- PDF Preview -->
-        <div v-else-if="isPdf" class="h-full">
-          <iframe
-            :src="previewUrl"
-            class="w-full h-full border-0"
-            @load="loading = false"
-            @error="handlePreviewError"
+        <div v-else-if="isPdf" class="h-full p-6">
+          <VuePdfEmbed 
+            v-if="previewUrl"
+            :source="previewUrl"
+            class="w-full h-full"
+            @loading-failed="handlePreviewError"
+            @loaded="loading = false"
           />
         </div>
         
@@ -97,6 +98,7 @@ import Card from '@/components/ui/Card.vue'
 import CardHeader from '@/components/ui/CardHeader.vue'
 import CardContent from '@/components/ui/CardContent.vue'
 import Button from '@/components/ui/Button.vue'
+import VuePdfEmbed from 'vue-pdf-embed'
 
 interface FileItem {
   name: string
@@ -240,6 +242,16 @@ async function loadFileContent() {
         responseType: 'blob'
       })
       
+      // Check if response is actually binary content (not HTML error)
+      const contentType = response.headers['content-type'] || response.data.type
+      
+      // Check if it's a small response (likely an error) or wrong content type
+      if (response.data.size < 1000 || (contentType && (contentType.includes('text/html') || contentType.includes('application/json')))) {
+        // Response is likely HTML/JSON error, read as text to get error message
+        const errorText = await response.data.text()
+        throw new Error(errorText.includes('"error"') ? JSON.parse(errorText).error : 'Invalid response from server')
+      }
+      
       // Clean up old blob URL if exists
       if (blobUrl.value) {
         window.URL.revokeObjectURL(blobUrl.value)
@@ -251,7 +263,7 @@ async function loadFileContent() {
   } catch (e: any) {
     error.value = e.response?.status === 404 
       ? 'File not found' 
-      : 'Failed to load file content'
+      : e.message || 'Failed to load file content'
     console.error('Failed to load file content:', e)
   } finally {
     loading.value = false

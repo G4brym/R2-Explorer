@@ -33,16 +33,18 @@ export const healthGroupIsolationMiddleware: MiddlewareHandler = async (
 			return c.json({ error: "User not assigned to a health group" }, 403);
 		}
 
-		// Check if the requested path starts with the user's health group
+		// Check if the requested path starts with the user's health group and username
 		const requestedPath = key ? `${key}` : "";
-		if (!requestedPath.startsWith(userHealthGroup)) {
+		const expectedPrefix = `${userHealthGroup}/${username}`;
+		
+		if (!requestedPath.startsWith(expectedPrefix) && requestedPath !== userHealthGroup) {
 			// For list operations without a key, enforce health group prefix
 			if (!key) {
 				c.set("health_group_filter", userHealthGroup);
 			} else {
 				return c.json(
 					{
-						error: `Access denied. You can only access ${userHealthGroup}/ folder.`,
+						error: `Access denied. You can only access ${expectedPrefix}/ folder.`,
 					},
 					403,
 				);

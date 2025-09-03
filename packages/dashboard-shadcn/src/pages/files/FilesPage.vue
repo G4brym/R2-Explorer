@@ -69,6 +69,17 @@
             New Folder
           </Button>
           <Button 
+            v-if="!isSelecting"
+            variant="outline" 
+            size="sm"
+            title="Toggle between folder view and show all files"
+            @click="showAllFiles = !showAllFiles"
+            :class="showAllFiles ? 'bg-primary text-primary-foreground' : ''"
+          >
+            <EyeIcon class="w-4 h-4 mr-2" />
+            {{ showAllFiles ? 'Folder View' : 'Show All Files' }}
+          </Button>
+          <Button 
             variant="ghost" 
             size="sm"
             title="Keyboard Shortcuts (F1)"
@@ -462,6 +473,7 @@ import {
   FolderPlusIcon,
   LoaderIcon,
   AlertCircleIcon,
+  Eye as EyeIcon,
   ArrowLeftIcon,
   MoreHorizontalIcon,
   FileIcon,
@@ -498,6 +510,7 @@ const error = ref('')
 const showUploadDialog = ref(false)
 const showCreateFolderDialog = ref(false)
 const showPreviewDialog = ref(false)
+const showAllFiles = ref(false)
 const selectedPreviewFile = ref<any>(null)
 const contextMenu = ref({
   show: false,
@@ -612,20 +625,22 @@ async function loadFiles() {
       // Client-side filtering based on current path
       const currentPrefix = currentPath.value ? `${currentPath.value}/` : ''
       
-      // Filter objects that match the current path
-      const filteredObjects = objects.filter((obj: any) => {
-        if (!currentPrefix) {
-          // Root level: show files that don't have '/' OR have only one level
-          return !obj.key.includes('/') || obj.key.split('/').length === 2
-        } else {
-          // Subfolder: show files that start with current prefix and are direct children
-          if (obj.key.startsWith(currentPrefix)) {
-            const relativePath = obj.key.substring(currentPrefix.length)
-            return !relativePath.includes('/') // Direct child, not nested further
-          }
-          return false
-        }
-      })
+      // Filter objects based on view mode
+      const filteredObjects = showAllFiles.value 
+        ? objects // Show all files when "Show All Files" is enabled
+        : objects.filter((obj: any) => {
+            if (!currentPrefix) {
+              // Root level: show files that don't have '/' OR have only one level
+              return !obj.key.includes('/') || obj.key.split('/').length === 2
+            } else {
+              // Subfolder: show files that start with current prefix and are direct children
+              if (obj.key.startsWith(currentPrefix)) {
+                const relativePath = obj.key.substring(currentPrefix.length)
+                return !relativePath.includes('/') // Direct child, not nested further
+              }
+              return false
+            }
+          })
       
       // Extract folder names from object keys
       const folderNames = new Set<string>()

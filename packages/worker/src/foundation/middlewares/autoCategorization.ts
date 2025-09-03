@@ -6,27 +6,39 @@ import type { AppContext } from "../../types";
  * Automatically categorizes uploaded documents based on filename
  */
 
-export type DocumentType = "contracts" | "invoices" | "workflows" | "other";
+export type DocumentType = "contracts" | "invoices" | "workflows" | "reports" | "forms" | "other";
 
 export const detectDocumentType = (filename: string): DocumentType => {
 	const normalizedName = filename.toLowerCase();
 
 	// Contract keywords
-	const contractKeywords = ["contract", "agreement", "msa", "sow"];
+	const contractKeywords = ["contract", "agreement", "msa", "sow", "terms"];
 	if (contractKeywords.some((keyword) => normalizedName.includes(keyword))) {
 		return "contracts";
 	}
 
 	// Invoice keywords
-	const invoiceKeywords = ["invoice", "inv", "bill", "statement"];
+	const invoiceKeywords = ["invoice", "inv", "bill", "statement", "payment"];
 	if (invoiceKeywords.some((keyword) => normalizedName.includes(keyword))) {
 		return "invoices";
 	}
 
 	// Workflow keywords
-	const workflowKeywords = ["workflow", "process", "diagram", "flow"];
+	const workflowKeywords = ["workflow", "process", "diagram", "flow", "procedure"];
 	if (workflowKeywords.some((keyword) => normalizedName.includes(keyword))) {
 		return "workflows";
+	}
+
+	// Report keywords
+	const reportKeywords = ["report", "analysis", "summary", "analytics"];
+	if (reportKeywords.some((keyword) => normalizedName.includes(keyword))) {
+		return "reports";
+	}
+
+	// Form keywords
+	const formKeywords = ["form", "application", "intake", "survey"];
+	if (formKeywords.some((keyword) => normalizedName.includes(keyword))) {
+		return "forms";
 	}
 
 	return "other";
@@ -54,11 +66,13 @@ export const autoCategorizationMiddleware: MiddlewareHandler = async (
 			const filename = key.split("/").pop() || "";
 			const documentType = detectDocumentType(filename);
 			const sanitizedFilename = sanitizeFilename(filename);
+			const username = c.get("authentication_username") || "unknown_user";
 
 			// Check if the file is being uploaded to the correct category folder
-			const expectedPath = `${userHealthGroup}/${documentType}/`;
+			// New format: health_group/username/category/filename
+			const expectedPath = `${userHealthGroup}/${username}/${documentType}/`;
 			if (!key.startsWith(expectedPath)) {
-				// Auto-redirect to the correct category folder
+				// Auto-redirect to the correct category folder with username
 				const newKey = `${expectedPath}${sanitizedFilename}`;
 				
 				// Store the suggested path for the frontend

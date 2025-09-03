@@ -77,6 +77,18 @@
                   Retrying... (attempt {{ (file.retryCount || 0) + 1 }}/3)
                 </div>
                 
+                <!-- AI Analysis Status -->
+                <div v-if="file.aiStatus === 'analyzing'" class="text-xs text-blue-600 mt-1 flex items-center">
+                  <div class="w-3 h-3 border border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  🧠 AI analyzing document...
+                </div>
+                <div v-else-if="file.aiStatus === 'completed' && file.aiResult" class="text-xs text-green-600 mt-1">
+                  ✨ AI classified as {{ file.aiResult }}
+                </div>
+                <div v-else-if="file.aiStatus === 'failed'" class="text-xs text-yellow-600 mt-1">
+                  ⚠️ AI analysis failed, using filename classification
+                </div>
+                
                 <!-- Progress bar -->
                 <div v-if="file.status !== 'completed'" class="w-full bg-muted rounded-full h-2 mt-1">
                   <div 
@@ -129,6 +141,7 @@ import { api } from '@/lib/api'
 import { UploadIcon, XIcon, FileIcon, AlertCircleIcon, CheckCircleIcon, RefreshCwIcon, FolderIcon } from 'lucide-vue-next'
 import { withRetry, handleError, networkStatus } from '@/lib/errors'
 import { toast } from '@/lib/toast'
+import { useAuthStore } from '@/stores/auth'
 import Card from '@/components/ui/Card.vue'
 import CardHeader from '@/components/ui/CardHeader.vue'
 import CardContent from '@/components/ui/CardContent.vue'
@@ -148,6 +161,8 @@ interface UploadingFile {
   status: 'uploading' | 'completed' | 'error' | 'retrying'
   error?: string
   retryCount?: number
+  aiStatus?: 'analyzing' | 'completed' | 'failed'
+  aiResult?: string
 }
 
 const props = defineProps<Props>()
@@ -155,6 +170,8 @@ const emit = defineEmits<{
   close: []
   uploaded: []
 }>()
+
+const authStore = useAuthStore()
 
 const dropZone = ref<HTMLElement>()
 const fileInput = ref<HTMLInputElement>()
@@ -349,14 +366,84 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
       
       // Handle folder structure from webkitRelativePath or regular file name
       const relativePath = (uploadFile.file as any).webkitRelativePath || uploadFile.file.name
-      const uploadPath = props.currentPath 
+      
+      // SpendRule: Auto-categorize files for henryford_user (client-side fallback)
+      let uploadPath = props.currentPath 
         ? `${props.currentPath}/${relativePath}`
         : relativePath
+        
+      // First, do immediate filename-based categorization
+      let documentType = 'other'
+      let aiSummary = ''
+      let vendor = ''
+      
+      const filename = uploadFile.file.name.toLowerCase()
+      
+      if (['invoice', 'inv', 'bill', 'statement', 'payment'].some(keyword => filename.includes(keyword))) {
+        documentType = 'invoices'
+      } else if (['contract', 'agreement', 'msa', 'sow', 'terms'].some(keyword => filename.includes(keyword))) {
+        documentType = 'contracts'
+      } else if (['workflow', 'process', 'diagram', 'flow', 'procedure'].some(keyword => filename.includes(keyword))) {
+        documentType = 'workflows'
+      } else if (['report', 'analysis', 'summary', 'analytics'].some(keyword => filename.includes(keyword))) {
+        documentType = 'reports'
+      } else if (['form', 'application', 'intake', 'survey'].some(keyword => filename.includes(keyword))) {
+        documentType = 'forms'
+      }
+      
+      // Show initial filename-based classification
+      uploadFile.aiResult = `${documentType} (filename)`
+      
+      // Then immediately follow with AI analysis for PDFs and images
+      if (uploadFile.file.type === 'application/pdf' || uploadFile.file.type.startsWith('image/')) {
+        try {
+          // Set AI analyzing status
+          uploadFile.aiStatus = 'analyzing'
+          
+          const { classifyDocumentWithAI } = await import('@/lib/ai-classifier')
+          const aiResult = await classifyDocumentWithAI(uploadFile.file, uploadFile.file.name)
+          
+          if (aiResult.confidence > 0.7) {
+            // AI succeeded - update classification
+            documentType = aiResult.category
+            aiSummary = aiResult.summary || ''
+            vendor = aiResult.vendor || ''
+            
+            // Set AI completed status with result
+            uploadFile.aiStatus = 'completed'
+            uploadFile.aiResult = aiResult.summary ? `${documentType}: ${aiResult.summary}` : documentType
+            
+            // Show AI classification success
+            if (aiResult.summary) {
+              toast.success(`✨ AI upgraded: ${documentType} - ${aiResult.summary}`)
+            } else {
+              toast.success(`✨ AI confirmed as ${documentType}${vendor ? ' from ' + vendor : ''}`)
+            }
+          } else {
+            // AI low confidence - keep filename classification
+            uploadFile.aiStatus = 'completed'
+            uploadFile.aiResult = `${documentType} (AI low confidence)`
+          }
+        } catch (error) {
+          console.warn('AI classification failed, keeping filename classification:', error)
+          // Set AI failed status but keep filename classification
+          uploadFile.aiStatus = 'failed'
+          uploadFile.aiResult = `${documentType} (filename)`
+        }
+      }
+      
+      // Always add health group and category structure
+      // Include username for better admin organization: health_group/username/category/filename
+      const categories = ['invoices', 'contracts', 'workflows', 'reports', 'forms', 'other']
+      if (!categories.some(cat => uploadPath.includes(`/${cat}/`))) {
+        const username = authStore.user?.username || 'unknown_user'
+        uploadPath = `henry_ford/${username}/${documentType}/${uploadFile.file.name}`
+      }
       
       // Base64 encode the key as expected by the backend
       const encodedKey = btoa(uploadPath)
       
-      await withRetry(
+      const response = await withRetry(
         () => api.post(`/buckets/${props.bucket}/upload`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -374,6 +461,38 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
         }),
         { maxAttempts: 1 } // Handle retries manually for better UX
       )
+      
+      // Check if backend suggests auto-categorization
+      if (response.data && !response.data.success && response.data.suggestedPath) {
+        // Backend suggests a different path for better organization
+        const suggestedKey = btoa(response.data.suggestedPath)
+        
+        // Retry upload with suggested path
+        uploadFile.status = 'uploading'
+        uploadFile.progress = 0
+        
+        await withRetry(
+          () => api.post(`/buckets/${props.bucket}/upload`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            params: {
+              key: suggestedKey
+            },
+            onUploadProgress: (progressEvent) => {
+              if (progressEvent.total) {
+                uploadFile.progress = Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total
+                )
+              }
+            }
+          }),
+          { maxAttempts: 1 }
+        )
+        
+        // Show categorization message
+        toast.success(`File auto-organized to ${response.data.documentType} folder`)
+      }
       
       uploadFile.status = 'completed'
       uploadFile.progress = 100
