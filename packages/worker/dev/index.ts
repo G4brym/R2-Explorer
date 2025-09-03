@@ -83,10 +83,15 @@ export default {
 				server_config: "/api/server/config",
 				list_files: "/api/buckets/secure-uploads",
 				upload_file: "/api/buckets/secure-uploads/upload",
+				download_file: "/api/buckets/secure-uploads/{key}",
+				delete_file: "/api/buckets/secure-uploads/delete",
+				create_folder: "/api/buckets/secure-uploads/folder",
 			},
 			test_endpoints: {
 				"GET /api/server/config": "Server configuration and auth info",
 				"GET /api/buckets/secure-uploads": "List files (requires auth)",
+				"GET /api/buckets/secure-uploads/{key}": "Download file (requires auth)",
+				"POST /api/buckets/secure-uploads/upload": "Upload file (requires auth)",
 			},
 			dashboard: "Deploy dashboard separately on Cloudflare Pages",
 			authentication: "Basic Auth required for all API endpoints"

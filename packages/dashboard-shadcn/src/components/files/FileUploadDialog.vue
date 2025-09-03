@@ -1,0 +1,425 @@
+<template>
+  <div v-if="isOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <Card class="w-full max-w-2xl mx-4">
+      <CardHeader>
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">Upload Files</h2>
+          <Button variant="ghost" size="icon" @click="close">
+            <XIcon class="w-4 h-4" />
+          </Button>
+        </div>
+      </CardHeader>
+      
+      <CardContent>
+        <!-- Drag and Drop Area -->
+        <div
+          ref="dropZone"
+          class="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center transition-colors"
+          :class="{ 'border-primary bg-primary/5': isDragging }"
+          @dragover.prevent="handleDragOver"
+          @dragleave.prevent="handleDragLeave"
+          @drop.prevent="handleDrop"
+        >
+          <UploadIcon class="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <h3 class="text-lg font-medium mb-2">Drop files or folders here to upload</h3>
+          <p class="text-muted-foreground mb-4">Or click to select files or folders</p>
+          <div class="flex space-x-2">
+            <Button variant="outline" @click="triggerFileInput">
+              <FileIcon class="w-4 h-4 mr-2" />
+              Select Files
+            </Button>
+            <Button variant="outline" @click="triggerFolderInput">
+              <FolderIcon class="w-4 h-4 mr-2" />
+              Select Folder
+            </Button>
+          </div>
+          
+          <input
+            ref="fileInput"
+            type="file"
+            multiple
+            class="hidden"
+            @change="handleFileSelect"
+          />
+          
+          <input
+            ref="folderInput"
+            type="file"
+            webkitdirectory
+            directory
+            multiple
+            class="hidden"
+            @change="handleFolderSelect"
+          />
+        </div>
+
+        <!-- Upload Progress -->
+        <div v-if="uploadingFiles.length > 0" class="mt-6">
+          <h3 class="font-medium mb-3">Upload Progress</h3>
+          <div class="space-y-3">
+            <div v-for="file in uploadingFiles" :key="file.name" class="flex items-center space-x-3">
+              <!-- Status Icon -->
+              <CheckCircleIcon v-if="file.status === 'completed'" class="w-4 h-4 text-green-500 flex-shrink-0" />
+              <AlertCircleIcon v-else-if="file.status === 'error'" class="w-4 h-4 text-red-500 flex-shrink-0" />
+              <RefreshCwIcon v-else-if="file.status === 'retrying'" class="w-4 h-4 text-yellow-500 animate-spin flex-shrink-0" />
+              <FileIcon v-else class="w-4 h-4 text-blue-500 flex-shrink-0" />
+              
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium truncate">{{ file.name }}</div>
+                
+                <!-- Error message -->
+                <div v-if="file.status === 'error' && file.error" class="text-xs text-red-500 mt-1">
+                  {{ file.error }}
+                </div>
+                
+                <!-- Retry info -->
+                <div v-else-if="file.status === 'retrying'" class="text-xs text-yellow-600 mt-1">
+                  Retrying... (attempt {{ (file.retryCount || 0) + 1 }}/3)
+                </div>
+                
+                <!-- Progress bar -->
+                <div v-if="file.status !== 'completed'" class="w-full bg-muted rounded-full h-2 mt-1">
+                  <div 
+                    class="h-2 rounded-full transition-all"
+                    :class="{
+                      'bg-green-500': file.status === 'completed',
+                      'bg-red-500': file.status === 'error',
+                      'bg-yellow-500': file.status === 'retrying',
+                      'bg-primary': file.status === 'uploading'
+                    }"
+                    :style="{ width: `${file.progress}%` }"
+                  />
+                </div>
+              </div>
+              
+              <!-- Progress percentage and retry button -->
+              <div class="flex items-center space-x-2 flex-shrink-0">
+                <div class="text-sm text-muted-foreground">
+                  {{ file.status === 'completed' ? 'Done' : `${file.progress}%` }}
+                </div>
+                <Button 
+                  v-if="file.status === 'error'" 
+                  variant="ghost" 
+                  size="sm" 
+                  @click="retryUpload(file)"
+                  class="text-xs px-2 py-1 h-6"
+                >
+                  Retry
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Overall progress summary -->
+          <div class="mt-4 pt-3 border-t">
+            <div class="flex justify-between text-sm">
+              <span>{{ completedCount }}/{{ uploadingFiles.length }} files uploaded</span>
+              <span v-if="hasErrors" class="text-red-500">{{ errorCount }} failed</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue'
+import { api } from '@/lib/api'
+import { UploadIcon, XIcon, FileIcon, AlertCircleIcon, CheckCircleIcon, RefreshCwIcon, FolderIcon } from 'lucide-vue-next'
+import { withRetry, handleError, networkStatus } from '@/lib/errors'
+import { toast } from '@/lib/toast'
+import Card from '@/components/ui/Card.vue'
+import CardHeader from '@/components/ui/CardHeader.vue'
+import CardContent from '@/components/ui/CardContent.vue'
+import Button from '@/components/ui/Button.vue'
+import { computed } from 'vue'
+
+interface Props {
+  isOpen: boolean
+  currentPath: string
+  bucket: string
+}
+
+interface UploadingFile {
+  name: string
+  progress: number
+  file: File
+  status: 'uploading' | 'completed' | 'error' | 'retrying'
+  error?: string
+  retryCount?: number
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits<{
+  close: []
+  uploaded: []
+}>()
+
+const dropZone = ref<HTMLElement>()
+const fileInput = ref<HTMLInputElement>()
+const folderInput = ref<HTMLInputElement>()
+const isDragging = ref(false)
+const uploadingFiles = ref<UploadingFile[]>([])
+
+const completedCount = computed(() => 
+  uploadingFiles.value.filter(f => f.status === 'completed').length
+)
+
+const errorCount = computed(() => 
+  uploadingFiles.value.filter(f => f.status === 'error').length
+)
+
+const hasErrors = computed(() => errorCount.value > 0)
+
+function close() {
+  emit('close')
+}
+
+function triggerFileInput() {
+  fileInput.value?.click()
+}
+
+function triggerFolderInput() {
+  folderInput.value?.click()
+}
+
+function handleFolderSelect(e: Event) {
+  const target = e.target as HTMLInputElement
+  const files = Array.from(target.files || [])
+  
+  if (files.length > 0) {
+    toast.info(`Selected ${files.length} files from folder structure`)
+    uploadFiles(files)
+  }
+}
+
+function handleDragOver(e: DragEvent) {
+  e.preventDefault()
+  isDragging.value = true
+}
+
+function handleDragLeave(e: DragEvent) {
+  e.preventDefault()
+  // Only set to false if leaving the drop zone completely
+  if (!dropZone.value?.contains(e.relatedTarget as Node)) {
+    isDragging.value = false
+  }
+}
+
+async function handleDrop(e: DragEvent) {
+  e.preventDefault()
+  isDragging.value = false
+  
+  const items = Array.from(e.dataTransfer?.items || [])
+  const files: File[] = []
+  
+  // Process both files and directories
+  for (const item of items) {
+    if (item.kind === 'file') {
+      const entry = item.webkitGetAsEntry()
+      if (entry) {
+        const entryFiles = await processEntry(entry)
+        files.push(...entryFiles)
+      } else {
+        // Fallback for browsers that don't support webkitGetAsEntry
+        const file = item.getAsFile()
+        if (file) files.push(file)
+      }
+    }
+  }
+  
+  if (files.length > 0) {
+    toast.info(`Processing ${files.length} files from dropped items`)
+    uploadFiles(files)
+  }
+}
+
+// Helper function to recursively process directory entries
+async function processEntry(entry: any): Promise<File[]> {
+  return new Promise((resolve) => {
+    const files: File[] = []
+    
+    if (entry.isFile) {
+      entry.file((file: File) => {
+        // Preserve folder structure in file path
+        const relativePath = entry.fullPath.startsWith('/') 
+          ? entry.fullPath.slice(1) 
+          : entry.fullPath
+        
+        // Add folder structure to file object for upload path
+        Object.defineProperty(file, 'webkitRelativePath', {
+          value: relativePath,
+          writable: false
+        })
+        
+        resolve([file])
+      })
+    } else if (entry.isDirectory) {
+      const dirReader = entry.createReader()
+      
+      function readEntries() {
+        dirReader.readEntries(async (entries: any[]) => {
+          if (entries.length === 0) {
+            resolve(files)
+            return
+          }
+          
+          for (const childEntry of entries) {
+            const childFiles = await processEntry(childEntry)
+            files.push(...childFiles)
+          }
+          
+          // Continue reading (directories might have more entries)
+          readEntries()
+        })
+      }
+      
+      readEntries()
+    } else {
+      resolve([])
+    }
+  })
+}
+
+function handleFileSelect(e: Event) {
+  const target = e.target as HTMLInputElement
+  const files = Array.from(target.files || [])
+  uploadFiles(files)
+}
+
+async function uploadFiles(files: File[]) {
+  if (files.length === 0) return
+  
+  // Check network connection
+  if (!networkStatus.isOnline) {
+    toast.error('Cannot upload files while offline')
+    return
+  }
+  
+  // Initialize upload tracking
+  uploadingFiles.value = files.map(file => ({
+    name: file.name,
+    progress: 0,
+    file,
+    status: 'uploading' as const,
+    retryCount: 0
+  }))
+  
+  // Upload files in parallel with error handling
+  const uploadPromises = uploadingFiles.value.map(uploadFile => 
+    uploadSingleFile(uploadFile)
+  )
+  
+  await Promise.allSettled(uploadPromises)
+  
+  // Show summary
+  const completed = completedCount.value
+  const failed = errorCount.value
+  
+  if (completed > 0 && failed === 0) {
+    toast.success(`Successfully uploaded ${completed} file${completed === 1 ? '' : 's'}`)
+    emit('uploaded')
+    
+    // Auto-close after successful upload
+    setTimeout(() => {
+      uploadingFiles.value = []
+      emit('close')
+    }, 1500)
+  } else if (completed > 0 && failed > 0) {
+    toast.warning(`Uploaded ${completed} files successfully, ${failed} failed`)
+  } else if (failed > 0) {
+    toast.error(`Failed to upload ${failed} file${failed === 1 ? '' : 's'}`)
+  }
+}
+
+async function uploadSingleFile(uploadFile: UploadingFile) {
+  const maxRetries = 3
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      if (attempt > 0) {
+        uploadFile.status = 'retrying'
+        uploadFile.retryCount = attempt
+        uploadFile.progress = 0
+      }
+      
+      const formData = new FormData()
+      formData.append('file', uploadFile.file)
+      
+      // Handle folder structure from webkitRelativePath or regular file name
+      const relativePath = (uploadFile.file as any).webkitRelativePath || uploadFile.file.name
+      const uploadPath = props.currentPath 
+        ? `${props.currentPath}/${relativePath}`
+        : relativePath
+      
+      // Base64 encode the key as expected by the backend
+      const encodedKey = btoa(uploadPath)
+      
+      await withRetry(
+        () => api.post(`/buckets/${props.bucket}/upload`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          params: {
+            key: encodedKey
+          },
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              uploadFile.progress = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              )
+            }
+          }
+        }),
+        { maxAttempts: 1 } // Handle retries manually for better UX
+      )
+      
+      uploadFile.status = 'completed'
+      uploadFile.progress = 100
+      return
+    } catch (error: any) {
+      console.error(`Upload attempt ${attempt + 1} failed for ${uploadFile.name}:`, error)
+      
+      if (attempt === maxRetries - 1) {
+        // Final attempt failed
+        uploadFile.status = 'error'
+        uploadFile.error = error.response?.data?.error || 'Upload failed'
+        uploadFile.progress = 0
+      } else {
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)))
+      }
+    }
+  }
+}
+
+async function retryUpload(uploadFile: UploadingFile) {
+  uploadFile.status = 'uploading'
+  uploadFile.error = undefined
+  uploadFile.retryCount = 0
+  uploadFile.progress = 0
+  
+  await uploadSingleFile(uploadFile)
+}
+
+// Prevent default drag behaviors on window
+function preventDefaults(e: DragEvent) {
+  e.preventDefault()
+  e.stopPropagation()
+}
+
+onMounted(() => {
+  window.addEventListener('dragenter', preventDefaults)
+  window.addEventListener('dragover', preventDefaults)
+  window.addEventListener('dragleave', preventDefaults)
+  window.addEventListener('drop', preventDefaults)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('dragenter', preventDefaults)
+  window.removeEventListener('dragover', preventDefaults)
+  window.removeEventListener('dragleave', preventDefaults)
+  window.removeEventListener('drop', preventDefaults)
+})
+</script>
