@@ -1,74 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Explorer</title>
+    <title>Explorer - SpendRule Document Management</title>
 
     <meta charset="utf-8">
-    <meta name="description" content="<%= productDescription %>">
+    <meta name="description" content="SpendRule Document Management System">
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
 
     <meta name="robots" content="noindex">
     <meta name="googlebot" content="noindex">
 
-    <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-    <link rel="icon" type="image/ico" href="favicon.ico">
-    <style>
-      .initialLoading {
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        background-color: #f5f5f5;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      }
-
-      .initialLoading .loading-container {
-        text-align: center;
-        padding: 2rem;
-      }
-
-      .initialLoading .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #3498db;
-        border-radius: 50%;
-        animation: initialLoadingSpin 1s linear infinite;
-        margin: 0 auto 1rem;
-      }
-
-      @keyframes initialLoadingSpin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-
-      .initialLoading .loading-text {
-        color: #333;
-        font-size: 1.2rem;
-        margin-bottom: 0.5rem;
-      }
-    </style>
+    <link rel="icon" type="image/png" sizes="128x128" href="/icons/favicon-128x128.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <link rel="icon" type="image/ico" href="/favicon.ico">
   </head>
   <body>
-    <!-- quasar:entry-point -->
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
-
-  <script>
-      var elem = document.getElementById('q-app')
-      elem.innerHTML = `
-<div class="initialLoading">
-  <div class="loading-container" id="loadingContainer">
-    <div class="spinner"></div>
-    <p class="loading-text">Loading Explorer</p>
-    <p style="color: #666; font-size: 0.9rem;">Please wait while the application initializes...</p>
-  </div>
-</div>` + elem.innerHTML;
-  </script>
 </html>

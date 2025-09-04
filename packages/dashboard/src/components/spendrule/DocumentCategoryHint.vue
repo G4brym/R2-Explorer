@@ -1,77 +1,94 @@
 <template>
-  <q-card v-if="showHint" class="q-ma-md" flat bordered>
-    <q-card-section class="bg-blue-1">
-      <div class="text-subtitle2 text-blue-8">
-        <q-icon name="info" class="q-mr-xs" />
-        SpendRule Auto-Organization
+  <Card v-if="showHint" class="m-6">
+    <CardHeader class="bg-blue-50 dark:bg-blue-950">
+      <div class="flex items-center space-x-2 text-blue-700 dark:text-blue-300">
+        <InfoIcon class="w-5 h-5" />
+        <h3 class="text-lg font-semibold">SpendRule Auto-Organization</h3>
       </div>
-    </q-card-section>
-    <q-card-section>
-      <div class="text-body2 q-mb-sm">
+    </CardHeader>
+    
+    <CardContent class="pt-4">
+      <p class="text-sm text-muted-foreground mb-4">
         Files will be automatically organized based on type:
-      </div>
-      <div class="row q-gutter-md">
-        <div class="col">
-          <q-chip color="green" text-color="white" icon="description">
-            Contracts
-          </q-chip>
-          <div class="text-caption q-mt-xs">
+      </p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="text-center">
+          <div class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 mb-2">
+            <FileTextIcon class="w-4 h-4 mr-1" />
+            <span class="text-sm font-medium">Contracts</span>
+          </div>
+          <div class="text-xs text-muted-foreground">
             contract, agreement, msa, sow
           </div>
         </div>
-        <div class="col">
-          <q-chip color="orange" text-color="white" icon="receipt">
-            Invoices
-          </q-chip>
-          <div class="text-caption q-mt-xs">
+        
+        <div class="text-center">
+          <div class="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200 mb-2">
+            <ReceiptIcon class="w-4 h-4 mr-1" />
+            <span class="text-sm font-medium">Invoices</span>
+          </div>
+          <div class="text-xs text-muted-foreground">
             invoice, inv, bill, statement
           </div>
         </div>
-        <div class="col">
-          <q-chip color="purple" text-color="white" icon="account_tree">
-            Workflows
-          </q-chip>
-          <div class="text-caption q-mt-xs">
-            workflow, process, diagram, flow
+        
+        <div class="text-center">
+          <div class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 mb-2">
+            <WorkflowIcon class="w-4 h-4 mr-1" />
+            <span class="text-sm font-medium">Workflows</span>
           </div>
-        </div>
-        <div class="col">
-          <q-chip color="grey" text-color="white" icon="folder">
-            Other
-          </q-chip>
-          <div class="text-caption q-mt-xs">
-            all other files
+          <div class="text-xs text-muted-foreground">
+            workflow, process, diagram, visio
           </div>
         </div>
       </div>
-      <div class="text-caption q-mt-md text-grey-6">
-        <q-icon name="lightbulb" class="q-mr-xs" />
-        Tip: You can create subfolders within each category to organize by vendor
+      
+      <div class="mt-4 pt-4 border-t">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-muted-foreground">
+            Files are organized into health group folders automatically
+          </span>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            @click="hideHint"
+            class="text-muted-foreground hover:text-foreground"
+          >
+            <XIcon class="w-4 h-4 mr-1" />
+            Hide
+          </Button>
+        </div>
       </div>
-    </q-card-section>
-    <q-card-actions align="right">
-      <q-btn flat dense @click="dismissHint" label="Got it" color="primary" />
-    </q-card-actions>
-  </q-card>
+    </CardContent>
+  </Card>
 </template>
 
-<script>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { InfoIcon, FileTextIcon, XIcon } from 'lucide-vue-next'
+import Card from '@/components/ui/Card.vue'
+import CardHeader from '@/components/ui/CardHeader.vue'
+import CardContent from '@/components/ui/CardContent.vue'
+import Button from '@/components/ui/Button.vue'
 
-export default {
-  name: 'DocumentCategoryHint',
-  setup() {
-    const showHint = ref(localStorage.getItem('spendrule-hint-dismissed') !== 'true')
+// Custom icons for SpendRule categories
+const ReceiptIcon = FileTextIcon // Using FileText as receipt icon
+const WorkflowIcon = FileTextIcon // Using FileText as workflow icon
 
-    const dismissHint = () => {
-      showHint.value = false
-      localStorage.setItem('spendrule-hint-dismissed', 'true')
-    }
+const showHint = ref(true)
 
-    return {
-      showHint,
-      dismissHint
-    }
-  }
+function hideHint() {
+  showHint.value = false
+  // Store preference in localStorage
+  localStorage.setItem('spendrule-hide-category-hint', 'true')
 }
+
+onMounted(() => {
+  // Check if user has hidden the hint before
+  const hidePreference = localStorage.getItem('spendrule-hide-category-hint')
+  if (hidePreference === 'true') {
+    showHint.value = false
+  }
+})
 </script>

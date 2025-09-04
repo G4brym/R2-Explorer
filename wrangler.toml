@@ -4,6 +4,7 @@
 name = "spendrule-doc-upload-dashboard"
 main = "packages/worker/dev/index.ts"
 compatibility_date = "2024-11-01"
+account_id = "484a9ce3fd2308c387998c60ae605819"
 
 # AI Binding - Cloudflare Workers AI
 [ai]

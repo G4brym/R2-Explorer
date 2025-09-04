@@ -61,14 +61,29 @@ export class ClassifyDocument extends OpenAPIRoute {
 		try {
 			console.log('🧠 Worker: Starting Cloudflare AI classification for:', data.filename);
 			
-			// Use Cloudflare Workers AI instead of external Claude API
-			const aiResponse = await c.env.AI.run('@cf/llama-3.2-11b-vision-instruct', {
-				messages: [{
-					role: 'user',
-					content: [
-						{
-							type: 'text',
-							text: `Analyze this healthcare document (filename: ${data.filename}). 
+			// Use Cloudflare Workers AI with proper format
+			// Convert base64 to Uint8Array for Workers runtime
+			let bytes: Uint8Array;
+			try {
+				// Clean base64 string - remove data URL prefix if present
+				const cleanBase64 = data.fileData.replace(/^data:image\/[a-z]+;base64,/, '');
+				const binaryString = atob(cleanBase64);
+				bytes = new Uint8Array(binaryString.length);
+				for (let i = 0; i < binaryString.length; i++) {
+					bytes[i] = binaryString.charCodeAt(i);
+				}
+			} catch (base64Error) {
+				console.warn('Base64 decode failed, using filename classification:', base64Error);
+				return {
+					success: false,
+					error: "Invalid base64 image data",
+					result: this.classifyByFilename(data.filename)
+				};
+			}
+			
+			const aiResponse = await c.env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', {
+				image: Array.from(bytes),
+				prompt: `Analyze this healthcare document (filename: ${data.filename}). 
 
 Classify the document and extract key information.
 
@@ -77,33 +92,17 @@ Respond with ONLY this JSON format:
   "category": "invoices|contracts|workflows|reports|forms|other",
   "confidence": 0.85,
   "vendor": "Company Name if found",
-  "summary": "Brief 1-2 sentence summary",
-  "extractedData": {
-    "documentType": "Medical Invoice",
-    "amount": "$1,234.56 if found",
-    "date": "2024-03-15 if found",
-    "vendor": "Company name",
-    "keyEntities": ["key", "terms", "found"]
-  }
+  "summary": "Brief 1-2 sentence summary"
 }
 
 CATEGORIES:
 - invoices: Bills, invoices, statements, payments
-- contracts: Agreements, MSAs, SOWs, contracts
+- contracts: Agreements, MSAs, SOWs, contracts  
 - workflows: Procedures, processes, diagrams
 - reports: Analytics, summaries, reports
 - forms: Applications, intake forms, surveys
-- other: Everything else`
-						},
-						{
-							type: 'image_url',
-							image_url: {
-								url: `data:${data.mimeType};base64,${data.fileData}`
-							}
-						}
-					]
-				}],
-				max_tokens: 512
+- other: Everything else`,
+				max_tokens: 256
 			});
 
 			console.log('📥 Worker: Cloudflare AI response:', aiResponse);
