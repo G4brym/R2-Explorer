@@ -64,20 +64,16 @@ export class ClassifyDocument extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const data = await this.getValidatedData<typeof ClassifyDocumentInput>();
 
-		// Validate required data
-		if (!data.filename) {
-			return {
-				success: false,
-				error: "Filename is required",
-				result: this.classifyByFilename("unknown")
-			};
-		}
+		console.log('🔍 Received data:', JSON.stringify(data, null, 2));
 
+		// Use filename or default if not provided
+		const filename = data.filename || 'unknown-document';
+		
 		// Ensure mimeType is not undefined
 		const mimeType = data.mimeType || 'application/octet-stream';
 
 		try {
-			console.log('🤖 Worker: Starting AI classification for:', data.filename, 'Type:', mimeType);
+			console.log('🤖 Worker: Starting AI classification for:', filename, 'Type:', mimeType);
 			
 			// Use vision model to analyze file directly - no text extraction needed!
 			const isImageFile = mimeType.startsWith('image/');
@@ -95,7 +91,7 @@ export class ClassifyDocument extends OpenAPIRoute {
 									type: 'text',
 									text: `Analyze this business document image and extract key information.
 
-DOCUMENT NAME: ${data.filename}
+DOCUMENT NAME: ${filename}
 FILE TYPE: ${mimeType}
 
 Based on what you can see in this document, provide ONLY the following information (write "UNKNOWN" if not found):
@@ -137,7 +133,7 @@ Respond with ONLY this JSON format:
 				aiResponse = await c.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
 					prompt: `Analyze this file and provide business document classification.
 
-DOCUMENT NAME: ${data.filename}
+DOCUMENT NAME: ${filename}
 FILE TYPE: ${mimeType}
 
 Based on the filename and file type, classify this document:
@@ -176,7 +172,7 @@ Respond with ONLY this JSON format:
 				return {
 					success: false,
 					error: "AI response was not valid JSON",
-					result: this.classifyByFilename(data.filename)
+					result: this.classifyByFilename(filename)
 				};
 			}
 
@@ -214,7 +210,7 @@ Respond with ONLY this JSON format:
 			return {
 				success: false,
 				error: error instanceof Error ? error.message : String(error),
-				result: this.classifyByFilename(data.filename)
+				result: this.classifyByFilename(filename)
 			};
 		}
 	}

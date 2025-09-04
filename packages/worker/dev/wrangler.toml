@@ -1,6 +1,7 @@
 name = "spendrule-dev"
 main = "index.ts"
 compatibility_date = "2024-01-01"
+account_id = "484a9ce3fd2308c387998c60ae605819"
 
 # AI Binding - Cloudflare Workers AI
 [ai]
