@@ -24,21 +24,29 @@ interface AIConfig {
   enabled: boolean
 }
 
-// Configuration - Claude only for simplicity and speed
+// Configuration - Always enabled since API key is in worker
 const aiConfig: AIConfig = {
-  claudeApiKey: process.env.VITE_CLAUDE_API_KEY,
+  claudeApiKey: undefined, // API key handled by worker
   geminiApiKey: undefined, // Not using Gemini
-  enabled: !!process.env.VITE_CLAUDE_API_KEY
+  enabled: true // Always enabled, worker will handle fallback
 }
 
 export async function classifyDocumentWithAI(
   file: File,
   filename: string
 ): Promise<DocumentClassification> {
+  // Debug logging
+  console.log('🧠 AI Config:', {
+    enabled: aiConfig.enabled,
+    useWorkerProxy: true,
+    filename: filename
+  })
+  
   // Fallback to filename-based classification
   const filenameResult = classifyByFilename(filename)
   
   if (!aiConfig.enabled) {
+    console.log('❌ AI disabled')
     return filenameResult
   }
   
@@ -78,80 +86,41 @@ async function extractWithPdfParse(pdfFile: File): Promise<string> {
 }
 
 
-// Claude Vision API - handles PDFs, images, and scanned documents
+// Claude Vision API via Worker Proxy - handles PDFs, images, and scanned documents
 async function analyzeWithClaudeVision(file: File, filename: string): Promise<DocumentClassification> {
   try {
+    console.log('📄 Starting Claude Vision analysis via worker for:', filename, 'Type:', file.type)
     const base64Data = await fileToBase64(file)
     const mediaType = file.type === 'application/pdf' ? 'application/pdf' : file.type
     
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': aiConfig.claudeApiKey!,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 400,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: `Analyze this healthcare document (filename: ${filename}). 
-
-Extract text and classify the document. Focus on the first 3 pages if it's a PDF.
-
-Respond with ONLY this JSON format:
-{
-  "category": "invoices|contracts|workflows|reports|forms|other",
-  "confidence": 0.85,
-  "vendor": "Company Name if found",
-  "summary": "Brief 1-2 sentence summary",
-  "extractedData": {
-    "documentType": "Medical Invoice",
-    "amount": "$1,234.56 if found",
-    "date": "2024-03-15 if found",
-    "vendor": "Company name",
-    "keyEntities": ["key", "terms", "found"]
-  }
-}
-
-CATEGORIES:
-- invoices: Bills, invoices, statements, payments
-- contracts: Agreements, MSAs, SOWs, contracts
-- workflows: Procedures, processes, diagrams
-- reports: Analytics, summaries, reports
-- forms: Applications, intake forms, surveys
-- other: Everything else`
-            },
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: mediaType,
-                data: base64Data
-              }
-            }
-          ]
-        }]
-      })
+    // Import API helper
+    const { api } = await import('@/lib/api')
+    
+    console.log('🚀 Making API call to worker proxy...')
+    const response = await api.post('/ai/classify', {
+      filename,
+      fileData: base64Data,
+      mimeType: mediaType
     })
     
-    const result = await response.json()
-    const aiResponse = result.content?.[0]?.text || '{}'
+    console.log('📥 Worker proxy response:', response.data)
     
-    const parsed = JSON.parse(aiResponse)
+    const result = response.data.result
+    console.log('✅ Worker AI result:', result)
+
     return {
-      category: parsed.category || 'other',
-      confidence: parsed.confidence || 0.7,
-      vendor: parsed.vendor,
-      summary: parsed.summary,
-      extractedData: parsed.extractedData
+      category: result.category || 'other',
+      confidence: result.confidence || 0.7,
+      vendor: result.vendor,
+      summary: result.summary,
+      extractedData: result.extractedData
     }
   } catch (error) {
-    console.error('Claude Vision analysis failed:', error)
+    console.error('🚨 Worker AI analysis failed:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    })
     return classifyByFilename(filename)
   }
 }

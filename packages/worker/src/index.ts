@@ -27,6 +27,7 @@ import { dashboardIndex, dashboardRedirect } from "./modules/dashboard";
 import { receiveEmail } from "./modules/emails/receiveEmail";
 import { SendEmail } from "./modules/emails/sendEmail";
 import { GetInfo } from "./modules/server/getInfo";
+import { ClassifyDocument } from "./modules/ai/classifyDocument";
 import type {
 	AppContext,
 	AppEnv,
@@ -122,6 +123,12 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	}
 
 	openapi.get("/api/server/config", GetInfo);
+	
+	// AI endpoints - require authentication
+	if (config.basicAuth) {
+		app.use("/api/ai/*", healthGroupIsolationMiddleware);
+	}
+	openapi.post("/api/ai/classify", ClassifyDocument);
 
 	openapi.get("/api/buckets/:bucket", ListObjects);
 	openapi.post("/api/buckets/:bucket/move", MoveObject);
