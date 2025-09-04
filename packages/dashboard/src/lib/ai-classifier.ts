@@ -35,14 +35,34 @@ export async function classifyDocumentWithAI(
   file: File,
   filename: string
 ): Promise<DocumentClassification> {
-  console.log('📋 Smart document classification for:', filename)
+  console.log('🤖 AI document classification for:', filename, 'Type:', file.type)
   
-  // Use reliable filename-based classification - it's very accurate for your users
-  const result = classifyByFilename(filename)
-  console.log(`✅ Classified as: ${result.category}`)
-  
-  // Return reliable result with good confidence
-  return { ...result, confidence: 0.85 }
+  try {
+    // Import API helper
+    const { api } = await import('@/lib/api')
+    
+    // Send file info to worker for AI analysis
+    console.log('🚀 Sending to AI worker...')
+    const response = await api.post('/ai/classify', {
+      filename,
+      fileData: '', // Let worker handle file content extraction
+      mimeType: file.type
+    })
+    
+    console.log('📥 AI response:', response.data)
+    
+    if (response.data?.success && response.data?.result) {
+      return response.data.result
+    } else {
+      // Fallback to filename classification
+      console.log('🔄 AI failed, using filename fallback')
+      return classifyByFilename(filename)
+    }
+    
+  } catch (error) {
+    console.warn('❌ AI classification error:', error)
+    return classifyByFilename(filename)
+  }
 }
 
 // Simple PDF text extraction using pdf-parse

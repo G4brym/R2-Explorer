@@ -59,58 +59,39 @@ export class ClassifyDocument extends OpenAPIRoute {
 		const data = await this.getValidatedData<typeof ClassifyDocumentInput>();
 
 		try {
-			console.log('🧠 Worker: Starting AI classification for:', data.filename);
+			console.log('🤖 Worker: Starting AI classification for:', data.filename, 'Type:', data.mimeType);
 			
-			// Check if file data is provided (empty for non-image files)
-			if (!data.fileData || data.fileData.trim() === '') {
-				console.log('📋 No file data provided, using intelligent filename classification');
-				return {
-					success: true,
-					result: this.classifyByFilename(data.filename)
-				};
-			}
-			
-			// Use Cloudflare Workers AI with proper format for images
-			// Convert base64 to Uint8Array for Workers runtime
-			let bytes: Uint8Array;
-			try {
-				// Clean base64 string - remove data URL prefix if present
-				const cleanBase64 = data.fileData.replace(/^data:image\/[a-z]+;base64,/, '');
-				const binaryString = atob(cleanBase64);
-				bytes = new Uint8Array(binaryString.length);
-				for (let i = 0; i < binaryString.length; i++) {
-					bytes[i] = binaryString.charCodeAt(i);
-				}
-			} catch (base64Error) {
-				console.warn('Base64 decode failed, using filename classification:', base64Error);
-				return {
-					success: true,
-					result: this.classifyByFilename(data.filename)
-				};
-			}
-			
-			const aiResponse = await c.env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', {
-				image: Array.from(bytes),
-				prompt: `Analyze this healthcare document (filename: ${data.filename}). 
+			// Use Cloudflare's text-based AI model for robust document analysis
+			// This works with ANY file type by analyzing filename and metadata
+			const aiResponse = await c.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+				prompt: `You are a document classification expert. Analyze this file and provide classification with a brief summary.
 
-Classify the document and extract key information.
+Filename: ${data.filename}
+File Type: ${data.mimeType}
+Context: This is a healthcare/business document management system.
+
+Based on the filename and file type, classify this document and provide a brief summary.
+
+CATEGORIES (choose one):
+- invoices: Bills, invoices, statements, payments, medical bills
+- contracts: Agreements, MSAs, SOWs, contracts, legal documents  
+- workflows: Procedures, processes, diagrams, protocols, guidelines
+- reports: Analytics, summaries, reports, assessments, results
+- other: Everything else
+
+EXTRACTION REQUIREMENTS:
+- Extract vendor/company name if identifiable from filename
+- Identify service type (e.g., "Medical Services", "Legal Services", "Consulting", "IT Support")
+- Provide brief summary of document purpose
 
 Respond with ONLY this JSON format:
 {
-  "category": "invoices|contracts|workflows|reports|forms|other",
-  "confidence": 0.85,
-  "vendor": "Company Name if found",
-  "summary": "Brief 1-2 sentence summary"
-}
-
-CATEGORIES:
-- invoices: Bills, invoices, statements, payments
-- contracts: Agreements, MSAs, SOWs, contracts  
-- workflows: Procedures, processes, diagrams
-- reports: Analytics, summaries, reports
-- forms: Applications, intake forms, surveys
-- other: Everything else`,
-				max_tokens: 256
+  "category": "invoices|contracts|workflows|reports|other",
+  "confidence": 0.90,
+  "vendor": "Company/Vendor Name",
+  "serviceType": "Type of service provided",
+  "summary": "Brief 1-2 sentence description of what this document contains"
+}`
 			});
 
 			console.log('📥 Worker: Cloudflare AI response:', aiResponse);
