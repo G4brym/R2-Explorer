@@ -2,6 +2,10 @@ name = "spendrule-dev"
 main = "index.ts"
 compatibility_date = "2024-01-01"
 
+# AI Binding - Cloudflare Workers AI
+[ai]
+binding = "AI"
+
 # R2 Buckets
 [[r2_buckets]]
 binding = "secure-uploads"
@@ -12,7 +16,6 @@ preview_bucket_name = "secure-uploads-preview"
 [vars]
 SPENDRULE_MODE = "true"
 DEFAULT_BUCKET = "secure-uploads"
-CLAUDE_API_KEY = "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"
 
 # Build configuration
 [build]

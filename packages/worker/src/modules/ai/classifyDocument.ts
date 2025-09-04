@@ -58,38 +58,19 @@ export class ClassifyDocument extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const data = await this.getValidatedData<typeof ClassifyDocumentInput>();
 
-		// Get Claude API key from environment
-		const claudeApiKey = c.env.CLAUDE_API_KEY;
-		if (!claudeApiKey) {
-			console.error('❌ Claude API key not found in worker environment');
-			return {
-				success: false,
-				error: "AI classification not configured",
-				result: this.classifyByFilename(data.filename)
-			};
-		}
-
 		try {
-			console.log('🧠 Worker: Starting Claude API call for:', data.filename);
+			console.log('🧠 Worker: Starting Cloudflare AI classification for:', data.filename);
 			
-			const response = await fetch('https://api.anthropic.com/v1/messages', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'x-api-key': claudeApiKey,
-					'anthropic-version': '2023-06-01'
-				},
-				body: JSON.stringify({
-					model: 'claude-3-haiku-20240307',
-					max_tokens: 400,
-					messages: [{
-						role: 'user',
-						content: [
-							{
-								type: 'text',
-								text: `Analyze this healthcare document (filename: ${data.filename}). 
+			// Use Cloudflare Workers AI instead of external Claude API
+			const aiResponse = await c.env.AI.run('@cf/llama-3.2-11b-vision-instruct', {
+				messages: [{
+					role: 'user',
+					content: [
+						{
+							type: 'text',
+							text: `Analyze this healthcare document (filename: ${data.filename}). 
 
-Extract text and classify the document. Focus on the first 3 pages if it's a PDF.
+Classify the document and extract key information.
 
 Respond with ONLY this JSON format:
 {
@@ -113,31 +94,34 @@ CATEGORIES:
 - reports: Analytics, summaries, reports
 - forms: Applications, intake forms, surveys
 - other: Everything else`
-							},
-							{
-								type: 'image',
-								source: {
-									type: 'base64',
-									media_type: data.mimeType,
-									data: data.fileData
-								}
+						},
+						{
+							type: 'image_url',
+							image_url: {
+								url: `data:${data.mimeType};base64,${data.fileData}`
 							}
-						]
-					}]
-				})
+						}
+					]
+				}],
+				max_tokens: 512
 			});
 
-			const result = await response.json();
-			console.log('📥 Worker: Claude API response status:', response.status);
+			console.log('📥 Worker: Cloudflare AI response:', aiResponse);
 			
-			if (!response.ok) {
-				throw new Error(`Claude API error: ${response.status} - ${JSON.stringify(result)}`);
+			// Parse the response - it should be JSON
+			let parsed;
+			try {
+				const responseText = aiResponse.response || aiResponse.content || aiResponse;
+				parsed = typeof responseText === 'string' ? JSON.parse(responseText) : responseText;
+			} catch (parseError) {
+				console.warn('Failed to parse AI response as JSON, using fallback');
+				return {
+					success: false,
+					error: "AI response was not valid JSON",
+					result: this.classifyByFilename(data.filename)
+				};
 			}
 
-			const aiResponse = result.content?.[0]?.text || '{}';
-			console.log('🤖 Worker: Claude response text:', aiResponse);
-			
-			const parsed = JSON.parse(aiResponse);
 			console.log('✅ Worker: Parsed AI result:', parsed);
 
 			const classification: DocumentClassification = {
@@ -154,7 +138,7 @@ CATEGORIES:
 			};
 
 		} catch (error) {
-			console.error('🚨 Worker: Claude API call failed:', error);
+			console.error('🚨 Worker: Cloudflare AI call failed:', error);
 			
 			// Return filename-based fallback
 			return {
