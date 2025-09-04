@@ -3,10 +3,6 @@ main = "packages/worker/dev/index.ts"
 compatibility_date = "2024-11-01"
 account_id = "484a9ce3fd2308c387998c60ae605819"
 
-# Configure Cloudflare Pages build output directory (for dashboard deploys)
-# This allows Pages builds to auto-detect the correct static output path.
-pages_build_output_dir = "packages/dashboard/dist"
-
 # AI Binding - Cloudflare Workers AI
 [ai]
 binding = "AI"
@@ -33,6 +29,3 @@ cwd = "."
 
 # Remove environment configs to eliminate warning
 # Single production deployment
-
-# Pages configuration for dashboard deployment
-pages_build_output_dir = "packages/dashboard/dist"
