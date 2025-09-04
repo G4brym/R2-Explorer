@@ -233,8 +233,9 @@ async function confirmRename() {
     const newKey = pathParts.join('/')
     
     await api.post(`/buckets/${props.bucket}/move`, {
-      from: oldKey,
-      to: newKey
+      // Send base64-encoded keys to match API contract (server also accepts plain)
+      oldKey: btoa(oldKey),
+      newKey: btoa(newKey)
     })
     
     emit('renamed')
@@ -261,7 +262,8 @@ async function confirmDelete() {
   
   try {
     await api.post(`/buckets/${props.bucket}/delete`, {
-      key: props.file.key
+      // Encode to base64 for server consistency (fallback supported)
+      key: btoa(props.file.key)
     })
     
     emit('deleted')

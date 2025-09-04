@@ -883,7 +883,7 @@ async function bulkDelete() {
       try {
         if (type === 'file') {
           await withRetry(
-            () => api.post(`/buckets/${currentBucket.value}/delete`, { key: item.key }),
+            () => api.post(`/buckets/${currentBucket.value}/delete`, { key: btoa(item.key) }),
             { maxAttempts: 2 }
           )
         } else {

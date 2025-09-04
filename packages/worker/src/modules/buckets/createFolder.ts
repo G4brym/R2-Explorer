@@ -35,7 +35,12 @@ export class CreateFolder extends OpenAPIRoute {
 				message: `Bucket binding not found: ${bucketName}`,
 			});
 		}
-		const key = decodeURIComponent(escape(atob(data.body.key)));
+		let key: string;
+		try {
+			key = decodeURIComponent(escape(atob(data.body.key)));
+		} catch {
+			key = data.body.key;
+		}
 
 		// R2 doesn't have real folders. Create a zero-byte object with a trailing slash.
 		// Or, if key already ends with a slash, use it as is.

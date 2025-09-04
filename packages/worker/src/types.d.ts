@@ -17,7 +17,7 @@ export type R2ExplorerConfig = {
 		  }
 		| false;
 	showHiddenFiles?: boolean;
-	basicAuth?: BasicAuth | BasicAuth[];
+	basicAuth?: BasicAuthType | BasicAuthType[];
 };
 
 export type AppEnv = {

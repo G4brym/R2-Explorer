@@ -15,9 +15,9 @@ export default defineWorkersConfig({
           r2Persist: false,
           isolatedStorage: false,
           r2Buckets: {
-            "MY_TEST_BUCKET_1": "MY_TEST_BUCKET_1",
-            "MY_TEST_BUCKET_2": "MY_TEST_BUCKET_2",
-            "teste": "teste",
+            MY_TEST_BUCKET_1: { id: "MY_TEST_BUCKET_1" },
+            MY_TEST_BUCKET_2: { id: "MY_TEST_BUCKET_2" },
+            teste: { id: "teste" },
           },
 					bindings: {
 						NON_R2_BINDING: { type: "var", value: "some_value" }, // For testing non-bucket bindings

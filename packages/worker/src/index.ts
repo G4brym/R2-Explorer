@@ -28,6 +28,9 @@ import { receiveEmail } from "./modules/emails/receiveEmail";
 import { SendEmail } from "./modules/emails/sendEmail";
 import { GetInfo } from "./modules/server/getInfo";
 import { ClassifyDocument } from "./modules/ai/classifyDocument";
+import { CreateFolderEx } from "./modules/buckets/folders/createFolderEx";
+import { MoveFolder } from "./modules/buckets/folders/moveFolder";
+import { DeleteFolder } from "./modules/buckets/folders/deleteFolder";
 import type {
 	AppContext,
 	AppEnv,
@@ -131,6 +134,9 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	openapi.post("/api/ai/classify", ClassifyDocument);
 
 	openapi.get("/api/buckets/:bucket", ListObjects);
+	openapi.post("/api/buckets/:bucket/folders", CreateFolderEx);
+	openapi.post("/api/buckets/:bucket/folders/move", MoveFolder);
+	openapi.post("/api/buckets/:bucket/folders/delete", DeleteFolder);
 	openapi.post("/api/buckets/:bucket/move", MoveObject);
 	openapi.post("/api/buckets/:bucket/folder", CreateFolder);
 	openapi.post("/api/buckets/:bucket/upload", PutObject);

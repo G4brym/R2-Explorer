@@ -12,12 +12,15 @@ export class MoveObject extends OpenAPIRoute {
 			params: z.object({
 				bucket: z.string(),
 			}),
-			body: {
+		body: {
 				content: {
 					"application/json": {
 						schema: z.object({
-							oldKey: z.string().describe("base64 encoded file key"),
-							newKey: z.string().describe("base64 encoded file key"),
+							// Accept either oldKey/newKey (base64) or from/to (plain)
+							oldKey: z.string().optional(),
+							newKey: z.string().optional(),
+							from: z.string().optional(),
+							to: z.string().optional(),
 						}),
 					},
 				},
@@ -37,8 +40,24 @@ export class MoveObject extends OpenAPIRoute {
 			});
 		}
 
-		const oldKey = decodeURIComponent(escape(atob(data.body.oldKey)));
-		const newKey = decodeURIComponent(escape(atob(data.body.newKey)));
+		// Determine keys (base64 or plain)
+		let oldKeyRaw = data.body.oldKey ?? data.body.from;
+		let newKeyRaw = data.body.newKey ?? data.body.to;
+		if (!oldKeyRaw || !newKeyRaw) {
+			throw new HTTPException(400, { message: "Missing source or destination key" });
+		}
+		let oldKey: string;
+		let newKey: string;
+		try {
+			oldKey = decodeURIComponent(escape(atob(oldKeyRaw)));
+		} catch {
+			oldKey = oldKeyRaw;
+		}
+		try {
+			newKey = decodeURIComponent(escape(atob(newKeyRaw)));
+		} catch {
+			newKey = newKeyRaw;
+		}
 
 		const object = await bucket.get(oldKey);
 

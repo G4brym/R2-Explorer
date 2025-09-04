@@ -92,7 +92,8 @@ async function createFolder() {
       : `${folderName.value.trim()}/`
     
     await api.post(`/buckets/${props.bucket}/folder`, {
-      key: folderPath
+      // Worker expects base64-encoded key
+      key: btoa(folderPath)
     })
     
     console.log(`Created folder: ${folderPath}`)

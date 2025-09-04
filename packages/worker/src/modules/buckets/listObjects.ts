@@ -39,7 +39,7 @@ export class ListObjects extends OpenAPIRoute {
 			});
 		}
 
-		c.header("Access-Control-Allow-Credentials", "asads");
+		// CORS is handled by middleware/wrapper; remove invalid header
 
 		// SpendRule: Apply health group filtering
 		let prefix = data.query.prefix

@@ -37,7 +37,14 @@ export class DeleteObject extends OpenAPIRoute {
 			});
 		}
 
-		const key = decodeURIComponent(escape(atob(data.body.key)));
+
+		// Accept base64-encoded or plain keys for compatibility
+		let key: string;
+		try {
+			key = decodeURIComponent(escape(atob(data.body.key)));
+		} catch {
+			key = data.body.key;
+		}
 
 		await bucket.delete(key);
 

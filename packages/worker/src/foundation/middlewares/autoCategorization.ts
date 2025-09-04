@@ -58,7 +58,39 @@ export const autoCategorizationMiddleware: MiddlewareHandler = async (
 ) => {
 	// Only apply to PUT/POST operations (uploads)
 	if (c.req.method === "POST" || c.req.method === "PUT") {
-		const key = c.req.param("key");
+		// Determine incoming key: path param, query param, or JSON body
+		let key = c.req.param("key") as string | undefined;
+		if (!key) {
+			const url = new URL(c.req.url);
+			const qKey = url.searchParams.get("key");
+			if (qKey) {
+				try {
+					key = decodeURIComponent(escape(atob(qKey)));
+				} catch {
+					key = qKey;
+				}
+			}
+		}
+		if (!key) {
+			try {
+				const cloned = c.req.raw.clone();
+				const contentType = c.req.header("content-type") || "";
+				if (contentType.includes("application/json")) {
+					const body = await cloned.json().catch(() => undefined) as any;
+					const bodyKey = body?.key ?? body?.newKey ?? body?.to;
+					if (bodyKey) {
+						try {
+							key = decodeURIComponent(escape(atob(bodyKey)));
+						} catch {
+							key = String(bodyKey);
+						}
+					}
+				}
+			} catch {
+				// ignore
+			}
+		}
+
 		const userHealthGroup = c.get("user_health_group");
 
 		if (key && userHealthGroup && userHealthGroup !== "admin") {
