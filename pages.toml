@@ -1,0 +1,7 @@
+[build]
+command = "cd packages/dashboard && pnpm install && pnpm run build"
+
+[build.environment]
+NODE_VERSION = "20"
+
+pages_build_output_dir = "packages/dashboard/dist"
