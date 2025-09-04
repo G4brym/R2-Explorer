@@ -9,6 +9,9 @@ interface DocumentClassification {
   vendor?: string
   serviceType?: string
   summary?: string
+  amount?: string
+  dueDate?: string
+  priority?: 'URGENT' | 'HIGH' | 'NORMAL'
   extractedData?: {
     patientId?: string
     date?: string
@@ -16,6 +19,7 @@ interface DocumentClassification {
     vendor?: string
     serviceType?: string
     documentType?: string
+    priority?: string
     keyEntities?: string[]
   }
 }
@@ -216,17 +220,37 @@ function classifyByFilename(filename: string): DocumentClassification {
   const lower = filename.toLowerCase()
   
   if (['invoice', 'inv', 'bill', 'statement', 'payment'].some(k => lower.includes(k))) {
-    return { category: 'invoices', confidence: 0.6 }
+    return { 
+      category: 'invoices', 
+      confidence: 0.6,
+      summary: 'Invoice document identified by filename. Manual review recommended.',
+      priority: 'NORMAL'
+    }
   }
   if (['contract', 'agreement', 'msa', 'sow', 'terms'].some(k => lower.includes(k))) {
-    return { category: 'contracts', confidence: 0.6 }
+    return { 
+      category: 'contracts', 
+      confidence: 0.6,
+      summary: 'Contract document identified by filename. Manual review recommended.',
+      priority: 'NORMAL'
+    }
   }
   if (['workflow', 'process', 'diagram', 'flow', 'procedure'].some(k => lower.includes(k))) {
-    return { category: 'workflows', confidence: 0.6 }
+    return { 
+      category: 'workflows', 
+      confidence: 0.6,
+      summary: 'Workflow document identified by filename. Manual review recommended.',
+      priority: 'NORMAL'
+    }
   }
   // Forms are now classified as 'other' or more specific categories
   
-  return { category: 'other', confidence: 0.5 }
+  return { 
+    category: 'other', 
+    confidence: 0.5,
+    summary: 'Document uploaded. Manual classification required.',
+    priority: 'NORMAL'
+  }
 }
 
 // Helper function to convert File to base64

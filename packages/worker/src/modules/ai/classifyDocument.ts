@@ -14,12 +14,16 @@ interface DocumentClassification {
 	vendor?: string;
 	serviceType?: string;
 	summary?: string;
+	amount?: string;
+	dueDate?: string;
+	priority?: 'URGENT' | 'HIGH' | 'NORMAL';
 	extractedData?: {
 		documentType?: string;
 		amount?: string;
 		date?: string;
 		vendor?: string;
 		serviceType?: string;
+		priority?: string;
 		keyEntities?: string[];
 	};
 }
@@ -63,35 +67,34 @@ export class ClassifyDocument extends OpenAPIRoute {
 		try {
 			console.log('🤖 Worker: Starting AI classification for:', data.filename, 'Type:', data.mimeType);
 			
-			// Use Cloudflare's text-based AI model for robust document analysis
-			// This works with ANY file type by analyzing filename and metadata
+			// Enhanced AI analysis with improved data extraction
 			const aiResponse = await c.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
-				prompt: `You are a document classification expert. Analyze this file and provide classification with a brief summary.
+				prompt: `Analyze this document and extract key business information.
 
-Filename: ${data.filename}
-File Type: ${data.mimeType}
-Context: This is a healthcare/business document management system.
+DOCUMENT NAME: ${data.filename}
+FILE TYPE: ${data.mimeType}
+CONTEXT: This is a business/healthcare document management system.
 
-Based on the filename and file type, classify this document and provide a brief summary.
+Provide ONLY the following information (write "UNKNOWN" if not found):
 
-CATEGORIES (choose one):
-- invoices: Bills, invoices, statements, payments, medical bills
-- contracts: Agreements, MSAs, SOWs, contracts, legal documents  
-- workflows: Procedures, processes, diagrams, protocols, guidelines
-- other: Everything else
-
-EXTRACTION REQUIREMENTS:
-- Extract vendor/company name if identifiable from filename
-- Identify service type (e.g., "Medical Services", "Legal Services", "Consulting", "IT Support")
-- Provide brief summary of document purpose
+DOCUMENT TYPE: [Must be one of: invoices, contracts, workflows, other]
+VENDOR: [Company name providing services]
+AMOUNT: [Dollar amount if invoice or contract - include $ symbol]
+DUE DATE: [Payment due date or contract end date if applicable]
+SERVICE TYPE: [What service or product this relates to]
+PRIORITY: [URGENT if due within 7 days, HIGH if within 30 days, otherwise NORMAL]
+SUMMARY: [First sentence: What this document is. Second sentence: What action is needed.]
 
 Respond with ONLY this JSON format:
 {
   "category": "invoices|contracts|workflows|other",
   "confidence": 0.90,
-  "vendor": "Company/Vendor Name",
-  "serviceType": "Type of service provided",
-  "summary": "Brief 1-2 sentence description of what this document contains"
+  "vendor": "Company/Vendor Name or UNKNOWN",
+  "amount": "$1,234.56 or UNKNOWN", 
+  "dueDate": "March 15, 2025 or UNKNOWN",
+  "serviceType": "Type of service provided or UNKNOWN",
+  "priority": "URGENT|HIGH|NORMAL",
+  "summary": "Brief description of document and required action"
 }`
 			});
 
@@ -116,10 +119,21 @@ Respond with ONLY this JSON format:
 			const classification: DocumentClassification = {
 				category: parsed.category || 'other',
 				confidence: parsed.confidence || 0.7,
-				vendor: parsed.vendor,
-				serviceType: parsed.serviceType,
+				vendor: parsed.vendor && parsed.vendor !== 'UNKNOWN' ? parsed.vendor : undefined,
+				serviceType: parsed.serviceType && parsed.serviceType !== 'UNKNOWN' ? parsed.serviceType : undefined,
 				summary: parsed.summary,
-				extractedData: parsed.extractedData
+				amount: parsed.amount && parsed.amount !== 'UNKNOWN' ? parsed.amount : undefined,
+				dueDate: parsed.dueDate && parsed.dueDate !== 'UNKNOWN' ? parsed.dueDate : undefined,
+				priority: parsed.priority || 'NORMAL',
+				extractedData: {
+					documentType: parsed.category,
+					amount: parsed.amount && parsed.amount !== 'UNKNOWN' ? parsed.amount : undefined,
+					date: parsed.dueDate && parsed.dueDate !== 'UNKNOWN' ? parsed.dueDate : undefined,
+					vendor: parsed.vendor && parsed.vendor !== 'UNKNOWN' ? parsed.vendor : undefined,
+					serviceType: parsed.serviceType && parsed.serviceType !== 'UNKNOWN' ? parsed.serviceType : undefined,
+					priority: parsed.priority || 'NORMAL',
+					keyEntities: [parsed.vendor, parsed.serviceType].filter(Boolean)
+				}
 			};
 
 			return {
@@ -143,15 +157,35 @@ Respond with ONLY this JSON format:
 		const lower = (filename || 'unknown').toLowerCase();
 		
 		if (['invoice', 'inv', 'bill', 'statement', 'payment'].some(k => lower.includes(k))) {
-			return { category: 'invoices', confidence: 0.6 };
+			return { 
+				category: 'invoices', 
+				confidence: 0.6,
+				summary: 'Invoice document uploaded. Manual review required for amount and due date.',
+				priority: 'NORMAL'
+			};
 		}
 		if (['contract', 'agreement', 'msa', 'sow', 'terms'].some(k => lower.includes(k))) {
-			return { category: 'contracts', confidence: 0.6 };
+			return { 
+				category: 'contracts', 
+				confidence: 0.6,
+				summary: 'Contract document uploaded. Manual review required for terms and dates.',
+				priority: 'NORMAL'
+			};
 		}
 		if (['workflow', 'process', 'diagram', 'flow', 'procedure'].some(k => lower.includes(k))) {
-			return { category: 'workflows', confidence: 0.6 };
+			return { 
+				category: 'workflows', 
+				confidence: 0.6,
+				summary: 'Workflow document uploaded. Manual review required for process details.',
+				priority: 'NORMAL'
+			};
 		}
 		
-		return { category: 'other', confidence: 0.5 };
+		return { 
+			category: 'other', 
+			confidence: 0.5,
+			summary: 'Document uploaded. Manual classification and review required.',
+			priority: 'NORMAL'
+		};
 	}
 }
