@@ -166,7 +166,7 @@ CATEGORIES:
 	}
 
 	private classifyByFilename(filename: string): DocumentClassification {
-		const lower = filename.toLowerCase();
+		const lower = (filename || 'unknown').toLowerCase();
 		
 		if (['invoice', 'inv', 'bill', 'statement', 'payment'].some(k => lower.includes(k))) {
 			return { category: 'invoices', confidence: 0.6 };
