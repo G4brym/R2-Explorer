@@ -1,11 +1,11 @@
 import axios from 'axios'
 
-// SpendRule: Point to the worker API URL - always use deployed version for now
+// SpendRule: Point to the worker API URL
 let url = "https://spendrule-doc-upload-dashboard.oluwamakinwa.workers.dev"
-// For development, we'll use the deployed API since local worker isn't running
-// if (import.meta.env.DEV) {
-//   url = import.meta.env.VITE_SERVER_URL || "http://localhost:8787"
-// }
+// For development, use local worker with AI capabilities
+if (import.meta.env.DEV) {
+  url = import.meta.env.VITE_SERVER_URL || "http://localhost:8787"
+}
 
 export const api = axios.create({ 
   baseURL: `${url}/api`,
