@@ -33,10 +33,16 @@ export class ClassifyDocument extends OpenAPIRoute {
 		operationId: "classify-document",
 		tags: ["AI"],
 		summary: "Classify document using Claude AI",
-		requestBody: {
-			content: {
-				"application/json": {
-					schema: ClassifyDocumentInput,
+		request: {
+			body: {
+				content: {
+					"application/json": {
+						schema: z.object({
+							filename: z.string(),
+							fileData: z.string(),
+							mimeType: z.string(),
+						}),
+					},
 				},
 			},
 		},
@@ -62,15 +68,15 @@ export class ClassifyDocument extends OpenAPIRoute {
 	};
 
 	async handle(c: AppContext) {
-		const data = await this.getValidatedData<typeof ClassifyDocumentInput>();
+		const data = await this.getValidatedData<typeof this.schema>();
 
 		console.log('🔍 Received data:', JSON.stringify(data, null, 2));
 
 		// Use filename or default if not provided
-		const filename = data.filename || 'unknown-document';
+		const filename = data.body.filename || 'unknown-document';
 		
 		// Ensure mimeType is not undefined
-		const mimeType = data.mimeType || 'application/octet-stream';
+		const mimeType = data.body.mimeType || 'application/octet-stream';
 
 		try {
 			console.log('🤖 Worker: Starting AI classification for:', filename, 'Type:', mimeType);
@@ -79,7 +85,7 @@ export class ClassifyDocument extends OpenAPIRoute {
 			const isImageFile = mimeType.startsWith('image/');
 			let aiResponse;
 			
-			if (data.fileData && data.fileData.trim() && isImageFile) {
+			if (data.body.fileData && data.body.fileData.trim() && isImageFile) {
 				console.log('📸 Using vision model for image analysis');
 				// Use Llama Vision model for direct image analysis
 				aiResponse = await c.env.AI.run('@cf/meta/llama-3.2-11b-vision-instruct', {
@@ -119,7 +125,7 @@ Respond with ONLY this JSON format:
 								{
 									type: 'image_url',
 									image_url: {
-										url: `data:${mimeType};base64,${data.fileData}`
+										url: `data:${mimeType};base64,${data.body.fileData}`
 									}
 								}
 							]
