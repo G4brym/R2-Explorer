@@ -12,6 +12,11 @@ export const api = axios.create({
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json'
+  },
+  // Add basic auth credentials for SpendRule API
+  auth: {
+    username: 'spendrule_admin',
+    password: 'Admin_2025'
   }
 })
 
