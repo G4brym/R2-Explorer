@@ -82,206 +82,235 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { api } from '@/lib/api'
-import { toast } from '@/lib/toast'
-import { 
-  XIcon, 
-  DownloadIcon, 
-  LoaderIcon, 
-  AlertCircleIcon, 
-  FileIcon, 
-  FileTextIcon, 
-  ImageIcon 
-} from 'lucide-vue-next'
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import Button from '@/components/ui/Button.vue'
-import VuePdfEmbed from 'vue-pdf-embed'
+import Button from "@/components/ui/Button.vue";
+import Card from "@/components/ui/Card.vue";
+import CardContent from "@/components/ui/CardContent.vue";
+import CardHeader from "@/components/ui/CardHeader.vue";
+import { api } from "@/lib/api";
+import { toast } from "@/lib/toast";
+import {
+	AlertCircleIcon,
+	DownloadIcon,
+	FileIcon,
+	FileTextIcon,
+	ImageIcon,
+	LoaderIcon,
+	XIcon,
+} from "lucide-vue-next";
+import { computed, ref, watch } from "vue";
+import VuePdfEmbed from "vue-pdf-embed";
 
 interface FileItem {
-  name: string
-  key: string
-  size?: number
-  lastModified?: string
+	name: string;
+	key: string;
+	size?: number;
+	lastModified?: string;
 }
 
 interface Props {
-  isOpen: boolean
-  file: FileItem | null
-  bucket: string
+	isOpen: boolean;
+	file: FileItem | null;
+	bucket: string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  close: []
-}>()
+	close: [];
+}>();
 
-const loading = ref(false)
-const error = ref('')
-const textContent = ref('')
-const blobUrl = ref('')
+const loading = ref(false);
+const error = ref("");
+const textContent = ref("");
+const blobUrl = ref("");
 
 const previewUrl = computed(() => {
-  // For images and PDFs, we'll use a blob URL after fetching with auth
-  if (blobUrl.value) return blobUrl.value
-  
-  // Fallback for direct URL (won't work without auth)
-  if (!props.file) return ''
-  return `${api.defaults.baseURL}/buckets/${props.bucket}/${encodeURIComponent(props.file.key)}`
-})
+	// For images and PDFs, we'll use a blob URL after fetching with auth
+	if (blobUrl.value) return blobUrl.value;
+
+	// Fallback for direct URL (won't work without auth)
+	if (!props.file) return "";
+	return `${api.defaults.baseURL}/buckets/${props.bucket}/${encodeURIComponent(props.file.key)}`;
+});
 
 const isImage = computed(() => {
-  if (!props.file) return false
-  const ext = getFileExtension(props.file.name).toLowerCase()
-  return ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp'].includes(ext)
-})
+	if (!props.file) return false;
+	const ext = getFileExtension(props.file.name).toLowerCase();
+	return ["jpg", "jpeg", "png", "gif", "svg", "webp", "bmp"].includes(ext);
+});
 
 const isPdf = computed(() => {
-  if (!props.file) return false
-  return getFileExtension(props.file.name).toLowerCase() === 'pdf'
-})
+	if (!props.file) return false;
+	return getFileExtension(props.file.name).toLowerCase() === "pdf";
+});
 
 const isText = computed(() => {
-  if (!props.file) return false
-  const ext = getFileExtension(props.file.name).toLowerCase()
-  return ['txt', 'md', 'json', 'csv', 'xml', 'yaml', 'yml', 'log'].includes(ext)
-})
+	if (!props.file) return false;
+	const ext = getFileExtension(props.file.name).toLowerCase();
+	return ["txt", "md", "json", "csv", "xml", "yaml", "yml", "log"].includes(
+		ext,
+	);
+});
 
 function getFileExtension(filename: string) {
-  return filename.split('.').pop() || ''
+	return filename.split(".").pop() || "";
 }
 
 function getFileIcon(filename: string) {
-  if (!filename) return FileIcon
-  
-  const ext = getFileExtension(filename).toLowerCase()
-  
-  if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp'].includes(ext)) {
-    return ImageIcon
-  }
-  if (['txt', 'md', 'json', 'csv', 'xml', 'yaml', 'yml', 'log'].includes(ext)) {
-    return FileTextIcon
-  }
-  return FileIcon
+	if (!filename) return FileIcon;
+
+	const ext = getFileExtension(filename).toLowerCase();
+
+	if (["jpg", "jpeg", "png", "gif", "svg", "webp", "bmp"].includes(ext)) {
+		return ImageIcon;
+	}
+	if (["txt", "md", "json", "csv", "xml", "yaml", "yml", "log"].includes(ext)) {
+		return FileTextIcon;
+	}
+	return FileIcon;
 }
 
 function close() {
-  emit('close')
-  reset()
+	emit("close");
+	reset();
 }
 
 function reset() {
-  loading.value = false
-  error.value = ''
-  textContent.value = ''
-  
-  // Clean up blob URL if exists
-  if (blobUrl.value) {
-    window.URL.revokeObjectURL(blobUrl.value)
-    blobUrl.value = ''
-  }
+	loading.value = false;
+	error.value = "";
+	textContent.value = "";
+
+	// Clean up blob URL if exists
+	if (blobUrl.value) {
+		window.URL.revokeObjectURL(blobUrl.value);
+		blobUrl.value = "";
+	}
 }
 
 async function downloadFile() {
-  if (!props.file) return
-  
-  try {
-    // Encode the key with base64 as required by backend
-    const encodedKey = btoa(props.file.key)
-    
-    // Fetch the file with authentication
-    const response = await api.get(`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`, {
-      responseType: 'blob'
-    })
-    
-    // Create a blob URL and download
-    const blob = new Blob([response.data])
-    const url = window.URL.createObjectURL(blob)
-    
-    const link = document.createElement('a')
-    link.href = url
-    link.download = props.file.name
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    
-    // Cleanup
-    window.URL.revokeObjectURL(url)
-  } catch (error) {
-    console.error('Download failed:', error)
-    toast.error('Failed to download file')
-  }
+	if (!props.file) return;
+
+	try {
+		// Encode the key with base64 as required by backend
+		const encodedKey = btoa(props.file.key);
+
+		// Fetch the file with authentication
+		const response = await api.get(
+			`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`,
+			{
+				responseType: "blob",
+			},
+		);
+
+		// Create a blob URL and download
+		const blob = new Blob([response.data]);
+		const url = window.URL.createObjectURL(blob);
+
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = props.file.name;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		// Cleanup
+		window.URL.revokeObjectURL(url);
+	} catch (error) {
+		console.error("Download failed:", error);
+		toast.error("Failed to download file");
+	}
 }
 
 function handlePreviewError() {
-  loading.value = false
-  error.value = 'Failed to load preview'
+	loading.value = false;
+	error.value = "Failed to load preview";
 }
 
 async function loadFileContent() {
-  if (!props.file) return
-  
-  loading.value = true
-  error.value = ''
-  
-  try {
-    // For text files, fetch as text
-    if (isText.value) {
-      const encodedKey = btoa(props.file.key)
-      const response = await api.get(`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`, {
-        responseType: 'text'
-      })
-      textContent.value = response.data
-    } 
-    // For images and PDFs, fetch as blob and create object URL
-    else if (isImage.value || isPdf.value) {
-      const encodedKey = btoa(props.file.key)
-      const response = await api.get(`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`, {
-        responseType: 'blob'
-      })
-      
-      // Check if response is actually binary content (not HTML error)
-      const contentType = response.headers['content-type'] || response.data.type
-      
-      // Check if it's a small response (likely an error) or wrong content type
-      if (response.data.size < 1000 || (contentType && (contentType.includes('text/html') || contentType.includes('application/json')))) {
-        // Response is likely HTML/JSON error, read as text to get error message
-        const errorText = await response.data.text()
-        throw new Error(errorText.includes('"error"') ? JSON.parse(errorText).error : 'Invalid response from server')
-      }
-      
-      // Clean up old blob URL if exists
-      if (blobUrl.value) {
-        window.URL.revokeObjectURL(blobUrl.value)
-      }
-      
-      // Create new blob URL for preview
-      blobUrl.value = window.URL.createObjectURL(response.data)
-    }
-  } catch (e: any) {
-    error.value = e.response?.status === 404 
-      ? 'File not found' 
-      : e.message || 'Failed to load file content'
-    console.error('Failed to load file content:', e)
-  } finally {
-    loading.value = false
-  }
+	if (!props.file) return;
+
+	loading.value = true;
+	error.value = "";
+
+	try {
+		// For text files, fetch as text
+		if (isText.value) {
+			const encodedKey = btoa(props.file.key);
+			const response = await api.get(
+				`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`,
+				{
+					responseType: "text",
+				},
+			);
+			textContent.value = response.data;
+		}
+		// For images and PDFs, fetch as blob and create object URL
+		else if (isImage.value || isPdf.value) {
+			const encodedKey = btoa(props.file.key);
+			const response = await api.get(
+				`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`,
+				{
+					responseType: "blob",
+				},
+			);
+
+			// Check if response is actually binary content (not HTML error)
+			const contentType =
+				response.headers["content-type"] || response.data.type;
+
+			// Check if it's a small response (likely an error) or wrong content type
+			if (
+				response.data.size < 1000 ||
+				(contentType &&
+					(contentType.includes("text/html") ||
+						contentType.includes("application/json")))
+			) {
+				// Response is likely HTML/JSON error, read as text to get error message
+				const errorText = await response.data.text();
+				throw new Error(
+					errorText.includes('"error"')
+						? JSON.parse(errorText).error
+						: "Invalid response from server",
+				);
+			}
+
+			// Clean up old blob URL if exists
+			if (blobUrl.value) {
+				window.URL.revokeObjectURL(blobUrl.value);
+			}
+
+			// Create new blob URL for preview
+			blobUrl.value = window.URL.createObjectURL(response.data);
+		}
+	} catch (e: any) {
+		error.value =
+			e.response?.status === 404
+				? "File not found"
+				: e.message || "Failed to load file content";
+		console.error("Failed to load file content:", e);
+	} finally {
+		loading.value = false;
+	}
 }
 
 // Load preview when file changes
-watch(() => props.file, (newFile) => {
-  if (newFile && props.isOpen) {
-    reset()
-    loadFileContent()
-  }
-}, { immediate: true })
+watch(
+	() => props.file,
+	(newFile) => {
+		if (newFile && props.isOpen) {
+			reset();
+			loadFileContent();
+		}
+	},
+	{ immediate: true },
+);
 
 // Reset when dialog closes
-watch(() => props.isOpen, (isOpen) => {
-  if (!isOpen) {
-    reset()
-  }
-})
+watch(
+	() => props.isOpen,
+	(isOpen) => {
+		if (!isOpen) {
+			reset();
+		}
+	},
+);
 </script>

@@ -136,409 +136,477 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { api } from '@/lib/api'
-import { UploadIcon, XIcon, FileIcon, AlertCircleIcon, CheckCircleIcon, RefreshCwIcon, FolderIcon } from 'lucide-vue-next'
-import { withRetry, handleError, networkStatus } from '@/lib/errors'
-import { toast } from '@/lib/toast'
-import { useAuthStore } from '@/stores/auth'
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import Button from '@/components/ui/Button.vue'
-import { computed } from 'vue'
+import Button from "@/components/ui/Button.vue";
+import Card from "@/components/ui/Card.vue";
+import CardContent from "@/components/ui/CardContent.vue";
+import CardHeader from "@/components/ui/CardHeader.vue";
+import { api } from "@/lib/api";
+import { handleError, networkStatus, withRetry } from "@/lib/errors";
+import { toast } from "@/lib/toast";
+import { useAuthStore } from "@/stores/auth";
+import {
+	AlertCircleIcon,
+	CheckCircleIcon,
+	FileIcon,
+	FolderIcon,
+	RefreshCwIcon,
+	UploadIcon,
+	XIcon,
+} from "lucide-vue-next";
+import { onMounted, onUnmounted, ref } from "vue";
+import { computed } from "vue";
 
 interface Props {
-  isOpen: boolean
-  currentPath: string
-  bucket: string
+	isOpen: boolean;
+	currentPath: string;
+	bucket: string;
 }
 
 interface UploadingFile {
-  name: string
-  progress: number
-  file: File
-  status: 'uploading' | 'completed' | 'error' | 'retrying'
-  error?: string
-  retryCount?: number
-  aiStatus?: 'analyzing' | 'completed' | 'failed'
-  aiResult?: string
+	name: string;
+	progress: number;
+	file: File;
+	status: "uploading" | "completed" | "error" | "retrying";
+	error?: string;
+	retryCount?: number;
+	aiStatus?: "analyzing" | "completed" | "failed";
+	aiResult?: string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  close: []
-  uploaded: []
-}>()
+	close: [];
+	uploaded: [];
+}>();
 
-const authStore = useAuthStore()
+const authStore = useAuthStore();
 
-const dropZone = ref<HTMLElement>()
-const fileInput = ref<HTMLInputElement>()
-const folderInput = ref<HTMLInputElement>()
-const isDragging = ref(false)
-const uploadingFiles = ref<UploadingFile[]>([])
+const dropZone = ref<HTMLElement>();
+const fileInput = ref<HTMLInputElement>();
+const folderInput = ref<HTMLInputElement>();
+const isDragging = ref(false);
+const uploadingFiles = ref<UploadingFile[]>([]);
 
-const completedCount = computed(() => 
-  uploadingFiles.value.filter(f => f.status === 'completed').length
-)
+const completedCount = computed(
+	() => uploadingFiles.value.filter((f) => f.status === "completed").length,
+);
 
-const errorCount = computed(() => 
-  uploadingFiles.value.filter(f => f.status === 'error').length
-)
+const errorCount = computed(
+	() => uploadingFiles.value.filter((f) => f.status === "error").length,
+);
 
-const hasErrors = computed(() => errorCount.value > 0)
+const hasErrors = computed(() => errorCount.value > 0);
 
 function close() {
-  emit('close')
+	emit("close");
 }
 
 function triggerFileInput() {
-  fileInput.value?.click()
+	fileInput.value?.click();
 }
 
 function triggerFolderInput() {
-  folderInput.value?.click()
+	folderInput.value?.click();
 }
 
 function handleFolderSelect(e: Event) {
-  const target = e.target as HTMLInputElement
-  const files = Array.from(target.files || [])
-  
-  if (files.length > 0) {
-    toast.info(`Selected ${files.length} files from folder structure`)
-    uploadFiles(files)
-  }
+	const target = e.target as HTMLInputElement;
+	const files = Array.from(target.files || []);
+
+	if (files.length > 0) {
+		toast.info(`Selected ${files.length} files from folder structure`);
+		uploadFiles(files);
+	}
 }
 
 function handleDragOver(e: DragEvent) {
-  e.preventDefault()
-  isDragging.value = true
+	e.preventDefault();
+	isDragging.value = true;
 }
 
 function handleDragLeave(e: DragEvent) {
-  e.preventDefault()
-  // Only set to false if leaving the drop zone completely
-  if (!dropZone.value?.contains(e.relatedTarget as Node)) {
-    isDragging.value = false
-  }
+	e.preventDefault();
+	// Only set to false if leaving the drop zone completely
+	if (!dropZone.value?.contains(e.relatedTarget as Node)) {
+		isDragging.value = false;
+	}
 }
 
 async function handleDrop(e: DragEvent) {
-  e.preventDefault()
-  isDragging.value = false
-  
-  const items = Array.from(e.dataTransfer?.items || [])
-  const files: File[] = []
-  
-  // Process both files and directories
-  for (const item of items) {
-    if (item.kind === 'file') {
-      const entry = item.webkitGetAsEntry()
-      if (entry) {
-        const entryFiles = await processEntry(entry)
-        files.push(...entryFiles)
-      } else {
-        // Fallback for browsers that don't support webkitGetAsEntry
-        const file = item.getAsFile()
-        if (file) files.push(file)
-      }
-    }
-  }
-  
-  if (files.length > 0) {
-    toast.info(`Processing ${files.length} files from dropped items`)
-    uploadFiles(files)
-  }
+	e.preventDefault();
+	isDragging.value = false;
+
+	const items = Array.from(e.dataTransfer?.items || []);
+	const files: File[] = [];
+
+	// Process both files and directories
+	for (const item of items) {
+		if (item.kind === "file") {
+			const entry = item.webkitGetAsEntry();
+			if (entry) {
+				const entryFiles = await processEntry(entry);
+				files.push(...entryFiles);
+			} else {
+				// Fallback for browsers that don't support webkitGetAsEntry
+				const file = item.getAsFile();
+				if (file) files.push(file);
+			}
+		}
+	}
+
+	if (files.length > 0) {
+		toast.info(`Processing ${files.length} files from dropped items`);
+		uploadFiles(files);
+	}
 }
 
 // Helper function to recursively process directory entries
 async function processEntry(entry: any): Promise<File[]> {
-  return new Promise((resolve) => {
-    const files: File[] = []
-    
-    if (entry.isFile) {
-      entry.file((file: File) => {
-        // Preserve folder structure in file path
-        const relativePath = entry.fullPath.startsWith('/') 
-          ? entry.fullPath.slice(1) 
-          : entry.fullPath
-        
-        // Add folder structure to file object for upload path
-        Object.defineProperty(file, 'webkitRelativePath', {
-          value: relativePath,
-          writable: false
-        })
-        
-        resolve([file])
-      })
-    } else if (entry.isDirectory) {
-      const dirReader = entry.createReader()
-      
-      function readEntries() {
-        dirReader.readEntries(async (entries: any[]) => {
-          if (entries.length === 0) {
-            resolve(files)
-            return
-          }
-          
-          for (const childEntry of entries) {
-            const childFiles = await processEntry(childEntry)
-            files.push(...childFiles)
-          }
-          
-          // Continue reading (directories might have more entries)
-          readEntries()
-        })
-      }
-      
-      readEntries()
-    } else {
-      resolve([])
-    }
-  })
+	return new Promise((resolve) => {
+		const files: File[] = [];
+
+		if (entry.isFile) {
+			entry.file((file: File) => {
+				// Preserve folder structure in file path
+				const relativePath = entry.fullPath.startsWith("/")
+					? entry.fullPath.slice(1)
+					: entry.fullPath;
+
+				// Add folder structure to file object for upload path
+				Object.defineProperty(file, "webkitRelativePath", {
+					value: relativePath,
+					writable: false,
+				});
+
+				resolve([file]);
+			});
+		} else if (entry.isDirectory) {
+			const dirReader = entry.createReader();
+
+			function readEntries() {
+				dirReader.readEntries(async (entries: any[]) => {
+					if (entries.length === 0) {
+						resolve(files);
+						return;
+					}
+
+					for (const childEntry of entries) {
+						const childFiles = await processEntry(childEntry);
+						files.push(...childFiles);
+					}
+
+					// Continue reading (directories might have more entries)
+					readEntries();
+				});
+			}
+
+			readEntries();
+		} else {
+			resolve([]);
+		}
+	});
 }
 
 function handleFileSelect(e: Event) {
-  const target = e.target as HTMLInputElement
-  const files = Array.from(target.files || [])
-  uploadFiles(files)
+	const target = e.target as HTMLInputElement;
+	const files = Array.from(target.files || []);
+	uploadFiles(files);
 }
 
 async function uploadFiles(files: File[]) {
-  if (files.length === 0) return
-  
-  // Check network connection
-  if (!networkStatus.isOnline) {
-    toast.error('Cannot upload files while offline')
-    return
-  }
-  
-  // Initialize upload tracking
-  uploadingFiles.value = files.map(file => ({
-    name: file.name,
-    progress: 0,
-    file,
-    status: 'uploading' as const,
-    retryCount: 0
-  }))
-  
-  // Upload files in parallel with error handling
-  const uploadPromises = uploadingFiles.value.map(uploadFile => 
-    uploadSingleFile(uploadFile)
-  )
-  
-  await Promise.allSettled(uploadPromises)
-  
-  // Show summary
-  const completed = completedCount.value
-  const failed = errorCount.value
-  
-  if (completed > 0 && failed === 0) {
-    toast.success(`Successfully uploaded ${completed} file${completed === 1 ? '' : 's'}`)
-    emit('uploaded')
-    
-    // Auto-close after successful upload
-    setTimeout(() => {
-      uploadingFiles.value = []
-      emit('close')
-    }, 1500)
-  } else if (completed > 0 && failed > 0) {
-    toast.warning(`Uploaded ${completed} files successfully, ${failed} failed`)
-  } else if (failed > 0) {
-    toast.error(`Failed to upload ${failed} file${failed === 1 ? '' : 's'}`)
-  }
+	if (files.length === 0) return;
+
+	// Check network connection
+	if (!networkStatus.isOnline) {
+		toast.error("Cannot upload files while offline");
+		return;
+	}
+
+	// Initialize upload tracking
+	uploadingFiles.value = files.map((file) => ({
+		name: file.name,
+		progress: 0,
+		file,
+		status: "uploading" as const,
+		retryCount: 0,
+	}));
+
+	// Upload files in parallel with error handling
+	const uploadPromises = uploadingFiles.value.map((uploadFile) =>
+		uploadSingleFile(uploadFile),
+	);
+
+	await Promise.allSettled(uploadPromises);
+
+	// Show summary
+	const completed = completedCount.value;
+	const failed = errorCount.value;
+
+	if (completed > 0 && failed === 0) {
+		toast.success(
+			`Successfully uploaded ${completed} file${completed === 1 ? "" : "s"}`,
+		);
+		emit("uploaded");
+
+		// Auto-close after successful upload
+		setTimeout(() => {
+			uploadingFiles.value = [];
+			emit("close");
+		}, 1500);
+	} else if (completed > 0 && failed > 0) {
+		toast.warning(`Uploaded ${completed} files successfully, ${failed} failed`);
+	} else if (failed > 0) {
+		toast.error(`Failed to upload ${failed} file${failed === 1 ? "" : "s"}`);
+	}
 }
 
 async function uploadSingleFile(uploadFile: UploadingFile) {
-  const maxRetries = 3
-  
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      if (attempt > 0) {
-        uploadFile.status = 'retrying'
-        uploadFile.retryCount = attempt
-        uploadFile.progress = 0
-      }
-      
-      const formData = new FormData()
-      formData.append('file', uploadFile.file)
-      
-      // Handle folder structure from webkitRelativePath or regular file name
-      const relativePath = (uploadFile.file as any).webkitRelativePath || uploadFile.file.name
-      
-      // SpendRule: Auto-categorize files for henryford_user (client-side fallback)
-      let uploadPath = props.currentPath 
-        ? `${props.currentPath}/${relativePath}`
-        : relativePath
-        
-      // First, do immediate filename-based categorization
-      let documentType = 'other'
-      let aiSummary = ''
-      let vendor = ''
-      
-      const filename = uploadFile.file.name.toLowerCase()
-      
-      if (['invoice', 'inv', 'bill', 'statement', 'payment'].some(keyword => filename.includes(keyword))) {
-        documentType = 'invoices'
-      } else if (['contract', 'agreement', 'msa', 'sow', 'terms'].some(keyword => filename.includes(keyword))) {
-        documentType = 'contracts'
-      } else if (['workflow', 'process', 'diagram', 'flow', 'procedure'].some(keyword => filename.includes(keyword))) {
-        documentType = 'workflows'
-      } else if (['report', 'analysis', 'summary', 'analytics'].some(keyword => filename.includes(keyword))) {
-        documentType = 'reports'
-      } else if (['form', 'application', 'intake', 'survey'].some(keyword => filename.includes(keyword))) {
-        documentType = 'forms'
-      }
-      
-      // Show initial filename-based classification
-      uploadFile.aiResult = `${documentType} (filename)`
-      
-      // Then immediately follow with AI analysis for PDFs and images
-      if (uploadFile.file.type === 'application/pdf' || uploadFile.file.type.startsWith('image/')) {
-        try {
-          // Set AI analyzing status
-          uploadFile.aiStatus = 'analyzing'
-          
-          const { classifyDocumentWithAI } = await import('@/lib/ai-classifier')
-          const aiResult = await classifyDocumentWithAI(uploadFile.file, uploadFile.file.name)
-          
-          if (aiResult.confidence > 0.7) {
-            // AI succeeded - update classification
-            documentType = aiResult.category
-            aiSummary = aiResult.summary || ''
-            vendor = aiResult.vendor || ''
-            
-            // Set AI completed status with result
-            uploadFile.aiStatus = 'completed'
-            uploadFile.aiResult = aiResult.summary ? `${documentType}: ${aiResult.summary}` : documentType
-            
-            // Show AI classification success
-            if (aiResult.summary) {
-              toast.success(`✨ AI upgraded: ${documentType} - ${aiResult.summary}`)
-            } else {
-              toast.success(`✨ AI confirmed as ${documentType}${vendor ? ' from ' + vendor : ''}`)
-            }
-          } else {
-            // AI lower confidence - keep filename classification
-            uploadFile.aiStatus = 'completed'
-            uploadFile.aiResult = documentType
-          }
-        } catch (error) {
-          console.warn('AI classification failed, keeping filename classification:', error)
-          // Set AI failed status but keep filename classification
-          uploadFile.aiStatus = 'failed'
-          uploadFile.aiResult = `${documentType} (filename)`
-        }
-      }
-      
-      // Always add health group and category structure
-      // Include username for better admin organization: health_group/username/category/filename
-      const categories = ['invoices', 'contracts', 'workflows', 'reports', 'forms', 'other']
-      if (!categories.some(cat => uploadPath.includes(`/${cat}/`))) {
-        const username = authStore.user?.username || 'unknown_user'
-        uploadPath = `henry_ford/${username}/${documentType}/${uploadFile.file.name}`
-      }
-      
-      // Base64 encode the key as expected by the backend
-      const encodedKey = btoa(uploadPath)
-      
-      const response = await withRetry(
-        () => api.post(`/buckets/${props.bucket}/upload`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          params: {
-            key: encodedKey
-          },
-          onUploadProgress: (progressEvent) => {
-            if (progressEvent.total) {
-              uploadFile.progress = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              )
-            }
-          }
-        }),
-        { maxAttempts: 1 } // Handle retries manually for better UX
-      )
-      
-      // Check if backend suggests auto-categorization
-      if (response.data && !response.data.success && response.data.suggestedPath) {
-        // Backend suggests a different path for better organization
-        const suggestedKey = btoa(response.data.suggestedPath)
-        
-        // Retry upload with suggested path
-        uploadFile.status = 'uploading'
-        uploadFile.progress = 0
-        
-        await withRetry(
-          () => api.post(`/buckets/${props.bucket}/upload`, formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            params: {
-              key: suggestedKey
-            },
-            onUploadProgress: (progressEvent) => {
-              if (progressEvent.total) {
-                uploadFile.progress = Math.round(
-                  (progressEvent.loaded * 100) / progressEvent.total
-                )
-              }
-            }
-          }),
-          { maxAttempts: 1 }
-        )
-        
-        // Show categorization message
-        toast.success(`File auto-organized to ${response.data.documentType} folder`)
-      }
-      
-      uploadFile.status = 'completed'
-      uploadFile.progress = 100
-      return
-    } catch (error: any) {
-      console.error(`Upload attempt ${attempt + 1} failed for ${uploadFile.name}:`, error)
-      
-      if (attempt === maxRetries - 1) {
-        // Final attempt failed
-        uploadFile.status = 'error'
-        uploadFile.error = error.response?.data?.error || 'Upload failed'
-        uploadFile.progress = 0
-      } else {
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)))
-      }
-    }
-  }
+	const maxRetries = 3;
+
+	for (let attempt = 0; attempt < maxRetries; attempt++) {
+		try {
+			if (attempt > 0) {
+				uploadFile.status = "retrying";
+				uploadFile.retryCount = attempt;
+				uploadFile.progress = 0;
+			}
+
+			const formData = new FormData();
+			formData.append("file", uploadFile.file);
+
+			// Handle folder structure from webkitRelativePath or regular file name
+			const relativePath =
+				(uploadFile.file as any).webkitRelativePath || uploadFile.file.name;
+
+			// SpendRule: Auto-categorize files for henryford_user (client-side fallback)
+			let uploadPath = props.currentPath
+				? `${props.currentPath}/${relativePath}`
+				: relativePath;
+
+			// First, do immediate filename-based categorization
+			let documentType = "other";
+			let aiSummary = "";
+			let vendor = "";
+
+			const filename = uploadFile.file.name.toLowerCase();
+
+			if (
+				["invoice", "inv", "bill", "statement", "payment"].some((keyword) =>
+					filename.includes(keyword),
+				)
+			) {
+				documentType = "invoices";
+			} else if (
+				["contract", "agreement", "msa", "sow", "terms"].some((keyword) =>
+					filename.includes(keyword),
+				)
+			) {
+				documentType = "contracts";
+			} else if (
+				["workflow", "process", "diagram", "flow", "procedure"].some(
+					(keyword) => filename.includes(keyword),
+				)
+			) {
+				documentType = "workflows";
+			} else if (
+				["report", "analysis", "summary", "analytics"].some((keyword) =>
+					filename.includes(keyword),
+				)
+			) {
+				documentType = "reports";
+			} else if (
+				["form", "application", "intake", "survey"].some((keyword) =>
+					filename.includes(keyword),
+				)
+			) {
+				documentType = "forms";
+			}
+
+			// Show initial filename-based classification
+			uploadFile.aiResult = `${documentType} (filename)`;
+
+			// Then immediately follow with AI analysis for PDFs and images
+			if (
+				uploadFile.file.type === "application/pdf" ||
+				uploadFile.file.type.startsWith("image/")
+			) {
+				try {
+					// Set AI analyzing status
+					uploadFile.aiStatus = "analyzing";
+
+					const { classifyDocumentWithAI } = await import(
+						"@/lib/ai-classifier"
+					);
+					const aiResult = await classifyDocumentWithAI(
+						uploadFile.file,
+						uploadFile.file.name,
+					);
+
+					if (aiResult.confidence > 0.7) {
+						// AI succeeded - update classification
+						documentType = aiResult.category;
+						aiSummary = aiResult.summary || "";
+						vendor = aiResult.vendor || "";
+
+						// Set AI completed status with result
+						uploadFile.aiStatus = "completed";
+						uploadFile.aiResult = aiResult.summary
+							? `${documentType}: ${aiResult.summary}`
+							: documentType;
+
+						// Show AI classification success
+						if (aiResult.summary) {
+							toast.success(
+								`✨ AI upgraded: ${documentType} - ${aiResult.summary}`,
+							);
+						} else {
+							toast.success(
+								`✨ AI confirmed as ${documentType}${vendor ? " from " + vendor : ""}`,
+							);
+						}
+					} else {
+						// AI lower confidence - keep filename classification
+						uploadFile.aiStatus = "completed";
+						uploadFile.aiResult = documentType;
+					}
+				} catch (error) {
+					console.warn(
+						"AI classification failed, keeping filename classification:",
+						error,
+					);
+					// Set AI failed status but keep filename classification
+					uploadFile.aiStatus = "failed";
+					uploadFile.aiResult = `${documentType} (filename)`;
+				}
+			}
+
+			// Always add health group and category structure
+			// Include username for better admin organization: health_group/username/category/filename
+			const categories = [
+				"invoices",
+				"contracts",
+				"workflows",
+				"reports",
+				"forms",
+				"other",
+			];
+			if (!categories.some((cat) => uploadPath.includes(`/${cat}/`))) {
+				const username = authStore.user?.username || "unknown_user";
+				uploadPath = `henry_ford/${username}/${documentType}/${uploadFile.file.name}`;
+			}
+
+			// Base64 encode the key as expected by the backend
+			const encodedKey = btoa(uploadPath);
+
+			const response = await withRetry(
+				() =>
+					api.post(`/buckets/${props.bucket}/upload`, formData, {
+						headers: {
+							"Content-Type": "multipart/form-data",
+						},
+						params: {
+							key: encodedKey,
+						},
+						onUploadProgress: (progressEvent) => {
+							if (progressEvent.total) {
+								uploadFile.progress = Math.round(
+									(progressEvent.loaded * 100) / progressEvent.total,
+								);
+							}
+						},
+					}),
+				{ maxAttempts: 1 }, // Handle retries manually for better UX
+			);
+
+			// Check if backend suggests auto-categorization
+			if (
+				response.data &&
+				!response.data.success &&
+				response.data.suggestedPath
+			) {
+				// Backend suggests a different path for better organization
+				const suggestedKey = btoa(response.data.suggestedPath);
+
+				// Retry upload with suggested path
+				uploadFile.status = "uploading";
+				uploadFile.progress = 0;
+
+				await withRetry(
+					() =>
+						api.post(`/buckets/${props.bucket}/upload`, formData, {
+							headers: {
+								"Content-Type": "multipart/form-data",
+							},
+							params: {
+								key: suggestedKey,
+							},
+							onUploadProgress: (progressEvent) => {
+								if (progressEvent.total) {
+									uploadFile.progress = Math.round(
+										(progressEvent.loaded * 100) / progressEvent.total,
+									);
+								}
+							},
+						}),
+					{ maxAttempts: 1 },
+				);
+
+				// Show categorization message
+				toast.success(
+					`File auto-organized to ${response.data.documentType} folder`,
+				);
+			}
+
+			uploadFile.status = "completed";
+			uploadFile.progress = 100;
+			return;
+		} catch (error: any) {
+			console.error(
+				`Upload attempt ${attempt + 1} failed for ${uploadFile.name}:`,
+				error,
+			);
+
+			if (attempt === maxRetries - 1) {
+				// Final attempt failed
+				uploadFile.status = "error";
+				uploadFile.error = error.response?.data?.error || "Upload failed";
+				uploadFile.progress = 0;
+			} else {
+				// Wait before retrying
+				await new Promise((resolve) =>
+					setTimeout(resolve, 1000 * (attempt + 1)),
+				);
+			}
+		}
+	}
 }
 
 async function retryUpload(uploadFile: UploadingFile) {
-  uploadFile.status = 'uploading'
-  uploadFile.error = undefined
-  uploadFile.retryCount = 0
-  uploadFile.progress = 0
-  
-  await uploadSingleFile(uploadFile)
+	uploadFile.status = "uploading";
+	uploadFile.error = undefined;
+	uploadFile.retryCount = 0;
+	uploadFile.progress = 0;
+
+	await uploadSingleFile(uploadFile);
 }
 
 // Prevent default drag behaviors on window
 function preventDefaults(e: DragEvent) {
-  e.preventDefault()
-  e.stopPropagation()
+	e.preventDefault();
+	e.stopPropagation();
 }
 
 onMounted(() => {
-  window.addEventListener('dragenter', preventDefaults)
-  window.addEventListener('dragover', preventDefaults)
-  window.addEventListener('dragleave', preventDefaults)
-  window.addEventListener('drop', preventDefaults)
-})
+	window.addEventListener("dragenter", preventDefaults);
+	window.addEventListener("dragover", preventDefaults);
+	window.addEventListener("dragleave", preventDefaults);
+	window.addEventListener("drop", preventDefaults);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('dragenter', preventDefaults)
-  window.removeEventListener('dragover', preventDefaults)
-  window.removeEventListener('dragleave', preventDefaults)
-  window.removeEventListener('drop', preventDefaults)
-})
+	window.removeEventListener("dragenter", preventDefaults);
+	window.removeEventListener("dragover", preventDefaults);
+	window.removeEventListener("dragleave", preventDefaults);
+	window.removeEventListener("drop", preventDefaults);
+});
 </script>

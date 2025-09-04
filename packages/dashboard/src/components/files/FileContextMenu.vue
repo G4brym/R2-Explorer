@@ -24,6 +24,15 @@
       Rename
     </button>
     
+    <button
+      class="flex items-center w-full px-3 py-2 text-sm hover:bg-accent text-left"
+      :disabled="loading"
+      @click="move"
+    >
+      <MoveIcon class="w-4 h-4 mr-2" />
+      Move
+    </button>
+    
     <div class="h-px bg-border my-1" />
     
     <button
@@ -116,187 +125,208 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { api } from '@/lib/api'
-import { toast } from '@/lib/toast'
-import { DownloadIcon, EditIcon, TrashIcon, XIcon, LoaderIcon } from 'lucide-vue-next'
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import Button from '@/components/ui/Button.vue'
-import Input from '@/components/ui/Input.vue'
+import Button from "@/components/ui/Button.vue";
+import Card from "@/components/ui/Card.vue";
+import CardContent from "@/components/ui/CardContent.vue";
+import CardHeader from "@/components/ui/CardHeader.vue";
+import Input from "@/components/ui/Input.vue";
+import { api } from "@/lib/api";
+import { toast } from "@/lib/toast";
+import {
+	DownloadIcon,
+	EditIcon,
+	LoaderIcon,
+	MoveIcon,
+	TrashIcon,
+	XIcon,
+} from "lucide-vue-next";
+import { nextTick, onMounted, onUnmounted, ref } from "vue";
 
 interface FileItem {
-  name: string
-  key: string
-  size?: number
-  lastModified?: string
-  isFolder?: boolean
+	name: string;
+	key: string;
+	size?: number;
+	lastModified?: string;
+	isFolder?: boolean;
 }
 
 interface Props {
-  isOpen: boolean
-  x: number
-  y: number
-  file: FileItem | null
-  bucket: string
-  currentPath: string
+	isOpen: boolean;
+	x: number;
+	y: number;
+	file: FileItem | null;
+	bucket: string;
+	currentPath: string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  close: []
-  deleted: []
-  renamed: []
-}>()
+	close: [];
+	deleted: [];
+	renamed: [];
+	move: [];
+}>();
 
-const menuRef = ref<HTMLElement>()
-const showRenameDialog = ref(false)
-const showDeleteDialog = ref(false)
-const newName = ref('')
-const loading = ref(false)
-const downloading = ref(false)
-const error = ref('')
+const menuRef = ref<HTMLElement>();
+const showRenameDialog = ref(false);
+const showDeleteDialog = ref(false);
+const newName = ref("");
+const loading = ref(false);
+const downloading = ref(false);
+const error = ref("");
 
 async function download() {
-  if (!props.file) return
-  
-  downloading.value = true
-  
-  try {
-    // Encode the key with base64 as required by backend
-    const encodedKey = btoa(props.file.key)
-    
-    // Fetch file with authentication
-    const response = await api.get(`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`, {
-      responseType: 'blob'
-    })
-    
-    // Create blob URL for download
-    const blob = new Blob([response.data])
-    const url = window.URL.createObjectURL(blob)
-    
-    // Create temporary link and trigger download
-    const link = document.createElement('a')
-    link.href = url
-    link.download = props.file.name
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    
-    // Cleanup blob URL
-    window.URL.revokeObjectURL(url)
-    
-    // Reset after a short delay to show feedback
-    setTimeout(() => {
-      downloading.value = false
-      emit('close')
-    }, 500)
-  } catch (error) {
-    downloading.value = false
-    console.error('Download failed:', error)
-    toast.error('Failed to download file')
-    emit('close')
-  }
+	if (!props.file) return;
+
+	downloading.value = true;
+
+	try {
+		// Encode the key with base64 as required by backend
+		const encodedKey = btoa(props.file.key);
+
+		// Fetch file with authentication
+		const response = await api.get(
+			`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`,
+			{
+				responseType: "blob",
+			},
+		);
+
+		// Create blob URL for download
+		const blob = new Blob([response.data]);
+		const url = window.URL.createObjectURL(blob);
+
+		// Create temporary link and trigger download
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = props.file.name;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		// Cleanup blob URL
+		window.URL.revokeObjectURL(url);
+
+		// Reset after a short delay to show feedback
+		setTimeout(() => {
+			downloading.value = false;
+			emit("close");
+		}, 500);
+	} catch (error) {
+		downloading.value = false;
+		console.error("Download failed:", error);
+		toast.error("Failed to download file");
+		emit("close");
+	}
+}
+
+function move() {
+	if (!props.file) return;
+	emit("move");
+	emit("close");
 }
 
 function rename() {
-  if (!props.file) return
-  
-  newName.value = props.file.name
-  showRenameDialog.value = true
-  emit('close')
+	if (!props.file) return;
+
+	newName.value = props.file.name;
+	showRenameDialog.value = true;
+	emit("close");
 }
 
 function deleteFile() {
-  showDeleteDialog.value = true
-  emit('close')
+	showDeleteDialog.value = true;
+	emit("close");
 }
 
 function cancelRename() {
-  showRenameDialog.value = false
-  newName.value = ''
-  error.value = ''
-  loading.value = false
+	showRenameDialog.value = false;
+	newName.value = "";
+	error.value = "";
+	loading.value = false;
 }
 
 async function confirmRename() {
-  if (!props.file || !newName.value.trim()) return
-  
-  loading.value = true
-  error.value = ''
-  
-  try {
-    const oldKey = props.file.key
-    const pathParts = oldKey.split('/')
-    pathParts[pathParts.length - 1] = newName.value.trim()
-    const newKey = pathParts.join('/')
-    
-    await api.post(`/buckets/${props.bucket}/move`, {
-      // Send base64-encoded keys to match API contract (server also accepts plain)
-      oldKey: btoa(oldKey),
-      newKey: btoa(newKey)
-    })
-    
-    emit('renamed')
-    cancelRename()
-  } catch (e: any) {
-    error.value = e.response?.data?.error || 'Failed to rename file'
-    console.error('Failed to rename file:', e)
-  } finally {
-    loading.value = false
-  }
+	if (!props.file || !newName.value.trim()) return;
+
+	loading.value = true;
+	error.value = "";
+
+	try {
+		const oldKey = props.file.key;
+		const pathParts = oldKey.split("/");
+		pathParts[pathParts.length - 1] = newName.value.trim();
+		const newKey = pathParts.join("/");
+
+		await api.post(`/buckets/${props.bucket}/move`, {
+			// Send base64-encoded keys to match API contract (server also accepts plain)
+			oldKey: btoa(oldKey),
+			newKey: btoa(newKey),
+		});
+
+		emit("renamed");
+		cancelRename();
+	} catch (e: any) {
+		error.value = e.response?.data?.error || "Failed to rename file";
+		console.error("Failed to rename file:", e);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function cancelDelete() {
-  showDeleteDialog.value = false
-  error.value = ''
-  loading.value = false
+	showDeleteDialog.value = false;
+	error.value = "";
+	loading.value = false;
 }
 
 async function confirmDelete() {
-  if (!props.file) return
-  
-  loading.value = true
-  error.value = ''
-  
-  try {
-    await api.post(`/buckets/${props.bucket}/delete`, {
-      // Encode to base64 for server consistency (fallback supported)
-      key: btoa(props.file.key)
-    })
-    
-    emit('deleted')
-    cancelDelete()
-  } catch (e: any) {
-    error.value = e.response?.data?.error || 'Failed to delete file'
-    console.error('Failed to delete file:', e)
-  } finally {
-    loading.value = false
-  }
+	if (!props.file) return;
+
+	loading.value = true;
+	error.value = "";
+
+	try {
+		await api.post(`/buckets/${props.bucket}/delete`, {
+			// Encode to base64 for server consistency (fallback supported)
+			key: btoa(props.file.key),
+		});
+
+		emit("deleted");
+		cancelDelete();
+	} catch (e: any) {
+		error.value = e.response?.data?.error || "Failed to delete file";
+		console.error("Failed to delete file:", e);
+	} finally {
+		loading.value = false;
+	}
 }
 
 // Close menu when clicking outside
 function handleClickOutside(event: MouseEvent) {
-  if (props.isOpen && menuRef.value && !menuRef.value.contains(event.target as Node)) {
-    emit('close')
-  }
+	if (
+		props.isOpen &&
+		menuRef.value &&
+		!menuRef.value.contains(event.target as Node)
+	) {
+		emit("close");
+	}
 }
 
 // Close menu on escape key
 function handleKeyDown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && props.isOpen) {
-    emit('close')
-  }
+	if (event.key === "Escape" && props.isOpen) {
+		emit("close");
+	}
 }
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-  document.addEventListener('keydown', handleKeyDown)
-})
+	document.addEventListener("click", handleClickOutside);
+	document.addEventListener("keydown", handleKeyDown);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-  document.removeEventListener('keydown', handleKeyDown)
-})
+	document.removeEventListener("click", handleClickOutside);
+	document.removeEventListener("keydown", handleKeyDown);
+});
 </script>

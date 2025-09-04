@@ -158,177 +158,195 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { api } from '@/lib/api'
-import { FolderPlusIcon, EditIcon, TrashIcon, XIcon, LoaderIcon } from 'lucide-vue-next'
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import Button from '@/components/ui/Button.vue'
-import Input from '@/components/ui/Input.vue'
+import Button from "@/components/ui/Button.vue";
+import Card from "@/components/ui/Card.vue";
+import CardContent from "@/components/ui/CardContent.vue";
+import CardHeader from "@/components/ui/CardHeader.vue";
+import Input from "@/components/ui/Input.vue";
+import { api } from "@/lib/api";
+import {
+	EditIcon,
+	FolderPlusIcon,
+	LoaderIcon,
+	TrashIcon,
+	XIcon,
+} from "lucide-vue-next";
+import { onMounted, onUnmounted, ref } from "vue";
 
 interface FolderItem {
-  name: string
-  key?: string
+	name: string;
+	key?: string;
 }
 
 interface Props {
-  isOpen: boolean
-  x: number
-  y: number
-  folder: FolderItem | null
-  bucket: string
-  currentPath: string
+	isOpen: boolean;
+	x: number;
+	y: number;
+	folder: FolderItem | null;
+	bucket: string;
+	currentPath: string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  close: []
-  deleted: []
-  renamed: []
-  folderCreated: []
-}>()
+	close: [];
+	deleted: [];
+	renamed: [];
+	folderCreated: [];
+}>();
 
-const menuRef = ref<HTMLElement>()
-const showCreateDialog = ref(false)
-const showRenameDialog = ref(false)
-const showDeleteDialog = ref(false)
-const newFolderName = ref('')
-const newName = ref('')
-const loading = ref(false)
-const error = ref('')
+const menuRef = ref<HTMLElement>();
+const showCreateDialog = ref(false);
+const showRenameDialog = ref(false);
+const showDeleteDialog = ref(false);
+const newFolderName = ref("");
+const newName = ref("");
+const loading = ref(false);
+const error = ref("");
 
 function createSubfolder() {
-  newFolderName.value = ''
-  showCreateDialog.value = true
-  emit('close')
+	newFolderName.value = "";
+	showCreateDialog.value = true;
+	emit("close");
 }
 
 function rename() {
-  if (!props.folder) return
-  
-  newName.value = props.folder.name
-  showRenameDialog.value = true
-  emit('close')
+	if (!props.folder) return;
+
+	newName.value = props.folder.name;
+	showRenameDialog.value = true;
+	emit("close");
 }
 
 function deleteFolder() {
-  showDeleteDialog.value = true
-  emit('close')
+	showDeleteDialog.value = true;
+	emit("close");
 }
 
 function cancelCreate() {
-  showCreateDialog.value = false
-  newFolderName.value = ''
-  error.value = ''
-  loading.value = false
+	showCreateDialog.value = false;
+	newFolderName.value = "";
+	error.value = "";
+	loading.value = false;
 }
 
 async function confirmCreate() {
-  if (!newFolderName.value.trim() || !props.folder) return
-  
-  loading.value = true
-  error.value = ''
-  
-  try {
-    const folderPath = props.currentPath ? `${props.currentPath}/${props.folder.name}/${newFolderName.value.trim()}` : `${props.folder.name}/${newFolderName.value.trim()}`
-    
-    await api.post(`/buckets/${props.bucket}/folders`, {
-      name: folderPath
-    })
-    
-    emit('folderCreated')
-    cancelCreate()
-  } catch (e: any) {
-    error.value = e.response?.data?.error || 'Failed to create folder'
-    console.error('Failed to create folder:', e)
-  } finally {
-    loading.value = false
-  }
+	if (!newFolderName.value.trim() || !props.folder) return;
+
+	loading.value = true;
+	error.value = "";
+
+	try {
+		const folderPath = props.currentPath
+			? `${props.currentPath}/${props.folder.name}/${newFolderName.value.trim()}`
+			: `${props.folder.name}/${newFolderName.value.trim()}`;
+
+		await api.post(`/buckets/${props.bucket}/folders`, {
+			name: folderPath,
+		});
+
+		emit("folderCreated");
+		cancelCreate();
+	} catch (e: any) {
+		error.value = e.response?.data?.error || "Failed to create folder";
+		console.error("Failed to create folder:", e);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function cancelRename() {
-  showRenameDialog.value = false
-  newName.value = ''
-  error.value = ''
-  loading.value = false
+	showRenameDialog.value = false;
+	newName.value = "";
+	error.value = "";
+	loading.value = false;
 }
 
 async function confirmRename() {
-  if (!props.folder || !newName.value.trim()) return
-  
-  loading.value = true
-  error.value = ''
-  
-  try {
-    const oldPath = props.currentPath ? `${props.currentPath}/${props.folder.name}` : props.folder.name
-    const newPath = props.currentPath ? `${props.currentPath}/${newName.value.trim()}` : newName.value.trim()
-    
-    await api.post(`/buckets/${props.bucket}/folders/move`, {
-      from: oldPath,
-      to: newPath
-    })
-    
-    emit('renamed')
-    cancelRename()
-  } catch (e: any) {
-    error.value = e.response?.data?.error || 'Failed to rename folder'
-    console.error('Failed to rename folder:', e)
-  } finally {
-    loading.value = false
-  }
+	if (!props.folder || !newName.value.trim()) return;
+
+	loading.value = true;
+	error.value = "";
+
+	try {
+		const oldPath = props.currentPath
+			? `${props.currentPath}/${props.folder.name}`
+			: props.folder.name;
+		const newPath = props.currentPath
+			? `${props.currentPath}/${newName.value.trim()}`
+			: newName.value.trim();
+
+		await api.post(`/buckets/${props.bucket}/folders/move`, {
+			from: oldPath,
+			to: newPath,
+		});
+
+		emit("renamed");
+		cancelRename();
+	} catch (e: any) {
+		error.value = e.response?.data?.error || "Failed to rename folder";
+		console.error("Failed to rename folder:", e);
+	} finally {
+		loading.value = false;
+	}
 }
 
 function cancelDelete() {
-  showDeleteDialog.value = false
-  error.value = ''
-  loading.value = false
+	showDeleteDialog.value = false;
+	error.value = "";
+	loading.value = false;
 }
 
 async function confirmDelete() {
-  if (!props.folder) return
-  
-  loading.value = true
-  error.value = ''
-  
-  try {
-    const folderPath = props.currentPath ? `${props.currentPath}/${props.folder.name}` : props.folder.name
-    
-    await api.post(`/buckets/${props.bucket}/folders/delete`, {
-      path: folderPath
-    })
-    
-    emit('deleted')
-    cancelDelete()
-  } catch (e: any) {
-    error.value = e.response?.data?.error || 'Failed to delete folder'
-    console.error('Failed to delete folder:', e)
-  } finally {
-    loading.value = false
-  }
+	if (!props.folder) return;
+
+	loading.value = true;
+	error.value = "";
+
+	try {
+		const folderPath = props.currentPath
+			? `${props.currentPath}/${props.folder.name}`
+			: props.folder.name;
+
+		await api.post(`/buckets/${props.bucket}/folders/delete`, {
+			path: folderPath,
+		});
+
+		emit("deleted");
+		cancelDelete();
+	} catch (e: any) {
+		error.value = e.response?.data?.error || "Failed to delete folder";
+		console.error("Failed to delete folder:", e);
+	} finally {
+		loading.value = false;
+	}
 }
 
 // Close menu when clicking outside
 function handleClickOutside(event: MouseEvent) {
-  if (props.isOpen && menuRef.value && !menuRef.value.contains(event.target as Node)) {
-    emit('close')
-  }
+	if (
+		props.isOpen &&
+		menuRef.value &&
+		!menuRef.value.contains(event.target as Node)
+	) {
+		emit("close");
+	}
 }
 
 // Close menu on escape key
 function handleKeyDown(event: KeyboardEvent) {
-  if (event.key === 'Escape' && props.isOpen) {
-    emit('close')
-  }
+	if (event.key === "Escape" && props.isOpen) {
+		emit("close");
+	}
 }
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-  document.addEventListener('keydown', handleKeyDown)
-})
+	document.addEventListener("click", handleClickOutside);
+	document.addEventListener("keydown", handleKeyDown);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-  document.removeEventListener('keydown', handleKeyDown)
-})
+	document.removeEventListener("click", handleClickOutside);
+	document.removeEventListener("keydown", handleKeyDown);
+});
 </script>

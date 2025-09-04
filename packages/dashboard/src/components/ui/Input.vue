@@ -11,23 +11,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue'
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils";
+import { computed, useAttrs } from "vue";
 
 interface Props {
-  modelValue?: string
+	modelValue?: string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  'update:modelValue': [value: string]
-}>()
+	"update:modelValue": [value: string];
+}>();
 
-const attrs = useAttrs()
+const attrs = useAttrs();
 
 // Omit v-model related attrs to avoid conflicts
 const omittedAttrs = computed(() => {
-  const { modelValue, 'onUpdate:modelValue': _, ...rest } = attrs as any
-  return rest
-})
+	const { modelValue, "onUpdate:modelValue": _, ...rest } = attrs as any;
+	return rest;
+});
 </script>

@@ -44,73 +44,76 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { api } from '@/lib/api'
-import { XIcon, LoaderIcon } from 'lucide-vue-next'
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import Button from '@/components/ui/Button.vue'
-import Input from '@/components/ui/Input.vue'
+import Button from "@/components/ui/Button.vue";
+import Card from "@/components/ui/Card.vue";
+import CardContent from "@/components/ui/CardContent.vue";
+import CardHeader from "@/components/ui/CardHeader.vue";
+import Input from "@/components/ui/Input.vue";
+import { api } from "@/lib/api";
+import { LoaderIcon, XIcon } from "lucide-vue-next";
+import { ref, watch } from "vue";
 
 interface Props {
-  isOpen: boolean
-  currentPath: string
-  bucket: string
+	isOpen: boolean;
+	currentPath: string;
+	bucket: string;
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const emit = defineEmits<{
-  close: []
-  created: []
-}>()
+	close: [];
+	created: [];
+}>();
 
-const folderName = ref('')
-const loading = ref(false)
-const error = ref('')
+const folderName = ref("");
+const loading = ref(false);
+const error = ref("");
 
 function close() {
-  emit('close')
-  reset()
+	emit("close");
+	reset();
 }
 
 function reset() {
-  folderName.value = ''
-  loading.value = false
-  error.value = ''
+	folderName.value = "";
+	loading.value = false;
+	error.value = "";
 }
 
 async function createFolder() {
-  if (!folderName.value.trim()) return
-  
-  loading.value = true
-  error.value = ''
-  
-  try {
-    const folderPath = props.currentPath 
-      ? `${props.currentPath}/${folderName.value.trim()}/`
-      : `${folderName.value.trim()}/`
-    
-    await api.post(`/buckets/${props.bucket}/folder`, {
-      // Worker expects base64-encoded key
-      key: btoa(folderPath)
-    })
-    
-    console.log(`Created folder: ${folderPath}`)
-    emit('created')
-    close()
-  } catch (e: any) {
-    error.value = e.response?.data?.error || 'Failed to create folder'
-    console.error('Failed to create folder:', e)
-  } finally {
-    loading.value = false
-  }
+	if (!folderName.value.trim()) return;
+
+	loading.value = true;
+	error.value = "";
+
+	try {
+		const folderPath = props.currentPath
+			? `${props.currentPath}/${folderName.value.trim()}/`
+			: `${folderName.value.trim()}/`;
+
+		await api.post(`/buckets/${props.bucket}/folder`, {
+			// Worker expects base64-encoded key
+			key: btoa(folderPath),
+		});
+
+		console.log(`Created folder: ${folderPath}`);
+		emit("created");
+		close();
+	} catch (e: any) {
+		error.value = e.response?.data?.error || "Failed to create folder";
+		console.error("Failed to create folder:", e);
+	} finally {
+		loading.value = false;
+	}
 }
 
 // Reset form when dialog opens
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    reset()
-  }
-})
+watch(
+	() => props.isOpen,
+	(isOpen) => {
+		if (isOpen) {
+			reset();
+		}
+	},
+);
 </script>

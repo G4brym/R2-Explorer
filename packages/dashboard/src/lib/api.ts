@@ -1,49 +1,49 @@
-import axios from 'axios'
+import axios from "axios";
 
 // SpendRule: Point to the worker API URL
-let url = "https://spendrule-doc-upload-dashboard.oluwamakinwa.workers.dev"
+let url = "https://spendrule-doc-upload-dashboard.oluwamakinwa.workers.dev";
 // For development, use local worker with AI capabilities
 if (import.meta.env.DEV) {
-  url = import.meta.env.VITE_SERVER_URL || "http://localhost:8787"
+	url = import.meta.env.VITE_SERVER_URL || "http://localhost:8787";
 }
 
-export const api = axios.create({ 
-  baseURL: `${url}/api`,
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  // Add basic auth credentials for SpendRule API
-  auth: {
-    username: 'spendrule_admin',
-    password: 'Admin_2025'
-  }
-})
+export const api = axios.create({
+	baseURL: `${url}/api`,
+	timeout: 30000,
+	headers: {
+		"Content-Type": "application/json",
+	},
+	// Add basic auth credentials for SpendRule API
+	auth: {
+		username: "spendrule_admin",
+		password: "Admin_2025",
+	},
+});
 
 // Add request interceptor to ensure auth headers are always sent
 api.interceptors.request.use((config) => {
-  // Log requests in development
-  if (import.meta.env.DEV) {
-    console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`)
-  }
-  return config
-})
+	// Log requests in development
+	if (import.meta.env.DEV) {
+		console.log(`API Request: ${config.method?.toUpperCase()} ${config.url}`);
+	}
+	return config;
+});
 
 // Add response interceptor for error handling
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (import.meta.env.DEV) {
-      console.error('API Error:', error.response?.data || error.message)
-    }
-    
-    // Handle auth errors
-    if (error.response?.status === 401) {
-      // Clear stored tokens on auth error
-      localStorage.removeItem('explorer_session_token')
-      sessionStorage.removeItem('explorer_session_token')
-    }
-    
-    return Promise.reject(error)
-  }
-)
+	(response) => response,
+	(error) => {
+		if (import.meta.env.DEV) {
+			console.error("API Error:", error.response?.data || error.message);
+		}
+
+		// Handle auth errors
+		if (error.response?.status === 401) {
+			// Clear stored tokens on auth error
+			localStorage.removeItem("explorer_session_token");
+			sessionStorage.removeItem("explorer_session_token");
+		}
+
+		return Promise.reject(error);
+	},
+);

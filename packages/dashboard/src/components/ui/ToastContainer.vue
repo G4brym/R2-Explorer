@@ -15,8 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { toast } from '@/lib/toast'
-import Toast from './Toast.vue'
+import { toast } from "@/lib/toast";
+import Toast from "./Toast.vue";
 
-const { toasts, removeToast } = toast
+const { toasts, removeToast } = toast;
 </script>

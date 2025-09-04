@@ -73,49 +73,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { FolderIcon, LoaderIcon } from 'lucide-vue-next'
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import Input from '@/components/ui/Input.vue'
-import Button from '@/components/ui/Button.vue'
+import Button from "@/components/ui/Button.vue";
+import Card from "@/components/ui/Card.vue";
+import CardContent from "@/components/ui/CardContent.vue";
+import CardHeader from "@/components/ui/CardHeader.vue";
+import Input from "@/components/ui/Input.vue";
+import { useAuthStore } from "@/stores/auth";
+import { FolderIcon, LoaderIcon } from "lucide-vue-next";
+import { ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
 
 const form = ref({
-  username: '',
-  password: '',
-  remind: false
-})
+	username: "",
+	password: "",
+	remind: false,
+});
 
-const loading = ref(false)
-const error = ref('')
+const loading = ref(false);
+const error = ref("");
 
 async function handleLogin() {
-  if (loading.value) return
-  
-  loading.value = true
-  error.value = ''
-  
-  try {
-    await authStore.login(router, form.value)
-    
-    // Redirect to next page or default
-    const next = route.query.next as string
-    if (next) {
-      await router.push(next)
-    } else {
-      await router.push({ name: 'files', params: { bucket: 'secure-uploads' } })
-    }
-  } catch (e: any) {
-    error.value = e.message || 'Login failed. Please try again.'
-  } finally {
-    loading.value = false
-  }
+	if (loading.value) return;
+
+	loading.value = true;
+	error.value = "";
+
+	try {
+		await authStore.login(router, form.value);
+
+		// Redirect to next page or default
+		const next = route.query.next as string;
+		if (next) {
+			await router.push(next);
+		} else {
+			await router.push({
+				name: "files",
+				params: { bucket: "secure-uploads" },
+			});
+		}
+	} catch (e: any) {
+		error.value = e.message || "Login failed. Please try again.";
+	} finally {
+		loading.value = false;
+	}
 }
 </script>

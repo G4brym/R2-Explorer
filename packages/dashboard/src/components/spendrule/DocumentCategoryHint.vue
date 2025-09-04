@@ -65,30 +65,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { InfoIcon, FileTextIcon, XIcon } from 'lucide-vue-next'
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import Button from '@/components/ui/Button.vue'
+import Button from "@/components/ui/Button.vue";
+import Card from "@/components/ui/Card.vue";
+import CardContent from "@/components/ui/CardContent.vue";
+import CardHeader from "@/components/ui/CardHeader.vue";
+import { FileTextIcon, InfoIcon, XIcon } from "lucide-vue-next";
+import { onMounted, ref } from "vue";
 
 // Custom icons for SpendRule categories
-const ReceiptIcon = FileTextIcon // Using FileText as receipt icon
-const WorkflowIcon = FileTextIcon // Using FileText as workflow icon
+const ReceiptIcon = FileTextIcon; // Using FileText as receipt icon
+const WorkflowIcon = FileTextIcon; // Using FileText as workflow icon
 
-const showHint = ref(true)
+const showHint = ref(true);
 
 function hideHint() {
-  showHint.value = false
-  // Store preference in localStorage
-  localStorage.setItem('spendrule-hide-category-hint', 'true')
+	showHint.value = false;
+	// Store preference in localStorage
+	localStorage.setItem("spendrule-hide-category-hint", "true");
 }
 
 onMounted(() => {
-  // Check if user has hidden the hint before
-  const hidePreference = localStorage.getItem('spendrule-hide-category-hint')
-  if (hidePreference === 'true') {
-    showHint.value = false
-  }
-})
+	// Check if user has hidden the hint before
+	const hidePreference = localStorage.getItem("spendrule-hide-category-hint");
+	if (hidePreference === "true") {
+		showHint.value = false;
+	}
+});
 </script>

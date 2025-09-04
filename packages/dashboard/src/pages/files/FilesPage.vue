@@ -112,6 +112,14 @@
             Download
           </Button>
           <Button 
+            variant="outline" 
+            size="sm" 
+            @click="openMoveDialog()"
+          >
+            <MoveIcon class="w-4 h-4 mr-2" />
+            Move
+          </Button>
+          <Button 
             variant="destructive" 
             size="sm" 
             @click="showBulkDeleteDialog = true"
@@ -257,6 +265,19 @@
       </div>
     </div>
     
+    <!-- Pagination Controls -->
+    <Pagination
+      v-if="!loading && (files.length > 0 || currentPage > 1)"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      :total-items="totalItems"
+      :has-next="hasNextPage"
+      :has-previous="currentPage > 1"
+      @update:page-size="handlePageSizeChange"
+      @next="handleNextPage"
+      @previous="handlePreviousPage"
+    />
+    
     <!-- Upload Dialog -->
     <FileUploadDialog
       :is-open="showUploadDialog"
@@ -283,6 +304,15 @@
       @close="closePreview"
     />
     
+    <!-- Move File Dialog -->
+    <MoveFileDialog
+      v-model="showMoveDialog"
+      :items="moveItems"
+      :bucket="currentBucket"
+      :current-path="currentPath"
+      @moved="handleFileMoved"
+    />
+    
     <!-- File Context Menu -->
     <FileContextMenu
       :is-open="contextMenu.show"
@@ -294,6 +324,7 @@
       @close="closeContextMenu"
       @deleted="handleFileDeleted"
       @renamed="handleFileRenamed"
+      @move="handleContextMenuMove"
     />
     
     <!-- Folder Context Menu -->
@@ -460,684 +491,837 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { api } from '@/lib/api'
-import { formatBytes, formatDate } from '@/lib/utils'
-import { withRetry, handleError, operationManager, networkStatus } from '@/lib/errors'
-import { deduplicateRequest, performanceMonitor } from '@/lib/performance'
+import CreateFolderDialog from "@/components/files/CreateFolderDialog.vue";
+import FileContextMenu from "@/components/files/FileContextMenu.vue";
+import FilePreviewDialog from "@/components/files/FilePreviewDialog.vue";
+import FileUploadDialog from "@/components/files/FileUploadDialog.vue";
+import FolderContextMenu from "@/components/files/FolderContextMenu.vue";
+import MoveFileDialog from "@/components/files/MoveFileDialog.vue";
+import DocumentCategoryHint from "@/components/spendrule/DocumentCategoryHint.vue";
+import Button from "@/components/ui/Button.vue";
+import Card from "@/components/ui/Card.vue";
+import CardContent from "@/components/ui/CardContent.vue";
+import CardHeader from "@/components/ui/CardHeader.vue";
+import FileListSkeleton from "@/components/ui/FileListSkeleton.vue";
+import LoadingOverlay from "@/components/ui/LoadingOverlay.vue";
+import LoadingSpinner from "@/components/ui/LoadingSpinner.vue";
+import Pagination from "@/components/ui/Pagination.vue";
+import { api } from "@/lib/api";
 import {
-  FolderIcon,
-  ChevronRightIcon,
-  UploadIcon,
-  FolderPlusIcon,
-  LoaderIcon,
-  AlertCircleIcon,
-  Eye as EyeIcon,
-  ArrowLeftIcon,
-  MoreHorizontalIcon,
-  FileIcon,
-  FileTextIcon,
-  ImageIcon,
-  CheckSquareIcon,
-  XIcon,
-  DownloadIcon,
-  TrashIcon,
-  HelpCircleIcon,
-  KeyboardIcon
-} from 'lucide-vue-next'
-import Button from '@/components/ui/Button.vue'
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import FileUploadDialog from '@/components/files/FileUploadDialog.vue'
-import CreateFolderDialog from '@/components/files/CreateFolderDialog.vue'
-import FileContextMenu from '@/components/files/FileContextMenu.vue'
-import FolderContextMenu from '@/components/files/FolderContextMenu.vue'
-import FilePreviewDialog from '@/components/files/FilePreviewDialog.vue'
-import DocumentCategoryHint from '@/components/spendrule/DocumentCategoryHint.vue'
-import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
-import FileListSkeleton from '@/components/ui/FileListSkeleton.vue'
-import LoadingOverlay from '@/components/ui/LoadingOverlay.vue'
-import { toast } from '@/lib/toast'
+	handleError,
+	networkStatus,
+	operationManager,
+	withRetry,
+} from "@/lib/errors";
+import { deduplicateRequest, performanceMonitor } from "@/lib/performance";
+import { toast } from "@/lib/toast";
+import { formatBytes, formatDate } from "@/lib/utils";
+import {
+	AlertCircleIcon,
+	ArrowLeftIcon,
+	CheckSquareIcon,
+	ChevronRightIcon,
+	DownloadIcon,
+	Eye as EyeIcon,
+	FileIcon,
+	FileTextIcon,
+	FolderIcon,
+	FolderPlusIcon,
+	HelpCircleIcon,
+	ImageIcon,
+	KeyboardIcon,
+	LoaderIcon,
+	MoreHorizontalIcon,
+	MoveIcon,
+	TrashIcon,
+	UploadIcon,
+	XIcon,
+} from "lucide-vue-next";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
 
-const files = ref<any[]>([])
-const loading = ref(false)
-const error = ref('')
-const showUploadDialog = ref(false)
-const showCreateFolderDialog = ref(false)
-const showPreviewDialog = ref(false)
-const showAllFiles = ref(false)
-const selectedPreviewFile = ref<any>(null)
+const files = ref<any[]>([]);
+const loading = ref(false);
+const error = ref("");
+const showUploadDialog = ref(false);
+const showCreateFolderDialog = ref(false);
+const showPreviewDialog = ref(false);
+const showAllFiles = ref(false);
+const selectedPreviewFile = ref<any>(null);
 const contextMenu = ref({
-  show: false,
-  x: 0,
-  y: 0,
-  file: null as any
-})
+	show: false,
+	x: 0,
+	y: 0,
+	file: null as any,
+});
 
 const folderContextMenu = ref({
-  show: false,
-  x: 0,
-  y: 0,
-  folder: null as any
-})
+	show: false,
+	x: 0,
+	y: 0,
+	folder: null as any,
+});
 
-const isSelecting = ref(false)
-const selectedItems = ref<Array<{ type: 'file' | 'folder', key: string, item: any }>>([])
-const showBulkDeleteDialog = ref(false)
-const bulkOperationLoading = ref(false)
-const bulkOperationProgress = ref(0)
-const showKeyboardHelp = ref(false)
+const isSelecting = ref(false);
+const selectedItems = ref<
+	Array<{ type: "file" | "folder"; key: string; item: any }>
+>([]);
+const showBulkDeleteDialog = ref(false);
+const bulkOperationLoading = ref(false);
+const bulkOperationProgress = ref(0);
+const showKeyboardHelp = ref(false);
+const showMoveDialog = ref(false);
+const moveItems = ref<
+	Array<{ type: "file" | "folder"; key: string; name: string }>
+>([]);
 
-const currentBucket = computed(() => route.params.bucket as string)
+// Pagination state
+const currentPage = ref(1);
+const pageSize = ref(50);
+const totalItems = ref(0);
+const hasNextPage = ref(false);
+const cursor = ref<string | null>(null);
+const cursors = ref<string[]>([]); // Store cursors for previous pages
+
+const currentBucket = computed(() => route.params.bucket as string);
 const currentPath = computed(() => {
-  const pathMatch = route.params.pathMatch as string
-  return pathMatch ? decodeURIComponent(pathMatch) : ''
-})
+	const pathMatch = route.params.pathMatch as string;
+	return pathMatch ? decodeURIComponent(pathMatch) : "";
+});
 
-const folders = computed(() => 
-  files.value
-    .filter(item => item.isFolder)
-    .map(item => ({ name: item.name.replace(/\/$/, '') }))
-)
+const folders = computed(() =>
+	files.value
+		.filter((item) => item.isFolder)
+		.map((item) => ({ name: item.name.replace(/\/$/, "") })),
+);
 
-const filesList = computed(() => 
-  files.value.filter(item => !item.isFolder)
-)
+const filesList = computed(() => files.value.filter((item) => !item.isFolder));
 
-const hasFilesSelected = computed(() => 
-  selectedItems.value.some(item => item.type === 'file')
-)
+const hasFilesSelected = computed(() =>
+	selectedItems.value.some((item) => item.type === "file"),
+);
 
 // Folder statistics for sidebar
 const folderStats = computed(() => {
-  const filesCount = filesList.value.length
-  const foldersCount = folders.value.length
-  const totalSize = filesList.value.reduce((sum, file) => sum + (file.size || 0), 0)
-  
-  return {
-    files: filesCount,
-    folders: foldersCount,
-    totalSize: totalSize > 0 ? formatBytes(totalSize) : ''
-  }
-})
+	const filesCount = filesList.value.length;
+	const foldersCount = folders.value.length;
+	const totalSize = filesList.value.reduce(
+		(sum, file) => sum + (file.size || 0),
+		0,
+	);
+
+	return {
+		files: filesCount,
+		folders: foldersCount,
+		totalSize: totalSize > 0 ? formatBytes(totalSize) : "",
+	};
+});
 
 // Emit stats updates to parent (AppLayout)
 const emit = defineEmits<{
-  'update-stats': [stats: { files: number; folders: number; totalSize: string }]
-}>()
+	"update-stats": [
+		stats: { files: number; folders: number; totalSize: string },
+	];
+}>();
 
-const currentFocusIndex = ref(-1)
+const currentFocusIndex = ref(-1);
 const allItems = computed(() => [
-  ...folders.value.map(f => ({ ...f, type: 'folder' as const })),
-  ...filesList.value.map(f => ({ ...f, type: 'file' as const }))
-])
+	...folders.value.map((f) => ({ ...f, type: "folder" as const })),
+	...filesList.value.map((f) => ({ ...f, type: "file" as const })),
+]);
 
 function getFileIcon(filename: string) {
-  const ext = filename.split('.').pop()?.toLowerCase()
-  
-  if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp'].includes(ext || '')) {
-    return ImageIcon
-  }
-  if (['txt', 'md', 'json', 'csv'].includes(ext || '')) {
-    return FileTextIcon
-  }
-  return FileIcon
+	const ext = filename.split(".").pop()?.toLowerCase();
+
+	if (["jpg", "jpeg", "png", "gif", "svg", "webp"].includes(ext || "")) {
+		return ImageIcon;
+	}
+	if (["txt", "md", "json", "csv"].includes(ext || "")) {
+		return FileTextIcon;
+	}
+	return FileIcon;
 }
 
-async function loadFiles() {
-  const operationId = 'loadFiles'
-  const requestKey = `loadFiles:${currentBucket.value}:${currentPath.value}`
-  
-  // Check network status first
-  if (!networkStatus.isOnline) {
-    error.value = 'You are offline. Please check your connection.'
-    toast.warning('Cannot load files while offline')
-    return
-  }
-  
-  // Start performance monitoring
-  const endTiming = performanceMonitor.startTiming('loadFiles')
-  
-  await operationManager.execute(
-    operationId,
-    async () => {
-      loading.value = true
-      error.value = ''
-      
-      // Deduplicate concurrent requests to same path
-      const response = await deduplicateRequest(
-        requestKey,
-        async () => {
-          // WORKAROUND: Always fetch all files from root to avoid 500 errors with prefix
-          // We'll filter client-side instead
-          return await api.get(`/buckets/${currentBucket.value}`)
-        }
-      )
-      
-      const objects = response.data.objects || []
-      const prefixes = response.data.delimitedPrefixes || []
-      
-      // Client-side filtering based on current path
-      const currentPrefix = currentPath.value ? `${currentPath.value}/` : ''
-      
-      // Filter objects based on view mode
-      const filteredObjects = showAllFiles.value 
-        ? objects // Show all files when "Show All Files" is enabled
-        : objects.filter((obj: any) => {
-            if (!currentPrefix) {
-              // Root level: show files that don't have '/' OR have only one level
-              return !obj.key.includes('/') || obj.key.split('/').length === 2
-            } else {
-              // Subfolder: show files that start with current prefix and are direct children
-              if (obj.key.startsWith(currentPrefix)) {
-                const relativePath = obj.key.substring(currentPrefix.length)
-                return !relativePath.includes('/') // Direct child, not nested further
-              }
-              return false
-            }
-          })
-      
-      // Extract folder names from object keys
-      const folderNames = new Set<string>()
-      objects.forEach((obj: any) => {
-        if (!currentPrefix) {
-          // Root level: extract top-level folders
-          const parts = obj.key.split('/')
-          if (parts.length > 1) {
-            folderNames.add(parts[0])
-          }
-        } else {
-          // Subfolder: extract immediate subfolders
-          if (obj.key.startsWith(currentPrefix)) {
-            const relativePath = obj.key.substring(currentPrefix.length)
-            const parts = relativePath.split('/')
-            if (parts.length > 1) {
-              folderNames.add(parts[0])
-            }
-          }
-        }
-      })
-      
-      files.value = [
-        // Add folder entries
-        ...Array.from(folderNames).map(folderName => ({
-          name: folderName,
-          isFolder: true,
-          key: currentPrefix + folderName + '/',
-          size: 0,
-          lastModified: null // Explicitly set to null for folders
-        })),
-        // Add filtered objects
-        ...filteredObjects.map((obj: any) => ({
-          ...obj,
-          name: obj.key.split('/').pop() || obj.key,
-          isFolder: false
-        }))
-      ]
-      
-      loading.value = false
-      endTiming() // Record performance metric
-    },
-    {
-      context: {
-        operation: 'Load Files',
-        component: 'FilesPage',
-        retry: loadFiles
-      },
-      retry: true,
-      maxAttempts: 3
-    }
-  )
-  
-  // Update local loading state from operation manager
-  loading.value = operationManager.isLoading(operationId)
-  const operationError = operationManager.getError(operationId)
-  if (operationError) {
-    error.value = operationError
-  }
+async function loadFiles(resetPagination = false) {
+	if (resetPagination) {
+		currentPage.value = 1;
+		cursor.value = null;
+		cursors.value = [];
+	}
+
+	const operationId = "loadFiles";
+	const requestKey = `loadFiles:${currentBucket.value}:${currentPath.value}`;
+
+	// Check network status first
+	if (!networkStatus.isOnline) {
+		error.value = "You are offline. Please check your connection.";
+		toast.warning("Cannot load files while offline");
+		return;
+	}
+
+	// Start performance monitoring
+	const endTiming = performanceMonitor.startTiming("loadFiles");
+
+	await operationManager.execute(
+		operationId,
+		async () => {
+			loading.value = true;
+			error.value = "";
+
+			// Deduplicate concurrent requests to same path
+			const response = await deduplicateRequest(requestKey, async () => {
+				// WORKAROUND: Always fetch all files from root to avoid 500 errors with prefix
+				// We'll filter client-side instead
+				const params: any = {
+					limit: pageSize.value,
+				};
+
+				if (cursor.value && currentPage.value > 1) {
+					params.cursor = cursor.value;
+				}
+
+				return await api.get(`/buckets/${currentBucket.value}`, { params });
+			});
+
+			const objects = response.data.objects || [];
+			const prefixes = response.data.delimitedPrefixes || [];
+
+			// Update pagination info
+			totalItems.value = response.data.objects?.length || 0;
+			hasNextPage.value = response.data.truncated || false;
+			if (response.data.cursor) {
+				cursor.value = response.data.cursor;
+			}
+
+			// Client-side filtering based on current path
+			const currentPrefix = currentPath.value ? `${currentPath.value}/` : "";
+
+			// Filter objects based on view mode
+			const filteredObjects = showAllFiles.value
+				? objects // Show all files when "Show All Files" is enabled
+				: objects.filter((obj: any) => {
+						if (!currentPrefix) {
+							// Root level: show files that don't have '/' OR have only one level
+							return !obj.key.includes("/") || obj.key.split("/").length === 2;
+						} else {
+							// Subfolder: show files that start with current prefix and are direct children
+							if (obj.key.startsWith(currentPrefix)) {
+								const relativePath = obj.key.substring(currentPrefix.length);
+								return !relativePath.includes("/"); // Direct child, not nested further
+							}
+							return false;
+						}
+					});
+
+			// Extract folder names from object keys
+			const folderNames = new Set<string>();
+			objects.forEach((obj: any) => {
+				if (!currentPrefix) {
+					// Root level: extract top-level folders
+					const parts = obj.key.split("/");
+					if (parts.length > 1) {
+						folderNames.add(parts[0]);
+					}
+				} else {
+					// Subfolder: extract immediate subfolders
+					if (obj.key.startsWith(currentPrefix)) {
+						const relativePath = obj.key.substring(currentPrefix.length);
+						const parts = relativePath.split("/");
+						if (parts.length > 1) {
+							folderNames.add(parts[0]);
+						}
+					}
+				}
+			});
+
+			files.value = [
+				// Add folder entries
+				...Array.from(folderNames).map((folderName) => ({
+					name: folderName,
+					isFolder: true,
+					key: currentPrefix + folderName + "/",
+					size: 0,
+					lastModified: null, // Explicitly set to null for folders
+				})),
+				// Add filtered objects
+				...filteredObjects.map((obj: any) => ({
+					...obj,
+					name: obj.key.split("/").pop() || obj.key,
+					isFolder: false,
+				})),
+			];
+
+			loading.value = false;
+			endTiming(); // Record performance metric
+		},
+		{
+			context: {
+				operation: "Load Files",
+				component: "FilesPage",
+				retry: loadFiles,
+			},
+			retry: true,
+			maxAttempts: 3,
+		},
+	);
+
+	// Update local loading state from operation manager
+	loading.value = operationManager.isLoading(operationId);
+	const operationError = operationManager.getError(operationId);
+	if (operationError) {
+		error.value = operationError;
+	}
 }
 
 function navigateToFolder(folderName: string) {
-  const newPath = currentPath.value ? `${currentPath.value}/${folderName}` : folderName
-  router.push(`/files/${currentBucket.value}/${encodeURIComponent(newPath)}`)
+	const newPath = currentPath.value
+		? `${currentPath.value}/${folderName}`
+		: folderName;
+	router.push(`/files/${currentBucket.value}/${encodeURIComponent(newPath)}`);
 }
 
 function navigateUp() {
-  const pathParts = currentPath.value.split('/')
-  pathParts.pop()
-  
-  if (pathParts.length === 0) {
-    router.push(`/files/${currentBucket.value}`)
-  } else {
-    const newPath = pathParts.join('/')
-    router.push(`/files/${currentBucket.value}/${encodeURIComponent(newPath)}`)
-  }
+	const pathParts = currentPath.value.split("/");
+	pathParts.pop();
+
+	if (pathParts.length === 0) {
+		router.push(`/files/${currentBucket.value}`);
+	} else {
+		const newPath = pathParts.join("/");
+		router.push(`/files/${currentBucket.value}/${encodeURIComponent(newPath)}`);
+	}
 }
 
 function showContextMenu(event: MouseEvent, file: any) {
-  event.preventDefault()
-  event.stopPropagation()
-  
-  contextMenu.value = {
-    show: true,
-    x: event.clientX,
-    y: event.clientY,
-    file: {
-      ...file,
-      isFolder: false
-    }
-  }
+	event.preventDefault();
+	event.stopPropagation();
+
+	contextMenu.value = {
+		show: true,
+		x: event.clientX,
+		y: event.clientY,
+		file: {
+			...file,
+			isFolder: false,
+		},
+	};
 }
 
 function closeContextMenu() {
-  contextMenu.value.show = false
-  contextMenu.value.file = null
+	contextMenu.value.show = false;
+	contextMenu.value.file = null;
 }
 
 function showFolderContextMenu(event: MouseEvent, folder: any) {
-  event.preventDefault()
-  event.stopPropagation()
-  
-  folderContextMenu.value = {
-    show: true,
-    x: event.clientX,
-    y: event.clientY,
-    folder: folder
-  }
+	event.preventDefault();
+	event.stopPropagation();
+
+	folderContextMenu.value = {
+		show: true,
+		x: event.clientX,
+		y: event.clientY,
+		folder: folder,
+	};
 }
 
 function closeFolderContextMenu() {
-  folderContextMenu.value.show = false
-  folderContextMenu.value.folder = null
+	folderContextMenu.value.show = false;
+	folderContextMenu.value.folder = null;
 }
 
 function handleFileUploaded() {
-  toast.success('Files uploaded successfully')
-  loadFiles()
+	toast.success("Files uploaded successfully");
+	loadFiles();
 }
 
 function handleFolderCreated() {
-  toast.success('Folder created successfully')
-  loadFiles()
+	toast.success("Folder created successfully");
+	loadFiles();
 }
 
 function handleFileDeleted() {
-  toast.success('File deleted successfully')
-  loadFiles()
-  closeContextMenu()
+	toast.success("File deleted successfully");
+	loadFiles();
+	closeContextMenu();
 }
 
 function handleFileRenamed() {
-  toast.success('File renamed successfully')
-  loadFiles()
-  closeContextMenu()
+	toast.success("File renamed successfully");
+	loadFiles();
+	closeContextMenu();
+}
+
+function handleContextMenuMove() {
+	if (contextMenu.value.file) {
+		moveItems.value = [
+			{
+				type: "file",
+				key: contextMenu.value.file.key,
+				name: contextMenu.value.file.name,
+			},
+		];
+		showMoveDialog.value = true;
+		closeContextMenu();
+	}
 }
 
 function handleFolderDeleted() {
-  toast.success('Folder deleted successfully')
-  loadFiles()
-  closeFolderContextMenu()
+	toast.success("Folder deleted successfully");
+	loadFiles();
+	closeFolderContextMenu();
 }
 
 function handleFolderRenamed() {
-  toast.success('Folder renamed successfully')
-  loadFiles()
-  closeFolderContextMenu()
+	toast.success("Folder renamed successfully");
+	loadFiles();
+	closeFolderContextMenu();
 }
 
 // Multi-select functions
 function toggleSelectionMode() {
-  isSelecting.value = true
-  selectedItems.value = []
+	isSelecting.value = true;
+	selectedItems.value = [];
 }
 
 function exitSelectionMode() {
-  isSelecting.value = false
-  selectedItems.value = []
+	isSelecting.value = false;
+	selectedItems.value = [];
 }
 
 function selectAll() {
-  selectedItems.value = []
-  
-  // Add all folders
-  folders.value.forEach(folder => {
-    selectedItems.value.push({
-      type: 'folder',
-      key: folder.name,
-      item: folder
-    })
-  })
-  
-  // Add all files
-  filesList.value.forEach(file => {
-    selectedItems.value.push({
-      type: 'file',
-      key: file.key,
-      item: file
-    })
-  })
+	selectedItems.value = [];
+
+	// Add all folders
+	folders.value.forEach((folder) => {
+		selectedItems.value.push({
+			type: "folder",
+			key: folder.name,
+			item: folder,
+		});
+	});
+
+	// Add all files
+	filesList.value.forEach((file) => {
+		selectedItems.value.push({
+			type: "file",
+			key: file.key,
+			item: file,
+		});
+	});
 }
 
 function clearSelection() {
-  selectedItems.value = []
+	selectedItems.value = [];
 }
 
-function toggleSelection(type: 'file' | 'folder', key: string, item: any) {
-  const index = selectedItems.value.findIndex(selected => 
-    selected.type === type && selected.key === key
-  )
-  
-  if (index > -1) {
-    selectedItems.value.splice(index, 1)
-  } else {
-    selectedItems.value.push({ type, key, item })
-  }
+function toggleSelection(type: "file" | "folder", key: string, item: any) {
+	const index = selectedItems.value.findIndex(
+		(selected) => selected.type === type && selected.key === key,
+	);
+
+	if (index > -1) {
+		selectedItems.value.splice(index, 1);
+	} else {
+		selectedItems.value.push({ type, key, item });
+	}
 }
 
-function isSelected(type: 'file' | 'folder', key: string): boolean {
-  return selectedItems.value.some(selected => 
-    selected.type === type && selected.key === key
-  )
+function isSelected(type: "file" | "folder", key: string): boolean {
+	return selectedItems.value.some(
+		(selected) => selected.type === type && selected.key === key,
+	);
 }
 
 function bulkDownload() {
-  const fileItems = selectedItems.value.filter(item => item.type === 'file')
-  
-  if (fileItems.length === 0) {
-    toast.warning('No files selected for download')
-    return
-  }
-  
-  fileItems.forEach(({ item }) => {
-    const url = `${api.defaults.baseURL}/buckets/${currentBucket.value}/${encodeURIComponent(item.key)}`
-    
-    // Create temporary link and trigger download
-    const link = document.createElement('a')
-    link.href = url
-    link.download = item.name
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-  })
-  
-  toast.success(`Started downloading ${fileItems.length} file${fileItems.length === 1 ? '' : 's'}`)
+	const fileItems = selectedItems.value.filter((item) => item.type === "file");
+
+	if (fileItems.length === 0) {
+		toast.warning("No files selected for download");
+		return;
+	}
+
+	fileItems.forEach(({ item }) => {
+		const url = `${api.defaults.baseURL}/buckets/${currentBucket.value}/${encodeURIComponent(item.key)}`;
+
+		// Create temporary link and trigger download
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = item.name;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	});
+
+	toast.success(
+		`Started downloading ${fileItems.length} file${fileItems.length === 1 ? "" : "s"}`,
+	);
 }
 
 async function bulkDelete() {
-  if (selectedItems.value.length === 0) return
-  
-  showBulkDeleteDialog.value = false
-  bulkOperationLoading.value = true
-  bulkOperationProgress.value = 0
-  
-  const totalItems = selectedItems.value.length
-  let completedItems = 0
-  
-  try {
-    const deletePromises = selectedItems.value.map(async ({ type, item }) => {
-      try {
-        if (type === 'file') {
-          await withRetry(
-            () => api.post(`/buckets/${currentBucket.value}/delete`, { key: btoa(item.key) }),
-            { maxAttempts: 2 }
-          )
-        } else {
-          const folderPath = currentPath.value ? `${currentPath.value}/${item.name}` : item.name
-          await withRetry(
-            () => api.post(`/buckets/${currentBucket.value}/folders/delete`, { path: folderPath }),
-            { maxAttempts: 2 }
-          )
-        }
-        
-        completedItems++
-        bulkOperationProgress.value = Math.round((completedItems / totalItems) * 100)
-      } catch (error) {
-        console.error(`Failed to delete ${item.name}:`, error)
-        completedItems++
-        bulkOperationProgress.value = Math.round((completedItems / totalItems) * 100)
-        throw error
-      }
-    })
-    
-    await Promise.all(deletePromises)
-    toast.success(`Deleted ${selectedItems.value.length} item${selectedItems.value.length === 1 ? '' : 's'} successfully`)
-    selectedItems.value = []
-    loadFiles()
-  } catch (error) {
-    handleError(error, {
-      operation: 'Bulk Delete',
-      component: 'FilesPage'
-    })
-  } finally {
-    bulkOperationLoading.value = false
-    bulkOperationProgress.value = 0
-  }
+	if (selectedItems.value.length === 0) return;
+
+	showBulkDeleteDialog.value = false;
+	bulkOperationLoading.value = true;
+	bulkOperationProgress.value = 0;
+
+	const totalItems = selectedItems.value.length;
+	let completedItems = 0;
+
+	try {
+		const deletePromises = selectedItems.value.map(async ({ type, item }) => {
+			try {
+				if (type === "file") {
+					await withRetry(
+						() =>
+							api.post(`/buckets/${currentBucket.value}/delete`, {
+								key: btoa(item.key),
+							}),
+						{ maxAttempts: 2 },
+					);
+				} else {
+					const folderPath = currentPath.value
+						? `${currentPath.value}/${item.name}`
+						: item.name;
+					await withRetry(
+						() =>
+							api.post(`/buckets/${currentBucket.value}/folders/delete`, {
+								path: folderPath,
+							}),
+						{ maxAttempts: 2 },
+					);
+				}
+
+				completedItems++;
+				bulkOperationProgress.value = Math.round(
+					(completedItems / totalItems) * 100,
+				);
+			} catch (error) {
+				console.error(`Failed to delete ${item.name}:`, error);
+				completedItems++;
+				bulkOperationProgress.value = Math.round(
+					(completedItems / totalItems) * 100,
+				);
+				throw error;
+			}
+		});
+
+		await Promise.all(deletePromises);
+		toast.success(
+			`Deleted ${selectedItems.value.length} item${selectedItems.value.length === 1 ? "" : "s"} successfully`,
+		);
+		selectedItems.value = [];
+		loadFiles();
+	} catch (error) {
+		handleError(error, {
+			operation: "Bulk Delete",
+			component: "FilesPage",
+		});
+	} finally {
+		bulkOperationLoading.value = false;
+		bulkOperationProgress.value = 0;
+	}
 }
 
 function previewFile(file: any) {
-  selectedPreviewFile.value = file
-  showPreviewDialog.value = true
+	selectedPreviewFile.value = file;
+	showPreviewDialog.value = true;
 }
 
 function closePreview() {
-  showPreviewDialog.value = false
-  selectedPreviewFile.value = null
+	showPreviewDialog.value = false;
+	selectedPreviewFile.value = null;
 }
 
 // Keyboard navigation and shortcuts
 function handleKeyDown(event: KeyboardEvent) {
-  const { key, ctrlKey, metaKey, shiftKey } = event
-  const isModifier = ctrlKey || metaKey
-  
-  // Global shortcuts
-  switch (key) {
-    case 'Escape':
-      if (isSelecting.value) {
-        exitSelectionMode()
-        event.preventDefault()
-      }
-      break
-      
-    case 'a':
-    case 'A':
-      if (isModifier) {
-        if (isSelecting.value) {
-          enhancedSelectAll()
-        } else {
-          toggleSelectionMode()
-          enhancedSelectAll()
-        }
-        event.preventDefault()
-      }
-      break
-      
-    case 'u':
-    case 'U':
-      if (isModifier && !isSelecting.value) {
-        showUploadDialog.value = true
-        event.preventDefault()
-      }
-      break
-      
-    case 'n':
-    case 'N':
-      if (isModifier && !isSelecting.value) {
-        showCreateFolderDialog.value = true
-        event.preventDefault()
-      }
-      break
-      
-    case 's':
-    case 'S':
-      if (isModifier) {
-        toggleSelectionMode()
-        event.preventDefault()
-      }
-      break
-      
-    case 'Delete':
-    case 'Backspace':
-      if (isSelecting.value && selectedItems.value.length > 0 && !shiftKey) {
-        showBulkDeleteDialog.value = true
-        event.preventDefault()
-      }
-      break
-      
-    case 'r':
-    case 'R':
-      if (isModifier && !isSelecting.value) {
-        loadFiles()
-        event.preventDefault()
-      }
-      break
-      
-    case 'F1':
-      showKeyboardHelp.value = true
-      event.preventDefault()
-      break
-      
-    case 'ArrowUp':
-      if (allItems.value.length > 0) {
-        currentFocusIndex.value = Math.max(0, currentFocusIndex.value - 1)
-        focusCurrentItem()
-        event.preventDefault()
-      }
-      break
-      
-    case 'ArrowDown':
-      if (allItems.value.length > 0) {
-        currentFocusIndex.value = Math.min(allItems.value.length - 1, currentFocusIndex.value + 1)
-        focusCurrentItem()
-        event.preventDefault()
-      }
-      break
-      
-    case 'Home':
-      if (allItems.value.length > 0) {
-        currentFocusIndex.value = 0
-        focusCurrentItem()
-        event.preventDefault()
-      }
-      break
-      
-    case 'End':
-      if (allItems.value.length > 0) {
-        currentFocusIndex.value = allItems.value.length - 1
-        focusCurrentItem()
-        event.preventDefault()
-      }
-      break
-      
-    case ' ': // Space
-      if (isSelecting.value && currentFocusIndex.value >= 0) {
-        const item = allItems.value[currentFocusIndex.value]
-        if (item) {
-          const key = item.type === 'folder' ? item.name : item.key
-          enhancedToggleSelection(item.type, key, item)
-        }
-        event.preventDefault()
-      }
-      break
-  }
+	const { key, ctrlKey, metaKey, shiftKey } = event;
+	const isModifier = ctrlKey || metaKey;
+
+	// Global shortcuts
+	switch (key) {
+		case "Escape":
+			if (isSelecting.value) {
+				exitSelectionMode();
+				event.preventDefault();
+			}
+			break;
+
+		case "a":
+		case "A":
+			if (isModifier) {
+				if (isSelecting.value) {
+					enhancedSelectAll();
+				} else {
+					toggleSelectionMode();
+					enhancedSelectAll();
+				}
+				event.preventDefault();
+			}
+			break;
+
+		case "u":
+		case "U":
+			if (isModifier && !isSelecting.value) {
+				showUploadDialog.value = true;
+				event.preventDefault();
+			}
+			break;
+
+		case "n":
+		case "N":
+			if (isModifier && !isSelecting.value) {
+				showCreateFolderDialog.value = true;
+				event.preventDefault();
+			}
+			break;
+
+		case "s":
+		case "S":
+			if (isModifier) {
+				toggleSelectionMode();
+				event.preventDefault();
+			}
+			break;
+
+		case "Delete":
+		case "Backspace":
+			if (isSelecting.value && selectedItems.value.length > 0 && !shiftKey) {
+				showBulkDeleteDialog.value = true;
+				event.preventDefault();
+			}
+			break;
+
+		case "r":
+		case "R":
+			if (isModifier && !isSelecting.value) {
+				loadFiles();
+				event.preventDefault();
+			}
+			break;
+
+		case "F1":
+			showKeyboardHelp.value = true;
+			event.preventDefault();
+			break;
+
+		case "ArrowUp":
+			if (allItems.value.length > 0) {
+				currentFocusIndex.value = Math.max(0, currentFocusIndex.value - 1);
+				focusCurrentItem();
+				event.preventDefault();
+			}
+			break;
+
+		case "ArrowDown":
+			if (allItems.value.length > 0) {
+				currentFocusIndex.value = Math.min(
+					allItems.value.length - 1,
+					currentFocusIndex.value + 1,
+				);
+				focusCurrentItem();
+				event.preventDefault();
+			}
+			break;
+
+		case "Home":
+			if (allItems.value.length > 0) {
+				currentFocusIndex.value = 0;
+				focusCurrentItem();
+				event.preventDefault();
+			}
+			break;
+
+		case "End":
+			if (allItems.value.length > 0) {
+				currentFocusIndex.value = allItems.value.length - 1;
+				focusCurrentItem();
+				event.preventDefault();
+			}
+			break;
+
+		case " ": // Space
+			if (isSelecting.value && currentFocusIndex.value >= 0) {
+				const item = allItems.value[currentFocusIndex.value];
+				if (item) {
+					const key = item.type === "folder" ? item.name : item.key;
+					enhancedToggleSelection(item.type, key, item);
+				}
+				event.preventDefault();
+			}
+			break;
+	}
 }
 
 function focusCurrentItem() {
-  // Focus the current item in the list
-  nextTick(() => {
-    const items = document.querySelectorAll('[role="button"][tabindex="0"]')
-    const targetItem = items[currentFocusIndex.value + (currentPath.value ? 1 : 0)] // +1 for back button
-    if (targetItem) {
-      (targetItem as HTMLElement).focus()
-    }
-  })
+	// Focus the current item in the list
+	nextTick(() => {
+		const items = document.querySelectorAll('[role="button"][tabindex="0"]');
+		const targetItem =
+			items[currentFocusIndex.value + (currentPath.value ? 1 : 0)]; // +1 for back button
+		if (targetItem) {
+			(targetItem as HTMLElement).focus();
+		}
+	});
 }
 
 // Announce changes to screen readers
 function announceToScreenReader(message: string) {
-  const announcement = document.createElement('div')
-  announcement.setAttribute('aria-live', 'polite')
-  announcement.setAttribute('aria-atomic', 'true')
-  announcement.style.position = 'absolute'
-  announcement.style.left = '-10000px'
-  announcement.style.width = '1px'
-  announcement.style.height = '1px'
-  announcement.style.overflow = 'hidden'
-  announcement.textContent = message
-  
-  document.body.appendChild(announcement)
-  
-  setTimeout(() => {
-    document.body.removeChild(announcement)
-  }, 1000)
+	const announcement = document.createElement("div");
+	announcement.setAttribute("aria-live", "polite");
+	announcement.setAttribute("aria-atomic", "true");
+	announcement.style.position = "absolute";
+	announcement.style.left = "-10000px";
+	announcement.style.width = "1px";
+	announcement.style.height = "1px";
+	announcement.style.overflow = "hidden";
+	announcement.textContent = message;
+
+	document.body.appendChild(announcement);
+
+	setTimeout(() => {
+		document.body.removeChild(announcement);
+	}, 1000);
 }
 
 // Enhanced selection functions with screen reader support
-function enhancedToggleSelection(type: 'file' | 'folder', key: string, item: any) {
-  const wasSelected = isSelected(type, key)
-  toggleSelection(type, key, item)
-  
-  // Announce to screen readers
-  const action = wasSelected ? 'deselected' : 'selected'
-  const itemType = type === 'folder' ? 'folder' : 'file'
-  announceToScreenReader(`${itemType} ${item.name} ${action}. ${selectedItems.value.length} items selected.`)
+function enhancedToggleSelection(
+	type: "file" | "folder",
+	key: string,
+	item: any,
+) {
+	const wasSelected = isSelected(type, key);
+	toggleSelection(type, key, item);
+
+	// Announce to screen readers
+	const action = wasSelected ? "deselected" : "selected";
+	const itemType = type === "folder" ? "folder" : "file";
+	announceToScreenReader(
+		`${itemType} ${item.name} ${action}. ${selectedItems.value.length} items selected.`,
+	);
 }
 
 function enhancedSelectAll() {
-  const beforeCount = selectedItems.value.length
-  selectAll()
-  const afterCount = selectedItems.value.length
-  
-  announceToScreenReader(`Selected all ${afterCount} items.`)
+	const beforeCount = selectedItems.value.length;
+	selectAll();
+	const afterCount = selectedItems.value.length;
+
+	announceToScreenReader(`Selected all ${afterCount} items.`);
 }
 
 function enhancedClearSelection() {
-  const count = selectedItems.value.length
-  clearSelection()
-  announceToScreenReader(`Cleared selection. ${count} items deselected.`)
+	const count = selectedItems.value.length;
+	clearSelection();
+	announceToScreenReader(`Cleared selection. ${count} items deselected.`);
 }
 
-watch(() => route.params, loadFiles, { immediate: true })
+// Pagination functions
+function handleNextPage() {
+	if (hasNextPage.value) {
+		// Store current cursor for going back
+		if (cursor.value) {
+			cursors.value[currentPage.value - 1] = cursor.value;
+		}
+		currentPage.value++;
+		loadFiles();
+	}
+}
+
+function handlePreviousPage() {
+	if (currentPage.value > 1) {
+		currentPage.value--;
+		// Restore cursor for previous page
+		if (currentPage.value > 1) {
+			cursor.value = cursors.value[currentPage.value - 2] || null;
+		} else {
+			cursor.value = null;
+		}
+		loadFiles();
+	}
+}
+
+function handlePageSizeChange(newSize: number) {
+	pageSize.value = newSize;
+	loadFiles(true); // Reset pagination
+}
+
+// Move file functions
+function openMoveDialog(
+	items?: Array<{ type: "file" | "folder"; key: string; item: any }>,
+) {
+	if (items && items.length > 0) {
+		moveItems.value = items.map((item) => ({
+			type: item.type,
+			key: item.key,
+			name: item.item.name,
+		}));
+	} else if (selectedItems.value.length > 0) {
+		moveItems.value = selectedItems.value.map((item) => ({
+			type: item.type,
+			key: item.key,
+			name: item.item.name,
+		}));
+	}
+
+	if (moveItems.value.length > 0) {
+		showMoveDialog.value = true;
+	} else {
+		toast.warning("Please select items to move");
+	}
+}
+
+function handleFileMoved() {
+	clearSelection();
+	loadFiles(true); // Reload files after move
+}
+
+watch(
+	() => route.params,
+	() => loadFiles(true),
+	{ immediate: true },
+);
 
 // Watch for stats changes and emit to parent
-watch(folderStats, (newStats) => {
-  emit('update-stats', newStats)
-}, { immediate: true })
+watch(
+	folderStats,
+	(newStats) => {
+		emit("update-stats", newStats);
+	},
+	{ immediate: true },
+);
 
 // Listen for refresh events from layout
 function handleRefreshEvent() {
-  loadFiles()
+	loadFiles();
 }
 
 function handleUploadEvent() {
-  showUploadDialog.value = true
+	showUploadDialog.value = true;
 }
 
 function handleCreateFolderEvent() {
-  showCreateFolderDialog.value = true
+	showCreateFolderDialog.value = true;
 }
 
 // Add keyboard event listener
 onMounted(() => {
-  document.addEventListener('keydown', handleKeyDown)
-  window.addEventListener('refresh-view', handleRefreshEvent)
-  window.addEventListener('trigger-upload', handleUploadEvent)
-  window.addEventListener('trigger-create-folder', handleCreateFolderEvent)
-})
+	document.addEventListener("keydown", handleKeyDown);
+	window.addEventListener("refresh-view", handleRefreshEvent);
+	window.addEventListener("trigger-upload", handleUploadEvent);
+	window.addEventListener("trigger-create-folder", handleCreateFolderEvent);
+});
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeyDown)
-  window.removeEventListener('refresh-view', handleRefreshEvent)
-  window.removeEventListener('trigger-upload', handleUploadEvent)
-  window.removeEventListener('trigger-create-folder', handleCreateFolderEvent)
-  
-  // Log performance report on component unmount
-  if (import.meta.env.DEV) {
-    performanceMonitor.logReport()
-  }
-})
+	document.removeEventListener("keydown", handleKeyDown);
+	window.removeEventListener("refresh-view", handleRefreshEvent);
+	window.removeEventListener("trigger-upload", handleUploadEvent);
+	window.removeEventListener("trigger-create-folder", handleCreateFolderEvent);
+
+	// Log performance report on component unmount
+	if (import.meta.env.DEV) {
+		performanceMonitor.logReport();
+	}
+});
 </script>

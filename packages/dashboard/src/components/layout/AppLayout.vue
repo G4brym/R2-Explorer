@@ -179,119 +179,123 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { 
-  FolderIcon, 
-  SunIcon, 
-  MoonIcon, 
-  LogOutIcon, 
-  MenuIcon,
-  ChevronRightIcon,
-  RefreshCwIcon,
-  UploadIcon,
-  FolderPlusIcon
-} from 'lucide-vue-next'
-import Button from '@/components/ui/Button.vue'
-import { formatBytes } from '@/lib/utils'
+import Button from "@/components/ui/Button.vue";
+import { formatBytes } from "@/lib/utils";
+import { useAuthStore } from "@/stores/auth";
+import {
+	ChevronRightIcon,
+	FolderIcon,
+	FolderPlusIcon,
+	LogOutIcon,
+	MenuIcon,
+	MoonIcon,
+	RefreshCwIcon,
+	SunIcon,
+	UploadIcon,
+} from "lucide-vue-next";
+import { computed, onMounted, onUnmounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-const router = useRouter()
-const route = useRoute()
-const authStore = useAuthStore()
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
 
-const isDark = ref(false)
-const showSidebar = ref(true)
-const isDesktop = ref(true)
-
+const isDark = ref(false);
+const showSidebar = ref(true);
+const isDesktop = ref(true);
 
 const folderStats = ref({
-  files: 0,
-  folders: 0,
-  totalSize: ''
-})
+	files: 0,
+	folders: 0,
+	totalSize: "",
+});
 
-const currentBucket = computed(() => route.params.bucket as string)
+const currentBucket = computed(() => route.params.bucket as string);
 const currentPath = computed(() => {
-  const pathMatch = route.params.pathMatch as string
-  return pathMatch ? decodeURIComponent(pathMatch) : ''
-})
+	const pathMatch = route.params.pathMatch as string;
+	return pathMatch ? decodeURIComponent(pathMatch) : "";
+});
 
 function toggleTheme() {
-  isDark.value = !isDark.value
-  if (isDark.value) {
-    document.documentElement.classList.add('dark')
-    localStorage.setItem('theme', 'dark')
-  } else {
-    document.documentElement.classList.remove('dark')
-    localStorage.setItem('theme', 'light')
-  }
+	isDark.value = !isDark.value;
+	if (isDark.value) {
+		document.documentElement.classList.add("dark");
+		localStorage.setItem("theme", "dark");
+	} else {
+		document.documentElement.classList.remove("dark");
+		localStorage.setItem("theme", "light");
+	}
 }
 
 function toggleSidebar() {
-  showSidebar.value = !showSidebar.value
+	showSidebar.value = !showSidebar.value;
 }
 
 function closeSidebar() {
-  if (!isDesktop.value) {
-    showSidebar.value = false
-  }
+	if (!isDesktop.value) {
+		showSidebar.value = false;
+	}
 }
 
-
 function refreshCurrentView() {
-  // Emit event to refresh current view
-  window.dispatchEvent(new Event('refresh-view'))
+	// Emit event to refresh current view
+	window.dispatchEvent(new Event("refresh-view"));
 }
 
 function triggerUpload() {
-  // Dispatch global event to trigger upload dialog
-  window.dispatchEvent(new Event('trigger-upload'))
+	// Dispatch global event to trigger upload dialog
+	window.dispatchEvent(new Event("trigger-upload"));
 }
 
 function triggerCreateFolder() {
-  // Dispatch global event to trigger create folder dialog
-  window.dispatchEvent(new Event('trigger-create-folder'))
+	// Dispatch global event to trigger create folder dialog
+	window.dispatchEvent(new Event("trigger-create-folder"));
 }
 
-function updateFolderStats(stats: { files: number; folders: number; totalSize?: string }) {
-  folderStats.value = stats
+function updateFolderStats(stats: {
+	files: number;
+	folders: number;
+	totalSize?: string;
+}) {
+	folderStats.value = stats;
 }
 
 function handleResize() {
-  isDesktop.value = window.innerWidth >= 1024
-  if (isDesktop.value) {
-    showSidebar.value = true
-  }
+	isDesktop.value = window.innerWidth >= 1024;
+	if (isDesktop.value) {
+		showSidebar.value = true;
+	}
 }
 
 async function handleLogout() {
-  await authStore.logout(router)
+	await authStore.logout(router);
 }
 
 onMounted(() => {
-  // Initialize theme
-  const savedTheme = localStorage.getItem('theme')
-  const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-  
-  isDark.value = savedTheme === 'dark' || (!savedTheme && systemPrefersDark)
-  
-  if (isDark.value) {
-    document.documentElement.classList.add('dark')
-  }
-  
-  // Initialize responsive behavior
-  handleResize()
-  window.addEventListener('resize', handleResize)
-})
+	// Initialize theme
+	const savedTheme = localStorage.getItem("theme");
+	const systemPrefersDark = window.matchMedia(
+		"(prefers-color-scheme: dark)",
+	).matches;
+
+	isDark.value = savedTheme === "dark" || (!savedTheme && systemPrefersDark);
+
+	if (isDark.value) {
+		document.documentElement.classList.add("dark");
+	}
+
+	// Initialize responsive behavior
+	handleResize();
+	window.addEventListener("resize", handleResize);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
+	window.removeEventListener("resize", handleResize);
+});
 
 // Define emits
 defineEmits<{
-  upload: []
-  createFolder: []
-}>()
+	upload: [];
+	createFolder: [];
+}>();
 </script>

@@ -39,27 +39,27 @@
 </template>
 
 <script setup lang="ts">
-import LoadingSpinner from './LoadingSpinner.vue'
-import Card from './Card.vue'
-import CardContent from './CardContent.vue'
-import Button from './Button.vue'
+import Button from "./Button.vue";
+import Card from "./Card.vue";
+import CardContent from "./CardContent.vue";
+import LoadingSpinner from "./LoadingSpinner.vue";
 
 interface Props {
-  show: boolean
-  title: string
-  message?: string
-  progress?: number
-  persistent?: boolean
-  allowCancel?: boolean
+	show: boolean;
+	title: string;
+	message?: string;
+	progress?: number;
+	persistent?: boolean;
+	allowCancel?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
-  persistent: false,
-  allowCancel: false
-})
+	persistent: false,
+	allowCancel: false,
+});
 
 defineEmits<{
-  dismiss: []
-  cancel: []
-}>()
+	dismiss: [];
+	cancel: [];
+}>();
 </script>
