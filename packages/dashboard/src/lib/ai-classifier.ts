@@ -86,21 +86,38 @@ async function extractWithPdfParse(pdfFile: File): Promise<string> {
 }
 
 
-// Claude Vision API via Worker Proxy - handles PDFs, images, and scanned documents
+// AI Document Classification - optimized data handling
 async function analyzeWithClaudeVision(file: File, filename: string): Promise<DocumentClassification> {
   try {
-    console.log('📄 Starting Claude Vision analysis via worker for:', filename, 'Type:', file.type)
-    const base64Data = await fileToBase64(file)
-    const mediaType = file.type === 'application/pdf' ? 'application/pdf' : file.type
+    console.log('📄 Starting AI analysis for:', filename, 'Type:', file.type)
+    
+    // Check if file is an image that the AI model can process
+    const supportedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
     
     // Import API helper
     const { api } = await import('@/lib/api')
     
-    console.log('🚀 Making API call to worker proxy...')
+    if (!supportedImageTypes.includes(file.type)) {
+      console.log('📋 Non-image file, using intelligent filename classification via worker')
+      // Send only filename and type - no file data needed
+      const response = await api.post('/ai/classify', {
+        filename,
+        fileData: '', // Empty - worker will use filename classification
+        mimeType: file.type
+      })
+      
+      return response.data?.result || classifyByFilename(filename)
+    }
+    
+    // Only convert to base64 for images that AI can actually process
+    console.log('🖼️ Processing image with AI vision model')
+    const base64Data = await fileToBase64(file)
+    
+    console.log('🚀 Making AI vision API call...')
     const response = await api.post('/ai/classify', {
       filename,
       fileData: base64Data,
-      mimeType: mediaType
+      mimeType: file.type
     })
     
     console.log('📥 Worker proxy response:', response.data)

@@ -1113,15 +1113,27 @@ function handleRefreshEvent() {
   loadFiles()
 }
 
+function handleUploadEvent() {
+  showUploadDialog.value = true
+}
+
+function handleCreateFolderEvent() {
+  showCreateFolderDialog.value = true
+}
+
 // Add keyboard event listener
 onMounted(() => {
   document.addEventListener('keydown', handleKeyDown)
   window.addEventListener('refresh-view', handleRefreshEvent)
+  window.addEventListener('trigger-upload', handleUploadEvent)
+  window.addEventListener('trigger-create-folder', handleCreateFolderEvent)
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeyDown)
   window.removeEventListener('refresh-view', handleRefreshEvent)
+  window.removeEventListener('trigger-upload', handleUploadEvent)
+  window.removeEventListener('trigger-create-folder', handleCreateFolderEvent)
   
   // Log performance report on component unmount
   if (import.meta.env.DEV) {

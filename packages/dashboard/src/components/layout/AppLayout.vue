@@ -103,7 +103,7 @@
               <Button 
                 variant="ghost" 
                 class="w-full justify-start"
-                @click="$emit('upload')"
+                @click="triggerUpload"
               >
                 <UploadIcon class="w-4 h-4 mr-3" />
                 Upload Files
@@ -111,7 +111,7 @@
               <Button 
                 variant="ghost" 
                 class="w-full justify-start"
-                @click="$emit('createFolder')"
+                @click="triggerCreateFolder"
               >
                 <FolderPlusIcon class="w-4 h-4 mr-3" />
                 New Folder
@@ -242,6 +242,16 @@ function closeSidebar() {
 function refreshCurrentView() {
   // Emit event to refresh current view
   window.dispatchEvent(new Event('refresh-view'))
+}
+
+function triggerUpload() {
+  // Dispatch global event to trigger upload dialog
+  window.dispatchEvent(new Event('trigger-upload'))
+}
+
+function triggerCreateFolder() {
+  // Dispatch global event to trigger create folder dialog
+  window.dispatchEvent(new Event('trigger-create-folder'))
 }
 
 function updateFolderStats(stats: { files: number; folders: number; totalSize?: string }) {

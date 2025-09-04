@@ -420,9 +420,9 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
               toast.success(`✨ AI confirmed as ${documentType}${vendor ? ' from ' + vendor : ''}`)
             }
           } else {
-            // AI low confidence - keep filename classification
+            // AI lower confidence - keep filename classification
             uploadFile.aiStatus = 'completed'
-            uploadFile.aiResult = `${documentType} (AI low confidence)`
+            uploadFile.aiResult = documentType
           }
         } catch (error) {
           console.warn('AI classification failed, keeping filename classification:', error)

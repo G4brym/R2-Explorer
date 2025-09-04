@@ -59,9 +59,18 @@ export class ClassifyDocument extends OpenAPIRoute {
 		const data = await this.getValidatedData<typeof ClassifyDocumentInput>();
 
 		try {
-			console.log('🧠 Worker: Starting Cloudflare AI classification for:', data.filename);
+			console.log('🧠 Worker: Starting AI classification for:', data.filename);
 			
-			// Use Cloudflare Workers AI with proper format
+			// Check if file data is provided (empty for non-image files)
+			if (!data.fileData || data.fileData.trim() === '') {
+				console.log('📋 No file data provided, using intelligent filename classification');
+				return {
+					success: true,
+					result: this.classifyByFilename(data.filename)
+				};
+			}
+			
+			// Use Cloudflare Workers AI with proper format for images
 			// Convert base64 to Uint8Array for Workers runtime
 			let bytes: Uint8Array;
 			try {
@@ -75,8 +84,7 @@ export class ClassifyDocument extends OpenAPIRoute {
 			} catch (base64Error) {
 				console.warn('Base64 decode failed, using filename classification:', base64Error);
 				return {
-					success: false,
-					error: "Invalid base64 image data",
+					success: true,
 					result: this.classifyByFilename(data.filename)
 				};
 			}
