@@ -1,6 +1,6 @@
 [build]
-command = "cd packages/dashboard-shadcn && pnpm install && pnpm run build"
-publish = "packages/dashboard-shadcn/dist"
+command = "cd packages/dashboard && pnpm install && pnpm run build"
+publish = "packages/dashboard/dist"
 
 [env.production]
 NODE_VERSION = "20"
