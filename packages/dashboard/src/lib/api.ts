@@ -13,11 +13,7 @@ export const api = axios.create({
 	headers: {
 		"Content-Type": "application/json",
 	},
-	// Add basic auth credentials for SpendRule API
-	auth: {
-		username: "spendrule_admin",
-		password: "Admin_2025",
-	},
+	// Note: Auth credentials are set dynamically via Authorization header in auth store
 });
 
 // Add request interceptor to ensure auth headers are always sent
