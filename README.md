@@ -89,6 +89,15 @@ Choose the method that best suits your needs:
 
 For detailed instructions on maintaining and updating your installation, visit our [update guide](https://r2explorer.com/getting-started/updating-your-project/).
 
+## Cloudflare Pages Deploy (Dashboard)
+
+- Build output lives at `packages/dashboard/dist`.
+- `wrangler.toml` includes `pages_build_output_dir = "packages/dashboard/dist"` so Cloudflare Pages auto-detects the output.
+- A GitHub Action is provided at `.github/workflows/pages-deploy.yml`:
+  - Set repo secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+  - Default Pages project name is `explorer-dashboard` (change `CF_PAGES_PROJECT` in the workflow if needed).
+  - Push to `main` or `dev` to trigger a deploy.
+
 ## Roadmap
 
 We're actively working on these exciting features:

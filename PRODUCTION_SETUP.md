@@ -25,13 +25,30 @@ npx wrangler deploy
 ```
 
 ### 2. Dashboard Deployment (Frontend)
+
+Option A — Cloudflare Pages via GitHub Actions (recommended)
+
+1) Set repository secrets in GitHub:
+- `CLOUDFLARE_API_TOKEN` (Pages + Pages Write + Account Read permissions)
+- `CLOUDFLARE_ACCOUNT_ID` (found in Cloudflare dashboard)
+
+2) Ensure your Pages project name matches the workflow (default: `explorer-dashboard`).
+   - Update `.github/workflows/pages-deploy.yml` `CF_PAGES_PROJECT` if needed.
+
+3) Push to `main` or `dev`. The workflow will:
+- Build the dashboard (`packages/dashboard/dist`)
+- Deploy via `wrangler pages deploy` to the Pages project
+
+Option B — Manual build + deploy
 ```bash
 # Build for production
-cd packages/dashboard-shadcn
+cd packages/dashboard
 npm run build
 
-# Deploy to Cloudflare Pages or your preferred hosting
-# Upload dist/ folder to your hosting provider
+# Deploy to Cloudflare Pages
+# Either use the Cloudflare dashboard to upload packages/dashboard/dist
+# Or use wrangler directly:
+wrangler pages deploy packages/dashboard/dist --project-name <your-project> --branch main
 ```
 
 ### 3. Environment Configuration
@@ -83,6 +100,10 @@ Files are automatically categorized into:
 - Encrypted file storage in R2
 - Secure file access with signed URLs
 - No client-side storage of credentials
+
+## Additional Notes
+- `wrangler.toml` includes `pages_build_output_dir = "packages/dashboard/dist"` so Cloudflare Pages auto-detects the correct build output.
+- The dashboard `api` base URL can be configured via `VITE_SERVER_URL` in development.
 
 ## Support
 For technical support or feature requests, contact the development team.

@@ -1,0 +1,55 @@
+name: Deploy Dashboard to Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'packages/dashboard/**'
+      - '.github/workflows/pages-deploy.yml'
+      - 'wrangler.toml'
+
+permissions:
+  contents: read
+
+env:
+  CF_PAGES_PROJECT: explorer-dashboard
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build dashboard
+        run: pnpm -C packages/dashboard build
+
+      - name: Install Wrangler
+        run: pnpm add -g wrangler@^4
+
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          BRANCH_NAME="${GITHUB_REF_NAME}"
+          # Use wrangler pages deploy with explicit dist path and project name
+          wrangler pages deploy packages/dashboard/dist \
+            --project-name "${CF_PAGES_PROJECT}" \
+            --branch "${BRANCH_NAME}"
+
