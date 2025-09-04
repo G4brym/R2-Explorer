@@ -47,11 +47,15 @@ export async function classifyDocumentWithAI(
     // Import API helper
     const { api } = await import('@/lib/api')
     
-    // Send file info to worker for AI analysis
-    console.log('🚀 Sending to AI worker...')
+    // Convert file to base64 for content analysis
+    console.log('📄 Converting file to base64 for content analysis...')
+    const base64Data = await fileToBase64(file)
+    
+    // Send file content to worker for AI analysis
+    console.log('🚀 Sending file content to AI worker...')
     const response = await api.post('/ai/classify', {
       filename,
-      fileData: '', // Let worker handle file content extraction
+      fileData: base64Data, // Send actual file content for analysis
       mimeType: file.type
     })
     
@@ -88,133 +92,7 @@ async function extractWithPdfParse(pdfFile: File): Promise<string> {
 }
 
 
-// AI Document Classification - optimized data handling
-async function analyzeWithClaudeVision(file: File, filename: string): Promise<DocumentClassification> {
-  try {
-    console.log('📄 Starting AI analysis for:', filename, 'Type:', file.type)
-    
-    // Check if file is an image that the AI model can process
-    const supportedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
-    
-    // Import API helper
-    const { api } = await import('@/lib/api')
-    
-    if (!supportedImageTypes.includes(file.type)) {
-      console.log('📋 Non-image file, using intelligent filename classification via worker')
-      // Send only filename and type - no file data needed
-      const response = await api.post('/ai/classify', {
-        filename,
-        fileData: '', // Empty - worker will use filename classification
-        mimeType: file.type
-      })
-      
-      return response.data?.result || classifyByFilename(filename)
-    }
-    
-    // Only convert to base64 for images that AI can actually process
-    console.log('🖼️ Processing image with AI vision model')
-    const base64Data = await fileToBase64(file)
-    
-    console.log('🚀 Making AI vision API call...')
-    const response = await api.post('/ai/classify', {
-      filename,
-      fileData: base64Data,
-      mimeType: file.type
-    })
-    
-    console.log('📥 Worker proxy response:', response.data)
-    
-    const result = response.data.result
-    console.log('✅ Worker AI result:', result)
 
-    return {
-      category: result.category || 'other',
-      confidence: result.confidence || 0.7,
-      vendor: result.vendor,
-      summary: result.summary,
-      extractedData: result.extractedData
-    }
-  } catch (error) {
-    console.error('🚨 Worker AI analysis failed:', error)
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined
-    })
-    return classifyByFilename(filename)
-  }
-}
-
-// Text-only analysis for non-visual files
-async function analyzeWithClaudeText(text: string, filename: string): Promise<DocumentClassification> {
-  const prompt = `
-Analyze this healthcare document and provide classification:
-
-DOCUMENT TEXT:
-${text.substring(0, 2000)} // Limit to ~2000 chars to save tokens
-
-FILENAME: ${filename}
-
-Please respond with ONLY a JSON object in this exact format:
-{
-  "category": "invoices|contracts|workflows|reports|forms|other",
-  "confidence": 0.85,
-  "vendor": "Company Name if found",
-  "summary": "Brief 1-2 sentence summary of document purpose",
-  "extractedData": {
-    "documentType": "Medical Invoice",
-    "amount": "$1,234.56",
-    "date": "2024-03-15",
-    "vendor": "Medical Supply Co",
-    "keyEntities": ["patient care", "medical supplies", "Q1 2024"]
-  }
-}
-
-CLASSIFICATION RULES:
-- invoices: Bills, invoices, statements, payment requests
-- contracts: Agreements, MSAs, SOWs, service contracts  
-- workflows: Process documents, procedures, diagrams
-- reports: Analytics, summaries, performance reports
-- forms: Applications, intake forms, surveys
-- other: Everything else
-
-Focus on healthcare context. Be confident in classification.`
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': aiConfig.claudeApiKey!,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-3-haiku-20240307', // Fast and cost-effective
-        max_tokens: 300,
-        messages: [{
-          role: 'user',
-          content: prompt
-        }]
-      })
-    })
-    
-    const result = await response.json()
-    const aiResponse = result.content?.[0]?.text || '{}'
-    
-    // Parse Claude's JSON response
-    const parsed = JSON.parse(aiResponse)
-    return {
-      category: parsed.category || 'other',
-      confidence: parsed.confidence || 0.7,
-      vendor: parsed.vendor,
-      summary: parsed.summary,
-      extractedData: parsed.extractedData
-    }
-  } catch (error) {
-    console.error('Claude analysis failed:', error)
-    // Return filename-based fallback
-    return classifyByFilename(filename)
-  }
-}
 
 function classifyByFilename(filename: string): DocumentClassification {
   const lower = filename.toLowerCase()
