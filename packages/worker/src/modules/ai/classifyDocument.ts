@@ -9,15 +9,17 @@ const ClassifyDocumentInput = z.object({
 });
 
 interface DocumentClassification {
-	category: 'invoices' | 'contracts' | 'workflows' | 'reports' | 'forms' | 'other';
+	category: 'invoices' | 'contracts' | 'workflows' | 'other';
 	confidence: number;
 	vendor?: string;
+	serviceType?: string;
 	summary?: string;
 	extractedData?: {
 		documentType?: string;
 		amount?: string;
 		date?: string;
 		vendor?: string;
+		serviceType?: string;
 		keyEntities?: string[];
 	};
 }
@@ -76,7 +78,6 @@ CATEGORIES (choose one):
 - invoices: Bills, invoices, statements, payments, medical bills
 - contracts: Agreements, MSAs, SOWs, contracts, legal documents  
 - workflows: Procedures, processes, diagrams, protocols, guidelines
-- reports: Analytics, summaries, reports, assessments, results
 - other: Everything else
 
 EXTRACTION REQUIREMENTS:
@@ -86,7 +87,7 @@ EXTRACTION REQUIREMENTS:
 
 Respond with ONLY this JSON format:
 {
-  "category": "invoices|contracts|workflows|reports|other",
+  "category": "invoices|contracts|workflows|other",
   "confidence": 0.90,
   "vendor": "Company/Vendor Name",
   "serviceType": "Type of service provided",
@@ -116,6 +117,7 @@ Respond with ONLY this JSON format:
 				category: parsed.category || 'other',
 				confidence: parsed.confidence || 0.7,
 				vendor: parsed.vendor,
+				serviceType: parsed.serviceType,
 				summary: parsed.summary,
 				extractedData: parsed.extractedData
 			};
@@ -148,12 +150,6 @@ Respond with ONLY this JSON format:
 		}
 		if (['workflow', 'process', 'diagram', 'flow', 'procedure'].some(k => lower.includes(k))) {
 			return { category: 'workflows', confidence: 0.6 };
-		}
-		if (['report', 'analysis', 'summary', 'analytics'].some(k => lower.includes(k))) {
-			return { category: 'reports', confidence: 0.6 };
-		}
-		if (['form', 'application', 'intake', 'survey'].some(k => lower.includes(k))) {
-			return { category: 'forms', confidence: 0.6 };
 		}
 		
 		return { category: 'other', confidence: 0.5 };

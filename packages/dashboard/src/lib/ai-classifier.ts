@@ -4,15 +4,17 @@
  */
 
 interface DocumentClassification {
-  category: 'invoices' | 'contracts' | 'workflows' | 'reports' | 'forms' | 'other'
+  category: 'invoices' | 'contracts' | 'workflows' | 'other'
   confidence: number
   vendor?: string
+  serviceType?: string
   summary?: string
   extractedData?: {
     patientId?: string
     date?: string
     amount?: string
     vendor?: string
+    serviceType?: string
     documentType?: string
     keyEntities?: string[]
   }
@@ -222,12 +224,7 @@ function classifyByFilename(filename: string): DocumentClassification {
   if (['workflow', 'process', 'diagram', 'flow', 'procedure'].some(k => lower.includes(k))) {
     return { category: 'workflows', confidence: 0.6 }
   }
-  if (['report', 'analysis', 'summary', 'analytics'].some(k => lower.includes(k))) {
-    return { category: 'reports', confidence: 0.6 }
-  }
-  if (['form', 'application', 'intake', 'survey'].some(k => lower.includes(k))) {
-    return { category: 'forms', confidence: 0.6 }
-  }
+  // Forms are now classified as 'other' or more specific categories
   
   return { category: 'other', confidence: 0.5 }
 }
@@ -251,7 +248,5 @@ export const HEALTH_GROUP_CATEGORIES = {
   invoices: 'invoices',
   contracts: 'contracts', 
   workflows: 'workflows',
-  reports: 'reports',
-  forms: 'forms',
   other: 'other'
 } as const
