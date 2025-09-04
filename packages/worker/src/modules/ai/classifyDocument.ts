@@ -64,11 +64,23 @@ export class ClassifyDocument extends OpenAPIRoute {
 	async handle(c: AppContext) {
 		const data = await this.getValidatedData<typeof ClassifyDocumentInput>();
 
+		// Validate required data
+		if (!data.filename) {
+			return {
+				success: false,
+				error: "Filename is required",
+				result: this.classifyByFilename("unknown")
+			};
+		}
+
+		// Ensure mimeType is not undefined
+		const mimeType = data.mimeType || 'application/octet-stream';
+
 		try {
-			console.log('🤖 Worker: Starting AI classification for:', data.filename, 'Type:', data.mimeType);
+			console.log('🤖 Worker: Starting AI classification for:', data.filename, 'Type:', mimeType);
 			
 			// Use vision model to analyze file directly - no text extraction needed!
-			const isImageFile = data.mimeType.startsWith('image/');
+			const isImageFile = mimeType.startsWith('image/');
 			let aiResponse;
 			
 			if (data.fileData && data.fileData.trim() && isImageFile) {
@@ -84,7 +96,7 @@ export class ClassifyDocument extends OpenAPIRoute {
 									text: `Analyze this business document image and extract key information.
 
 DOCUMENT NAME: ${data.filename}
-FILE TYPE: ${data.mimeType}
+FILE TYPE: ${mimeType}
 
 Based on what you can see in this document, provide ONLY the following information (write "UNKNOWN" if not found):
 
@@ -111,7 +123,7 @@ Respond with ONLY this JSON format:
 								{
 									type: 'image_url',
 									image_url: {
-										url: `data:${data.mimeType};base64,${data.fileData}`
+										url: `data:${mimeType};base64,${data.fileData}`
 									}
 								}
 							]
@@ -126,7 +138,7 @@ Respond with ONLY this JSON format:
 					prompt: `Analyze this file and provide business document classification.
 
 DOCUMENT NAME: ${data.filename}
-FILE TYPE: ${data.mimeType}
+FILE TYPE: ${mimeType}
 
 Based on the filename and file type, classify this document:
 
