@@ -32,3 +32,6 @@ cwd = "."
 
 # Remove environment configs to eliminate warning
 # Single production deployment
+
+# Pages configuration for dashboard deployment
+pages_build_output_dir = "packages/dashboard/dist"
