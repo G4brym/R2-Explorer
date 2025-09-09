@@ -2,7 +2,7 @@
   <div class="h-full flex flex-col">
     <!-- Breadcrumb and actions -->
     <div class="border-b bg-card">
-      <div class="flex items-center justify-between px-6 py-4">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4">
         <div class="flex items-center space-x-2 text-sm text-muted-foreground">
           <FolderIcon class="w-4 h-4" />
           <span>{{ currentBucket }}</span>
@@ -12,7 +12,7 @@
           </template>
         </div>
         
-        <div class="flex items-center space-x-2">
+        <div class="flex flex-wrap items-center gap-2">
           <Button 
             v-if="!isSelecting" 
             variant="outline" 
@@ -55,8 +55,8 @@
             title="Upload Files (Ctrl+U)"
             @click="showUploadDialog = true"
           >
-            <UploadIcon class="w-4 h-4 mr-2" />
-            Upload
+            <UploadIcon class="w-4 h-4 lg:mr-2" />
+            <span class="hidden lg:inline">Upload</span>
           </Button>
           <Button 
             v-if="!isSelecting" 
@@ -65,8 +65,8 @@
             title="New Folder (Ctrl+N)"
             @click="showCreateFolderDialog = true"
           >
-            <FolderPlusIcon class="w-4 h-4 mr-2" />
-            New Folder
+            <FolderPlusIcon class="w-4 h-4 lg:mr-2" />
+            <span class="hidden lg:inline">New Folder</span>
           </Button>
           <Button 
             v-if="!isSelecting"
@@ -76,8 +76,8 @@
             @click="showAllFiles = !showAllFiles"
             :class="showAllFiles ? 'bg-primary text-primary-foreground' : ''"
           >
-            <EyeIcon class="w-4 h-4 mr-2" />
-            {{ showAllFiles ? 'Folder View' : 'Show All Files' }}
+            <EyeIcon class="w-4 h-4 lg:mr-2" />
+            <span class="hidden xl:inline">{{ showAllFiles ? 'Folder View' : 'Show All Files' }}</span>
           </Button>
           <Button 
             variant="ghost" 
@@ -96,12 +96,12 @@
     
     <!-- Bulk Operations Toolbar -->
     <div v-if="isSelecting && selectedItems.length > 0" class="border-b bg-muted/50">
-      <div class="flex items-center justify-between px-6 py-3">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 px-4 sm:px-6 py-2 sm:py-3">
         <div class="flex items-center space-x-2 text-sm">
           <span class="font-medium">{{ selectedItems.length }} item{{ selectedItems.length === 1 ? '' : 's' }} selected</span>
         </div>
         
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center gap-2">
           <Button 
             variant="outline" 
             size="sm" 
@@ -158,8 +158,8 @@
         </div>
       </div>
       
-      <div v-else class="p-6">
-        <div class="grid gap-4">
+      <div v-else class="p-3 sm:p-4 lg:p-6">
+        <div class="grid gap-2 sm:gap-3 lg:gap-4">
           <!-- Back navigation -->
           <div v-if="currentPath" 
                class="flex items-center p-3 rounded-lg border bg-card hover:bg-accent cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
@@ -304,8 +304,8 @@
       @close="closePreview"
     />
     
-    <!-- Move File Dialog -->
-    <MoveFileDialog
+    <!-- Move File Dialog (Improved with shadcn/ui) -->
+    <ImprovedMoveFileDialog
       v-model="showMoveDialog"
       :items="moveItems"
       :bucket="currentBucket"
@@ -496,7 +496,7 @@ import FileContextMenu from "@/components/files/FileContextMenu.vue";
 import FilePreviewDialog from "@/components/files/FilePreviewDialog.vue";
 import FileUploadDialog from "@/components/files/FileUploadDialog.vue";
 import FolderContextMenu from "@/components/files/FolderContextMenu.vue";
-import MoveFileDialog from "@/components/files/MoveFileDialog.vue";
+import ImprovedMoveFileDialog from "@/components/files/ImprovedMoveFileDialog.vue";
 import DocumentCategoryHint from "@/components/spendrule/DocumentCategoryHint.vue";
 import Button from "@/components/ui/Button.vue";
 import Card from "@/components/ui/Card.vue";

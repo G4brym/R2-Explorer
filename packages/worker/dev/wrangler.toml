@@ -10,8 +10,8 @@ binding = "AI"
 # R2 Buckets
 [[r2_buckets]]
 binding = "secure-uploads"
-bucket_name = "secure-uploads-preview"
-preview_bucket_name = "secure-uploads-preview"
+bucket_name = "secure-uploads"
+preview_bucket_name = "secure-uploads"
 
 # Environment variables
 [vars]

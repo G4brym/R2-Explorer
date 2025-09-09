@@ -1,11 +1,11 @@
 <template>
-  <div class="flex items-center justify-between px-6 py-3 border-t bg-card">
-    <div class="flex items-center space-x-4">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 sm:px-6 py-3 border-t bg-card">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
       <div class="text-sm text-muted-foreground">
-        Showing {{ startItem }}-{{ endItem }} of {{ totalItems }} items
+        <span class="hidden sm:inline">Showing </span>{{ startItem }}-{{ endItem }} <span class="hidden sm:inline">of {{ totalItems }} items</span><span class="sm:hidden">/{{ totalItems }}</span>
       </div>
       <div class="flex items-center space-x-2">
-        <label class="text-sm text-muted-foreground">Items per page:</label>
+        <label class="text-sm text-muted-foreground hidden lg:inline">Items per page:</label>
         <select 
           v-model="selectedPageSize" 
           @change="handlePageSizeChange"
@@ -26,8 +26,8 @@
         :disabled="!hasPrevious"
         @click="$emit('previous')"
       >
-        <ChevronLeftIcon class="w-4 h-4" />
-        Previous
+        <ChevronLeftIcon class="w-4 h-4 sm:mr-1" />
+        <span class="hidden sm:inline">Previous</span>
       </Button>
       
       <div class="flex items-center space-x-1">
@@ -42,8 +42,8 @@
         :disabled="!hasNext"
         @click="$emit('next')"
       >
-        Next
-        <ChevronRightIcon class="w-4 h-4" />
+        <span class="hidden sm:inline">Next</span>
+        <ChevronRightIcon class="w-4 h-4 sm:ml-1" />
       </Button>
     </div>
   </div>

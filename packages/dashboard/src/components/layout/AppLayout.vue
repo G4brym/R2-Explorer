@@ -18,7 +18,7 @@
             <div class="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
               <FolderIcon class="w-4 h-4 text-primary-foreground" />
             </div>
-            <h1 class="text-xl font-semibold">R2 Explorer</h1>
+            <h1 class="text-xl font-semibold">Explorer</h1>
           </div>
         </div>
         

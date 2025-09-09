@@ -17,6 +17,8 @@ export const healthGroupIsolationMiddleware: MiddlewareHandler = async (
 	// Health group mappings (expand as needed)
 	const healthGroupMapping: Record<string, string> = {
 		henryford_user: "henry_ford",
+		kettering_user: "kettering",
+		test_user: "test_group",
 	};
 
 	// Admin users have full access
