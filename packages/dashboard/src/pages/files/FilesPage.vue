@@ -723,11 +723,24 @@ async function loadFiles(resetPagination = false) {
 			// Add folders from delimitedPrefixes (these are actual folders)
 			if (prefixes && prefixes.length > 0) {
 				prefixes.forEach((prefix: string) => {
-					// Remove trailing slash and get folder name
-					const folderPath = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix;
-					const folderName = folderPath.split('/').pop();
-					if (folderName) {
-						folderNames.add(folderName);
+					// Handle root level vs subfolder prefixes
+					if (!currentPrefix) {
+						// Root level: extract top-level folder name
+						const folderPath = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix;
+						const folderName = folderPath.split('/')[0]; // Get first part for root level
+						if (folderName) {
+							folderNames.add(folderName);
+						}
+					} else {
+						// Subfolder: extract relative folder name
+						if (prefix.startsWith(currentPrefix)) {
+							const relativePath = prefix.substring(currentPrefix.length);
+							const folderPath = relativePath.endsWith('/') ? relativePath.slice(0, -1) : relativePath;
+							const folderName = folderPath.split('/')[0]; // Get first part of relative path
+							if (folderName) {
+								folderNames.add(folderName);
+							}
+						}
 					}
 				});
 			}
