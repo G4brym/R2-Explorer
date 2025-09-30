@@ -492,7 +492,20 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 			];
 			if (!categories.some((cat) => uploadPath.includes(`/${cat}/`))) {
 				const username = authStore.user?.username || "unknown_user";
-				uploadPath = `henry_ford/${username}/${documentType}/${uploadFile.file.name}`;
+				// Map username to health group
+				const healthGroupMapping: Record<string, string> = {
+					henryford_user: "henry_ford",
+					kettering_user: "kettering",
+					test_user: "test_group",
+				};
+				const healthGroup = healthGroupMapping[username] || "unknown_group";
+				
+				// Admin users don't need health group prefix
+				if (username === "spendrule_admin") {
+					uploadPath = `${documentType}/${uploadFile.file.name}`;
+				} else {
+					uploadPath = `${healthGroup}/${username}/${documentType}/${uploadFile.file.name}`;
+				}
 			}
 
 			// Base64 encode the key as expected by the backend
