@@ -673,12 +673,16 @@ async function loadFiles(resetPagination = false) {
 
 			// Deduplicate concurrent requests to same path
 			const response = await deduplicateRequest(requestKey, async () => {
-				// WORKAROUND: Always fetch all files from root to avoid 500 errors with prefix
-				// We'll filter client-side instead
 				const params: any = {
 					limit: pageSize.value,
 					delimiter: '/', // Add delimiter to get folder listings
 				};
+
+				// Add prefix when inside a folder (base64 encoded)
+				if (currentPath.value) {
+					const prefixPath = currentPath.value.endsWith('/') ? currentPath.value : `${currentPath.value}/`;
+					params.prefix = btoa(prefixPath);
+				}
 
 				if (cursor.value && currentPage.value > 1) {
 					params.cursor = cursor.value;
