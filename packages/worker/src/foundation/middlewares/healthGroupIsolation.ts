@@ -89,7 +89,9 @@ export const healthGroupIsolationMiddleware: MiddlewareHandler = async (
 
 		c.set("user_health_group", userHealthGroup);
 	} else {
+		// Admin users - no filtering
 		c.set("user_health_group", "admin");
+		c.set("health_group_filter", null);
 	}
 
 	await next();
