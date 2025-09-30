@@ -21,11 +21,15 @@ const spendRuleConfig = {
 			password: "Kettering_Secure_2025", // Kettering Health user
 		},
 		{
+			username: "osf_user",
+			password: "OSF_Secure_2025", // OSF HealthCare user
+		},
+		{
 			username: "test_user",
 			password: "Test_Secure_2025", // Test user for testing
 		},
 		{
-			username: "spendrule_admin", 
+			username: "spendrule_admin",
 			password: "Admin_2025", // Admin user with full access
 		},
 	],

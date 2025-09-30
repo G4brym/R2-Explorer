@@ -19,6 +19,7 @@ export const healthGroupIsolationMiddleware: MiddlewareHandler = async (
 		henryford_user: "henry_ford",
 		kettering_user: "kettering",
 		test_user: "test_group",
+		osf_user: "osf",
 	};
 
 	// Admin users have full access
@@ -71,7 +72,7 @@ export const healthGroupIsolationMiddleware: MiddlewareHandler = async (
 			return c.json({ error: "User not assigned to a health group" }, 403);
 		}
 
-		const expectedPrefix = `${userHealthGroup}/${username}`;
+		const expectedPrefix = `${userHealthGroup}`;
 
 		if (!requestedPath) {
 			// List operations – restrict listing to health group
