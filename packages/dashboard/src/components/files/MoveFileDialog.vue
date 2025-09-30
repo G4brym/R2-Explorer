@@ -163,6 +163,9 @@ const availableFolders = ref<
 const userHealthGroup = computed(() => {
 	const username = authStore.user?.username;
 	if (username === "henryford_user") return "henry_ford";
+	if (username === "kettering_user") return "kettering";
+	if (username === "osf_user") return "osf";
+	if (username === "test_user") return "test_group";
 	if (username === "spendrule_admin") return "admin";
 	return null;
 });

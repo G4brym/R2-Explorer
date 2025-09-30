@@ -77,14 +77,23 @@ export const healthGroupIsolationMiddleware: MiddlewareHandler = async (
 		if (!requestedPath) {
 			// List operations – restrict listing to health group
 			c.set("health_group_filter", userHealthGroup);
-		} else if (
-			!requestedPath.startsWith(expectedPrefix) &&
-			requestedPath !== userHealthGroup
-		) {
-			return c.json(
-				{ error: `Access denied. You can only access ${expectedPrefix}/ folder.` },
-				403,
-			);
+		} else {
+			// For upload operations, we'll allow the path to be corrected in putObject
+			const isUpload = c.req.url.includes('/upload') || c.req.url.includes('?key=');
+
+			if (isUpload) {
+				// For uploads, we'll let putObject handle path correction
+				// Just ensure the health group is set
+				c.set("user_health_group", userHealthGroup);
+			} else if (
+				!requestedPath.startsWith(`${expectedPrefix}/`) &&
+				requestedPath !== userHealthGroup
+			) {
+				return c.json(
+					{ error: `Access denied. You can only access ${expectedPrefix}/ folder.` },
+					403,
+				);
+			}
 		}
 
 		c.set("user_health_group", userHealthGroup);

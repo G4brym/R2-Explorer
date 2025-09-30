@@ -2,6 +2,7 @@ import { OpenAPIRoute } from "chanfana";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import type { AppContext } from "../../types";
+import { detectDocumentType } from "../../foundation/middlewares/autoCategorization";
 
 export class PutObject extends OpenAPIRoute {
 	schema = {
@@ -52,17 +53,25 @@ export class PutObject extends OpenAPIRoute {
 
 		let key = decodeURIComponent(escape(atob(data.query.key)));
 
+		// SpendRule: Ensure health group prefix for non-admin users
+		const userHealthGroup = c.get("user_health_group");
+		if (userHealthGroup && userHealthGroup !== "admin") {
+			// If key doesn't start with health group, prepend it
+			if (!key.startsWith(`${userHealthGroup}/`)) {
+				// Extract just the filename
+				const filename = key.split("/").pop() || key;
+				// Detect document type from filename
+				const documentType = detectDocumentType(filename);
+				// Create correct path: health_group/category/filename
+				key = `${userHealthGroup}/${documentType}/${filename}`;
+			}
+		}
+
 		// SpendRule: Check if auto-categorization suggested a different path
 		const suggestedPath = c.get("suggested_path");
-		if (suggestedPath) {
-			// Return the suggested path for the frontend to handle
-			return c.json({
-				success: false,
-				suggestedPath: suggestedPath,
-				documentType: c.get("document_type"),
-				message: `File should be uploaded to ${c.get("document_type")} folder`,
-				originalPath: key,
-			});
+		if (suggestedPath && suggestedPath !== key) {
+			// Use the suggested path instead
+			key = suggestedPath;
 		}
 
 		let customMetadata = undefined;

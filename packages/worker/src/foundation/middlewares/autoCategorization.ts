@@ -101,10 +101,10 @@ export const autoCategorizationMiddleware: MiddlewareHandler = async (
 			const username = c.get("authentication_username") || "unknown_user";
 
 			// Check if the file is being uploaded to the correct category folder
-			// New format: health_group/username/category/filename
-			const expectedPath = `${userHealthGroup}/${username}/${documentType}/`;
+			// New format: health_group/category/filename (no username subfolder)
+			const expectedPath = `${userHealthGroup}/${documentType}/`;
 			if (!key.startsWith(expectedPath)) {
-				// Auto-redirect to the correct category folder with username
+				// Auto-redirect to the correct category folder
 				const newKey = `${expectedPath}${sanitizedFilename}`;
 				
 				// Store the suggested path for the frontend

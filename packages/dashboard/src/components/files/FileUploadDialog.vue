@@ -496,6 +496,7 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 				const healthGroupMapping: Record<string, string> = {
 					henryford_user: "henry_ford",
 					kettering_user: "kettering",
+					osf_user: "osf",
 					test_user: "test_group",
 				};
 				const healthGroup = healthGroupMapping[username] || "unknown_group";

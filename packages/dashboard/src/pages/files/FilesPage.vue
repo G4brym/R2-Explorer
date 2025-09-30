@@ -677,6 +677,7 @@ async function loadFiles(resetPagination = false) {
 				// We'll filter client-side instead
 				const params: any = {
 					limit: pageSize.value,
+					delimiter: '/', // Add delimiter to get folder listings
 				};
 
 				if (cursor.value && currentPage.value > 1) {
@@ -716,8 +717,22 @@ async function loadFiles(resetPagination = false) {
 						}
 					});
 
-			// Extract folder names from object keys
+			// Extract folder names from delimitedPrefixes (actual folders from API)
 			const folderNames = new Set<string>();
+
+			// Add folders from delimitedPrefixes (these are actual folders)
+			if (prefixes && prefixes.length > 0) {
+				prefixes.forEach((prefix: string) => {
+					// Remove trailing slash and get folder name
+					const folderPath = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix;
+					const folderName = folderPath.split('/').pop();
+					if (folderName) {
+						folderNames.add(folderName);
+					}
+				});
+			}
+
+			// Also extract folder names from object keys for backward compatibility
 			objects.forEach((obj: any) => {
 				if (!currentPrefix) {
 					// Root level: extract top-level folders
