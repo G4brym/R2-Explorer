@@ -21,6 +21,11 @@ export const healthGroupIsolationMiddleware: MiddlewareHandler = async (
 		test_user: "test_group",
 		osf_user: "osf",
 		endeavor_user: "endeavor",
+		memorialcare_user: "memorialcare",
+		musc_user: "musc",
+		confluence_user: "confluence",
+		christianacare_user: "christianacare",
+		advocate_user: "advocate",
 	};
 
 	// Admin users have full access

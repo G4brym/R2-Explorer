@@ -29,6 +29,26 @@ const spendRuleConfig = {
 			password: "Endeavor_Secure_2025", // Endeavor Health user
 		},
 		{
+			username: "memorialcare_user",
+			password: "MemorialCare_Secure_2025", // MemorialCare user
+		},
+		{
+			username: "musc_user",
+			password: "MUSC_Secure_2025", // MUSC Health user
+		},
+		{
+			username: "confluence_user",
+			password: "Confluence_Secure_2025", // Confluence Health user
+		},
+		{
+			username: "christianacare_user",
+			password: "ChristianaCare_Secure_2025", // ChristianaCare user
+		},
+		{
+			username: "advocate_user",
+			password: "Advocate_Secure_2025", // Advocate user
+		},
+		{
 			username: "test_user",
 			password: "Test_Secure_2025", // Test user for testing
 		},
