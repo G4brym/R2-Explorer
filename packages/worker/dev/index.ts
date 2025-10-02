@@ -25,6 +25,10 @@ const spendRuleConfig = {
 			password: "OSF_Secure_2025", // OSF HealthCare user
 		},
 		{
+			username: "endeavor_user",
+			password: "Endeavor_Secure_2025", // Endeavor Health user
+		},
+		{
 			username: "test_user",
 			password: "Test_Secure_2025", // Test user for testing
 		},

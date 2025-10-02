@@ -20,6 +20,7 @@ export const healthGroupIsolationMiddleware: MiddlewareHandler = async (
 		kettering_user: "kettering",
 		test_user: "test_group",
 		osf_user: "osf",
+		endeavor_user: "endeavor",
 	};
 
 	// Admin users have full access
