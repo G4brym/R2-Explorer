@@ -254,6 +254,70 @@ export const apiHandler = {
 			},
 		);
 	},
+	fetchFilePage: async (bucket, prefix, delimiter = "/", cursor = null) => {
+		const mainStore = useMainStore();
+		const contentFiles = [];
+		const contentFolders = [];
+
+		const response = await apiHandler.listObjects(
+			bucket,
+			prefix,
+			delimiter,
+			cursor,
+		);
+
+		if (response.data.objects) {
+			const files = response.data.objects
+				.filter((obj) => {
+					return (
+						!(obj.key.endsWith("/") && delimiter !== "") && obj.key !== prefix
+					); // Remove selected folder when delimiter is defined
+				})
+				.map((obj) => mapFile(obj, prefix))
+				.filter((obj) => {
+					// Remove hidden files
+					return !(
+						mainStore.showHiddenFiles !== true && obj.name.startsWith(".")
+					);
+				});
+
+			for (const f of files) {
+				contentFiles.push(f);
+			}
+		}
+
+		if (response.data.delimitedPrefixes) {
+			const folders = response.data.delimitedPrefixes
+				.map((obj) => ({
+					name: obj.replace(prefix, ""),
+					hash: encode(obj.key),
+					key: obj,
+					lastModified: "--",
+					timestamp: 0,
+					size: "--",
+					sizeRaw: 0,
+					type: "folder",
+					icon: "folder",
+					color: "orange",
+				}))
+				.filter((obj) => {
+					// Remove hidden files
+					return !(
+						mainStore.showHiddenFiles !== true && obj.name.startsWith(".")
+					);
+				});
+
+			for (const f of folders) {
+				contentFolders.push(f);
+			}
+		}
+
+		return {
+			files: [...contentFolders, ...contentFiles],
+			truncated: response.data.truncated,
+			cursor: response.data.cursor,
+		};
+	},
 	fetchFile: async (bucket, prefix, delimiter = "/") => {
 		const mainStore = useMainStore();
 		let truncated = true;
