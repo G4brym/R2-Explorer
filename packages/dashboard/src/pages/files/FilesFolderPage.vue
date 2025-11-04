@@ -1,6 +1,6 @@
 <template>
   <q-page class="">
-    <div class="q-pa-md">
+    <div class="q-pa-md" ref="pageContainer" @scroll="handleScroll" style="height: 100vh; overflow-y: auto;">
       <q-breadcrumbs>
         <q-breadcrumbs-el style="cursor: pointer" v-for="obj in breadcrumbs" :key="obj.name" :label="obj.name" @click="breadcrumbsClick(obj)" />
       </q-breadcrumbs>
@@ -69,6 +69,15 @@
           </template>
         </q-table>
 
+        <div v-if="loadingMore" class="q-pa-md text-center">
+          <q-spinner color="primary" size="md" />
+          <div class="q-mt-sm text-grey">Loading more files...</div>
+        </div>
+
+        <div v-if="!hasMore && rows.length > 0 && !loading" class="q-pa-md text-center text-grey">
+          No more files to load
+        </div>
+
       </drag-and-drop>
 
     </div>
@@ -93,7 +102,10 @@ export default defineComponent({
 	components: { FileContextMenu, FileOptions, DragAndDrop, FilePreview },
 	data: () => ({
 		loading: false,
+		loadingMore: false,
 		rows: [],
+		cursor: null,
+		hasMore: true,
 		columns: [
 			{
 				name: "name",
@@ -192,10 +204,10 @@ export default defineComponent({
 	},
 	watch: {
 		selectedBucket(newVal) {
-			this.fetchFiles();
+			this.resetAndFetchFiles();
 		},
 		selectedFolder(newVal) {
-			this.fetchFiles();
+			this.resetAndFetchFiles();
 		},
 	},
 	methods: {
@@ -246,15 +258,64 @@ export default defineComponent({
 				this.$refs.preview.openFile(row);
 			}
 		},
+		resetAndFetchFiles: async function () {
+			this.rows = [];
+			this.cursor = null;
+			this.hasMore = true;
+			await this.fetchFiles();
+		},
 		fetchFiles: async function () {
+			if (this.loading || this.loadingMore || !this.hasMore) {
+				return;
+			}
+
 			this.loading = true;
 
-			this.rows = await apiHandler.fetchFile(
+			const result = await apiHandler.fetchFilePage(
 				this.selectedBucket,
 				this.selectedFolder,
 				"/",
+				this.cursor,
 			);
+
+			this.rows = result.files;
+			this.cursor = result.cursor;
+			this.hasMore = result.truncated;
 			this.loading = false;
+		},
+		loadMoreFiles: async function () {
+			if (this.loadingMore || !this.hasMore || this.loading) {
+				return;
+			}
+
+			this.loadingMore = true;
+
+			const result = await apiHandler.fetchFilePage(
+				this.selectedBucket,
+				this.selectedFolder,
+				"/",
+				this.cursor,
+			);
+
+			this.rows = [...this.rows, ...result.files];
+			this.cursor = result.cursor;
+			this.hasMore = result.truncated;
+			this.loadingMore = false;
+		},
+		handleScroll: function (event) {
+			const container = this.$refs.pageContainer;
+			if (!container || this.loadingMore || !this.hasMore) {
+				return;
+			}
+
+			const scrollTop = container.scrollTop;
+			const scrollHeight = container.scrollHeight;
+			const clientHeight = container.clientHeight;
+
+			// Load more when user is within 200px of the bottom
+			if (scrollTop + clientHeight >= scrollHeight - 200) {
+				this.loadMoreFiles();
+			}
 		},
 		openPreviewFromKey: async function () {
 			let key = `${decode(this.$route.params.file)}`;
@@ -267,12 +328,12 @@ export default defineComponent({
 		},
 	},
 	created() {
-		this.fetchFiles();
+		this.resetAndFetchFiles();
 	},
 	mounted() {
 		this.$refs.table.sort("name");
 
-		this.$bus.on("fetchFiles", this.fetchFiles);
+		this.$bus.on("fetchFiles", this.resetAndFetchFiles);
 
 		if (this.$route.params.file) {
 			this.openPreviewFromKey();
