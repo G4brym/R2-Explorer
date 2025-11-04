@@ -235,6 +235,7 @@ async function download() {
 			`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`,
 			{
 				responseType: "blob",
+				timeout: 300000, // allow up to 5 minutes for large files
 			},
 		);
 

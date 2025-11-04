@@ -1,15 +1,12 @@
 import axios from "axios";
 
-// SpendRule: Point to the worker API URL
-let url = "https://spendrule-dev.oluwamakinwa.workers.dev";
-// For development, use local worker with AI capabilities
-if (import.meta.env.DEV) {
-	url = import.meta.env.VITE_SERVER_URL || "http://localhost:8787";
-}
+// Use same-origin API by default; allow override via env
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 
 export const api = axios.create({
-	baseURL: `${url}/api`,
-	timeout: 30000,
+	baseURL: API_BASE,
+	// Give slower networks and downloads headroom; specific calls can override
+	timeout: 120000,
 	headers: {
 		"Content-Type": "application/json",
 	},
