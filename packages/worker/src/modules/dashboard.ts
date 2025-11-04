@@ -8,10 +8,8 @@ export function dashboardIndex(c: AppContext) {
 		);
 	}
 
-	return c.text(
-		"ASSETS binding is not pointing to a valid dashboard, learn more here: https://r2explorer.com/guides/migrating-to-1.1/",
-		500,
-	);
+	// Proxy the root request to the bound ASSETS service (Cloudflare Pages/static site)
+	return c.env.ASSETS.fetch(c.req.raw);
 }
 
 export async function dashboardRedirect(c: AppContext, next) {
@@ -22,11 +20,6 @@ export async function dashboardRedirect(c: AppContext, next) {
 		);
 	}
 
-	const url = new URL(c.req.url);
-
-	if (!url.pathname.includes(".")) {
-		return c.env.ASSETS.fetch(new Request(url.origin));
-	}
-
-	await next();
+	// Always proxy any remaining request (including assets with dots)
+	return c.env.ASSETS.fetch(c.req.raw);
 }

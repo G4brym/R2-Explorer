@@ -1021,7 +1021,7 @@ function bulkDownload() {
 async function downloadAllAsZip() {
 	try {
 		loading.value = true;
-		toast.info("Preparing ZIP archive...");
+		toast.info("Preparing ZIP archive... This may take a while for large folders.");
 
 		// Fetch the ZIP file with authentication
 		const response = await api.get(
@@ -1029,6 +1029,7 @@ async function downloadAllAsZip() {
 			{
 				params: currentPath.value ? { prefix: btoa(currentPath.value.endsWith('/') ? currentPath.value : `${currentPath.value}/`) } : {},
 				responseType: "blob",
+				timeout: 300000, // 5 minute timeout for large downloads
 			},
 		);
 
