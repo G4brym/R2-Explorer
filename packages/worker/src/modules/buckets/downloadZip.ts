@@ -1,7 +1,7 @@
 import { OpenAPIRoute } from "chanfana";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { zip } from "fflate";
+import { zipSync } from "fflate";
 import type { AppContext } from "../../types";
 
 export class DownloadZip extends OpenAPIRoute {
@@ -88,55 +88,33 @@ export class DownloadZip extends OpenAPIRoute {
 			});
 		}
 
-		// Download all files in parallel (batched to avoid memory limits)
-		const BATCH_SIZE = 50; // Process 50 files at a time
+		// Download all files and prepare for ZIP
 		const zipFiles: Record<string, Uint8Array> = {};
 
-		// Process files in batches for better performance
-		for (let i = 0; i < files.length; i += BATCH_SIZE) {
-			const batch = files.slice(i, i + BATCH_SIZE);
+		for (const file of files) {
+			try {
+				const object = await bucket.get(file.key);
 
-			// Download batch in parallel
-			const batchPromises = batch.map(async (file) => {
-				try {
-					const object = await bucket.get(file.key);
-
-					if (object && object.body) {
-						// Get relative path within the folder
-						let relativePath = file.key;
-						if (prefix) {
-							relativePath = file.key.substring(prefix.length);
-						}
-
-						// Read the file body as ArrayBuffer
-						const arrayBuffer = await object.arrayBuffer();
-						return { relativePath, data: new Uint8Array(arrayBuffer) };
+				if (object && object.body) {
+					// Get relative path within the folder
+					let relativePath = file.key;
+					if (prefix) {
+						relativePath = file.key.substring(prefix.length);
 					}
-				} catch (error) {
-					console.error(`Failed to download ${file.key}:`, error);
-				}
-				return null;
-			});
 
-			// Wait for batch to complete
-			const results = await Promise.all(batchPromises);
-
-			// Add successful downloads to ZIP files object
-			for (const result of results) {
-				if (result) {
-					zipFiles[result.relativePath] = result.data;
+					// Read the file body as ArrayBuffer
+					const arrayBuffer = await object.arrayBuffer();
+					zipFiles[relativePath] = new Uint8Array(arrayBuffer);
 				}
+			} catch (error) {
+				console.error(`Failed to download ${file.key}:`, error);
+				// Continue with other files even if one fails
 			}
 		}
 
-		// Create ZIP archive asynchronously with minimal compression for speed
-		const zippedData = await new Promise<Uint8Array>((resolve, reject) => {
-			zip(zipFiles, {
-				level: 1, // Fast compression (was 6, now 1 for speed)
-			}, (err, data) => {
-				if (err) reject(err);
-				else resolve(data);
-			});
+		// Create ZIP archive
+		const zippedData = zipSync(zipFiles, {
+			level: 6, // Compression level (0-9)
 		});
 
 		// Generate ZIP filename based on folder
