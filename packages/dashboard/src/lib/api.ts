@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // SpendRule: Point to the worker API URL
-let url = "https://spendrule-doc-upload-dashboard.oluwamakinwa.workers.dev";
+let url = "https://spendrule-dev.oluwamakinwa.workers.dev";
 // For development, use local worker with AI capabilities
 if (import.meta.env.DEV) {
 	url = import.meta.env.VITE_SERVER_URL || "http://localhost:8787";
