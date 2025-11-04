@@ -1,7 +1,9 @@
 import axios from "axios";
 
-// Use same-origin API by default; allow override via env
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api";
+// SpendRule: Point to the correct worker API URL
+// In production, use deployed worker; in development, use local or override with VITE_API_BASE_URL
+const API_BASE = import.meta.env.VITE_API_BASE_URL ||
+	(import.meta.env.DEV ? "/api" : "https://spendrule-dev.oluwamakinwa.workers.dev/api");
 
 export const api = axios.create({
 	baseURL: API_BASE,

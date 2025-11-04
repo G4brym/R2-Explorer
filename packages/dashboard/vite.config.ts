@@ -26,7 +26,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://spendrule-doc-upload-dashboard.oluwamakinwa.workers.dev',
+        target: 'https://spendrule-dev.oluwamakinwa.workers.dev',
         changeOrigin: true
       }
     }
