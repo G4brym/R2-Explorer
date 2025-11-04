@@ -14,6 +14,17 @@
         
         <div class="flex flex-wrap items-center gap-2">
           <Button
+            v-if="!isSelecting && isAdmin && !currentPath"
+            variant="default"
+            size="sm"
+            title="Download ALL health group files as one ZIP (Admin only)"
+            @click="downloadAllGroupsAsZip"
+            :disabled="loading"
+          >
+            <DownloadIcon class="w-4 h-4 lg:mr-2" />
+            <span class="hidden lg:inline">Download All Groups</span>
+          </Button>
+          <Button
             v-if="!isSelecting"
             variant="outline"
             size="sm"
@@ -557,6 +568,7 @@ const router = useRouter();
 const files = ref<any[]>([]);
 const loading = ref(false);
 const error = ref("");
+const isAdmin = ref(false);
 const showUploadDialog = ref(false);
 const showCreateFolderDialog = ref(false);
 const showPreviewDialog = ref(false);
@@ -704,6 +716,9 @@ async function loadFiles(resetPagination = false) {
 
 			const objects = response.data.objects || [];
 			const prefixes = response.data.delimitedPrefixes || [];
+
+			// Capture admin status from API response
+			isAdmin.value = response.data.isAdmin || false;
 
 			// Update pagination info
 			totalItems.value = response.data.objects?.length || 0;
@@ -1008,16 +1023,6 @@ async function downloadAllAsZip() {
 		loading.value = true;
 		toast.info("Preparing ZIP archive...");
 
-		// Build the API URL with prefix parameter
-		const params = new URLSearchParams();
-		if (currentPath.value) {
-			// Encode the current path as base64 for the API
-			const prefixPath = currentPath.value.endsWith('/') ? currentPath.value : `${currentPath.value}/`;
-			params.set("prefix", btoa(prefixPath));
-		}
-
-		const url = `${api.defaults.baseURL}/buckets/${currentBucket.value}/download/zip${params.toString() ? `?${params.toString()}` : ""}`;
-
 		// Fetch the ZIP file with authentication
 		const response = await api.get(
 			`/buckets/${currentBucket.value}/download/zip`,
@@ -1053,6 +1058,49 @@ async function downloadAllAsZip() {
 	} catch (error: any) {
 		console.error("Download failed:", error);
 		const errorMessage = error.response?.data?.error || "Failed to download files as ZIP";
+		toast.error(errorMessage);
+	} finally {
+		loading.value = false;
+	}
+}
+
+async function downloadAllGroupsAsZip() {
+	try {
+		loading.value = true;
+		toast.info("Preparing complete archive of all health groups... This may take a while.");
+
+		// Fetch the complete ZIP file with authentication
+		const response = await api.get(
+			`/buckets/${currentBucket.value}/download/all-groups`,
+			{
+				responseType: "blob",
+				timeout: 600000, // 10 minute timeout for large downloads
+			},
+		);
+
+		// Create blob URL for download
+		const blob = new Blob([response.data], { type: "application/zip" });
+		const downloadUrl = window.URL.createObjectURL(blob);
+
+		// Generate filename with date
+		const today = new Date().toISOString().split("T")[0];
+		const filename = `all_health_groups_${today}.zip`;
+
+		// Create temporary link and trigger download
+		const link = document.createElement("a");
+		link.href = downloadUrl;
+		link.download = filename;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		// Cleanup blob URL
+		window.URL.revokeObjectURL(downloadUrl);
+
+		toast.success("Complete archive downloaded successfully");
+	} catch (error: any) {
+		console.error("Download all groups failed:", error);
+		const errorMessage = error.response?.data?.error || "Failed to download all health groups";
 		toast.error(errorMessage);
 	} finally {
 		loading.value = false;

@@ -14,6 +14,7 @@ import { autoCategorizationMiddleware } from "./foundation/middlewares/autoCateg
 import { settings } from "./foundation/settings";
 import { CreateFolder } from "./modules/buckets/createFolder";
 import { DeleteObject } from "./modules/buckets/deleteObject";
+import { DownloadAllGroups } from "./modules/buckets/downloadAllGroups";
 import { DownloadZip } from "./modules/buckets/downloadZip";
 import { GetObject } from "./modules/buckets/getObject";
 import { HeadObject } from "./modules/buckets/headObject";
@@ -136,6 +137,7 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
 	openapi.get("/api/buckets/:bucket", ListObjects);
 	openapi.get("/api/buckets/:bucket/download/zip", DownloadZip);
+	openapi.get("/api/buckets/:bucket/download/all-groups", DownloadAllGroups);
 	openapi.post("/api/buckets/:bucket/folders", CreateFolderEx);
 	openapi.post("/api/buckets/:bucket/folders/move", MoveFolder);
 	openapi.post("/api/buckets/:bucket/folders/delete", DeleteFolder);
