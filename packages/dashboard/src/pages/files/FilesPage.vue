@@ -13,10 +13,21 @@
         </div>
         
         <div class="flex flex-wrap items-center gap-2">
-          <Button 
-            v-if="!isSelecting" 
-            variant="outline" 
-            size="sm" 
+          <Button
+            v-if="!isSelecting"
+            variant="outline"
+            size="sm"
+            title="Download all files in current folder as ZIP"
+            @click="downloadAllAsZip"
+            :disabled="loading || files.length === 0"
+          >
+            <DownloadIcon class="w-4 h-4 lg:mr-2" />
+            <span class="hidden lg:inline">Download All</span>
+          </Button>
+          <Button
+            v-if="!isSelecting"
+            variant="outline"
+            size="sm"
             @click="toggleSelectionMode"
           >
             <CheckSquareIcon class="w-4 h-4 mr-2" />
@@ -990,6 +1001,62 @@ function bulkDownload() {
 	toast.success(
 		`Started downloading ${fileItems.length} file${fileItems.length === 1 ? "" : "s"}`,
 	);
+}
+
+async function downloadAllAsZip() {
+	try {
+		loading.value = true;
+		toast.info("Preparing ZIP archive...");
+
+		// Build the API URL with prefix parameter
+		const params = new URLSearchParams();
+		if (currentPath.value) {
+			// Encode the current path as base64 for the API
+			const prefixPath = currentPath.value.endsWith('/') ? currentPath.value : `${currentPath.value}/`;
+			params.set("prefix", btoa(prefixPath));
+		}
+
+		const url = `${api.defaults.baseURL}/buckets/${currentBucket.value}/download/zip${params.toString() ? `?${params.toString()}` : ""}`;
+
+		// Fetch the ZIP file with authentication
+		const response = await api.get(
+			`/buckets/${currentBucket.value}/download/zip`,
+			{
+				params: currentPath.value ? { prefix: btoa(currentPath.value.endsWith('/') ? currentPath.value : `${currentPath.value}/`) } : {},
+				responseType: "blob",
+			},
+		);
+
+		// Create blob URL for download
+		const blob = new Blob([response.data], { type: "application/zip" });
+		const downloadUrl = window.URL.createObjectURL(blob);
+
+		// Generate filename from path or use default
+		let filename = "download.zip";
+		if (currentPath.value) {
+			const folderName = currentPath.value.split("/").pop() || "download";
+			filename = `${folderName}.zip`;
+		}
+
+		// Create temporary link and trigger download
+		const link = document.createElement("a");
+		link.href = downloadUrl;
+		link.download = filename;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+
+		// Cleanup blob URL
+		window.URL.revokeObjectURL(downloadUrl);
+
+		toast.success("ZIP archive downloaded successfully");
+	} catch (error: any) {
+		console.error("Download failed:", error);
+		const errorMessage = error.response?.data?.error || "Failed to download files as ZIP";
+		toast.error(errorMessage);
+	} finally {
+		loading.value = false;
+	}
 }
 
 async function bulkDelete() {
