@@ -141,7 +141,7 @@ import Card from "@/components/ui/Card.vue";
 import CardContent from "@/components/ui/CardContent.vue";
 import CardHeader from "@/components/ui/CardHeader.vue";
 import { api } from "@/lib/api";
-import { uploadFile } from "@/lib/chunked-upload";
+import { uploadFile as uploadFileToR2 } from "@/lib/chunked-upload";
 import { handleError, networkStatus, withRetry } from "@/lib/errors";
 import { toast } from "@/lib/toast";
 import { useAuthStore } from "@/stores/auth";
@@ -517,7 +517,7 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 			const encodedKey = btoa(uploadPath);
 
 			// Use chunked upload helper which automatically handles files >100MB
-			const response = await uploadFile({
+			const response = await uploadFileToR2({
 				bucket: props.bucket,
 				key: encodedKey,
 				file: uploadFile.file,
