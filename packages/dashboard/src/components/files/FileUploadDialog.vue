@@ -141,6 +141,7 @@ import Card from "@/components/ui/Card.vue";
 import CardContent from "@/components/ui/CardContent.vue";
 import CardHeader from "@/components/ui/CardHeader.vue";
 import { api } from "@/lib/api";
+import { uploadFile } from "@/lib/chunked-upload";
 import { handleError, networkStatus, withRetry } from "@/lib/errors";
 import { toast } from "@/lib/toast";
 import { useAuthStore } from "@/stores/auth";
@@ -371,9 +372,6 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 				uploadFile.progress = 0;
 			}
 
-			const formData = new FormData();
-			formData.append("file", uploadFile.file);
-
 			// Handle folder structure from webkitRelativePath or regular file name
 			const relativePath =
 				(uploadFile.file as any).webkitRelativePath || uploadFile.file.name;
@@ -518,65 +516,17 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 			// Base64 encode the key as expected by the backend
 			const encodedKey = btoa(uploadPath);
 
-			const response = await withRetry(
-				() =>
-					api.post(`/buckets/${props.bucket}/upload`, formData, {
-						headers: {
-							"Content-Type": "multipart/form-data",
-						},
-						params: {
-							key: encodedKey,
-						},
-						onUploadProgress: (progressEvent) => {
-							if (progressEvent.total) {
-								uploadFile.progress = Math.round(
-									(progressEvent.loaded * 100) / progressEvent.total,
-								);
-							}
-						},
-					}),
-				{ maxAttempts: 1 }, // Handle retries manually for better UX
-			);
+			// Use chunked upload helper which automatically handles files >100MB
+			const response = await uploadFile({
+				bucket: props.bucket,
+				key: encodedKey,
+				file: uploadFile.file,
+				onProgress: (progress) => {
+					uploadFile.progress = progress.percentage;
+				},
+			});
 
-			// Check if backend suggests auto-categorization
-			if (
-				response.data &&
-				!response.data.success &&
-				response.data.suggestedPath
-			) {
-				// Backend suggests a different path for better organization
-				const suggestedKey = btoa(response.data.suggestedPath);
-
-				// Retry upload with suggested path
-				uploadFile.status = "uploading";
-				uploadFile.progress = 0;
-
-				await withRetry(
-					() =>
-						api.post(`/buckets/${props.bucket}/upload`, formData, {
-							headers: {
-								"Content-Type": "multipart/form-data",
-							},
-							params: {
-								key: suggestedKey,
-							},
-							onUploadProgress: (progressEvent) => {
-								if (progressEvent.total) {
-									uploadFile.progress = Math.round(
-										(progressEvent.loaded * 100) / progressEvent.total,
-									);
-								}
-							},
-						}),
-					{ maxAttempts: 1 },
-				);
-
-				// Show categorization message
-				toast.success(
-					`File auto-organized to ${response.data.documentType} folder`,
-				);
-			}
-
+			// Upload successful
 			uploadFile.status = "completed";
 			uploadFile.progress = 100;
 			return;

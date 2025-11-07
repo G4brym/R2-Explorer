@@ -16,6 +16,12 @@ export class PartUpload extends OpenAPIRoute {
 							format: "binary",
 						}),
 					},
+					"multipart/form-data": {
+						schema: z.object({}).openapi({
+							type: "string",
+							format: "binary",
+						}),
+					},
 				},
 			},
 			params: z.object({
