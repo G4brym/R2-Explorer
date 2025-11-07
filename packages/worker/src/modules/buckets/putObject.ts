@@ -88,13 +88,20 @@ export class PutObject extends OpenAPIRoute {
 			);
 		}
 
+
 		// SpendRule: Add document metadata
+		// Optimization: avoid reading the entire request body just to compute size.
+		// Use Content-Length header when available to prevent double-reading and blocking.
 		const documentMetadata = c.get("document_metadata");
+		const contentLengthHeader = c.req.raw.headers.get("content-length");
+		const parsedContentLength = contentLengthHeader ? Number(contentLengthHeader) : undefined;
 		if (documentMetadata) {
 			customMetadata = {
 				...customMetadata,
 				...documentMetadata,
-				fileSize: c.req.raw.body ? await c.req.raw.clone().arrayBuffer().then(buf => buf.byteLength) : 0,
+				...(Number.isFinite(parsedContentLength)
+					? { fileSize: parsedContentLength as number }
+					: {}),
 			};
 		}
 
