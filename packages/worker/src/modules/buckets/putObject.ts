@@ -91,10 +91,14 @@ export class PutObject extends OpenAPIRoute {
 		// SpendRule: Add document metadata
 		const documentMetadata = c.get("document_metadata");
 		if (documentMetadata) {
+			// Get file size from Content-Length header (avoids loading entire file into memory)
+			const contentLength = c.req.header("Content-Length");
+			const fileSize = contentLength ? Number.parseInt(contentLength, 10) : undefined;
+
 			customMetadata = {
 				...customMetadata,
 				...documentMetadata,
-				fileSize: c.req.raw.body ? await c.req.raw.clone().arrayBuffer().then(buf => buf.byteLength) : 0,
+				...(fileSize ? { fileSize } : {}),
 			};
 		}
 

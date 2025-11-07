@@ -8,7 +8,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL ||
 export const api = axios.create({
 	baseURL: API_BASE,
 	// Give slower networks and downloads headroom; specific calls can override
-	timeout: 120000,
+	timeout: 300000, // 5 minutes for large file uploads
 	headers: {
 		"Content-Type": "application/json",
 	},
