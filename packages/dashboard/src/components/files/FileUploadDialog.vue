@@ -423,10 +423,10 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 			// Show initial filename-based classification
 			uploadFile.aiResult = `${documentType} (filename)`;
 
-			// Skip AI analysis for files over 0.5MB to avoid 413 errors
-			// Note: Base64 encoding adds 33% overhead, and Cloudflare has limits
+			// Skip AI analysis for files over 25MB to avoid request size limits
+			// Note: Base64 encoding adds 33% overhead, so 25MB becomes ~33MB
 			const fileSizeMB = uploadFile.file.size / (1024 * 1024);
-			const isAiEligible = fileSizeMB <= 0.5 && (uploadFile.file.type === "application/pdf" || uploadFile.file.type.startsWith("image/"));
+			const isAiEligible = fileSizeMB <= 25 && (uploadFile.file.type === "application/pdf" || uploadFile.file.type.startsWith("image/"));
 
 			if (isAiEligible) {
 				try {
@@ -477,7 +477,7 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 					uploadFile.aiStatus = "failed";
 					uploadFile.aiResult = `${documentType} (filename)`;
 				}
-			} else if (fileSizeMB > 2) {
+			} else if (fileSizeMB > 25) {
 				console.log(
 					`Skipping AI classification for large file (${fileSizeMB.toFixed(1)}MB): ${uploadFile.file.name}`,
 				);
