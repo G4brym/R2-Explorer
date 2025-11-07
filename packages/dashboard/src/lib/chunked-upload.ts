@@ -2,11 +2,12 @@ import { api } from "./api";
 
 /**
  * Chunked upload for files larger than 100MB
- * Uses R2 multipart upload API
+ * Uses R2 multipart upload API with parallel uploads
  */
 
-const CHUNK_SIZE = 50 * 1024 * 1024; // 50MB chunks (well under 100MB limit)
+const CHUNK_SIZE = 90 * 1024 * 1024; // 90MB chunks (close to 100MB limit for fewer chunks)
 const FILE_SIZE_THRESHOLD = 100 * 1024 * 1024; // 100MB threshold
+const MAX_CONCURRENT_UPLOADS = 3; // Upload 3 chunks in parallel for speed
 
 interface UploadProgress {
 	loaded: number;
@@ -76,23 +77,22 @@ async function chunkedMultipartUpload({ bucket, key, file, onProgress }: Chunked
 		const uploadId = createResponse.data.uploadId;
 		console.log(`Multipart upload created with ID: ${uploadId}`);
 
-		// Step 2: Upload chunks in parallel (limit concurrency to 3)
+		// Step 2: Upload chunks in parallel (limit concurrency to MAX_CONCURRENT_UPLOADS)
 		const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 		const parts: Array<{ partNumber: number; etag: string }> = [];
-		let uploadedBytes = 0;
+		const chunkProgress: Record<number, number> = {}; // Track progress per chunk
 
-		console.log(`Uploading ${totalChunks} chunks...`);
+		console.log(`Uploading ${totalChunks} chunks with ${MAX_CONCURRENT_UPLOADS} concurrent uploads...`);
 
-		// Upload chunks sequentially for now (can optimize with parallel later)
-		for (let i = 0; i < totalChunks; i++) {
-			const start = i * CHUNK_SIZE;
+		// Helper function to upload a single chunk
+		const uploadChunk = async (chunkIndex: number) => {
+			const start = chunkIndex * CHUNK_SIZE;
 			const end = Math.min(start + CHUNK_SIZE, file.size);
 			const chunk = file.slice(start, end);
-			const partNumber = i + 1;
+			const partNumber = chunkIndex + 1;
 
-			console.log(`Uploading chunk ${partNumber}/${totalChunks} (${(chunk.size / 1024 / 1024).toFixed(2)}MB)`);
+			console.log(`Starting chunk ${partNumber}/${totalChunks} (${(chunk.size / 1024 / 1024).toFixed(2)}MB)`);
 
-			// Upload this chunk
 			const partResponse = await api.post(
 				`/buckets/${bucket}/multipart/upload`,
 				chunk,
@@ -106,28 +106,45 @@ async function chunkedMultipartUpload({ bucket, key, file, onProgress }: Chunked
 						partNumber,
 					},
 					onUploadProgress: (progressEvent) => {
-						const chunkProgress = progressEvent.loaded;
-						const totalProgress = uploadedBytes + chunkProgress;
+						// Update this chunk's progress
+						chunkProgress[chunkIndex] = progressEvent.loaded;
+
+						// Calculate total progress across all chunks
+						const totalLoaded = Object.values(chunkProgress).reduce((sum, val) => sum + val, 0);
 
 						if (onProgress) {
 							onProgress({
-								loaded: totalProgress,
+								loaded: totalLoaded,
 								total: file.size,
-								percentage: Math.round((totalProgress * 100) / file.size),
+								percentage: Math.round((totalLoaded * 100) / file.size),
 							});
 						}
 					},
 				}
 			);
 
-			parts.push({
+			console.log(`Chunk ${partNumber}/${totalChunks} uploaded, etag: ${partResponse.data.etag}`);
+
+			return {
 				partNumber,
 				etag: partResponse.data.etag,
-			});
+			};
+		};
 
-			uploadedBytes += chunk.size;
-			console.log(`Chunk ${partNumber}/${totalChunks} uploaded, etag: ${partResponse.data.etag}`);
+		// Upload chunks in parallel batches
+		for (let i = 0; i < totalChunks; i += MAX_CONCURRENT_UPLOADS) {
+			const batch = [];
+			for (let j = 0; j < MAX_CONCURRENT_UPLOADS && i + j < totalChunks; j++) {
+				batch.push(uploadChunk(i + j));
+			}
+
+			// Wait for this batch to complete before starting the next
+			const batchResults = await Promise.all(batch);
+			parts.push(...batchResults);
 		}
+
+		// Sort parts by part number (important for R2)
+		parts.sort((a, b) => a.partNumber - b.partNumber);
 
 		// Step 3: Complete multipart upload
 		console.log(`Completing multipart upload with ${parts.length} parts`);
