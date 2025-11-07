@@ -425,10 +425,12 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 			// Show initial filename-based classification
 			uploadFile.aiResult = `${documentType} (filename)`;
 
-			// Then immediately follow with AI analysis for PDFs and images
+			// Then immediately follow with AI analysis for PDFs and images (skip files > 10MB to avoid 413 errors)
+			const fileSizeMB = uploadFile.file.size / (1024 * 1024);
 			if (
-				uploadFile.file.type === "application/pdf" ||
-				uploadFile.file.type.startsWith("image/")
+				fileSizeMB <= 10 &&
+				(uploadFile.file.type === "application/pdf" ||
+					uploadFile.file.type.startsWith("image/"))
 			) {
 				try {
 					// Set AI analyzing status
@@ -478,6 +480,12 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 					uploadFile.aiStatus = "failed";
 					uploadFile.aiResult = `${documentType} (filename)`;
 				}
+			} else if (fileSizeMB > 10) {
+				// Skip AI for large files
+				console.log(
+					`Skipping AI classification for large file (${fileSizeMB.toFixed(1)}MB): ${uploadFile.file.name}`,
+				);
+				uploadFile.aiResult = `${documentType} (filename - file too large for AI)`;
 			}
 
 			// Always add health group and category structure

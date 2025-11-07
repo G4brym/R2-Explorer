@@ -12,6 +12,12 @@ export class PutObject extends OpenAPIRoute {
 		request: {
 			body: {
 				content: {
+					"multipart/form-data": {
+						schema: z.object({}).openapi({
+							type: "string",
+							format: "binary",
+						}),
+					},
 					"application/octet-stream": {
 						schema: z.object({}).openapi({
 							type: "string",

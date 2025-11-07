@@ -69,30 +69,36 @@ export default {
 	},
 	async fetch(request, env, context) {
 		const url = new URL(request.url);
-		
+
 		// Handle CORS preflight requests
 		if (request.method === 'OPTIONS') {
 			return new Response(null, {
 				headers: {
 					'Access-Control-Allow-Origin': '*',
-					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-					'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+					'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+					'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length',
+					'Access-Control-Max-Age': '86400',
 				},
 			});
 		}
-		
+
 		// Only handle API routes, let dashboard be served separately
 		if (url.pathname.startsWith('/api/')) {
 			try {
 				const explorer = R2Explorer(spendRuleConfig);
 				const response = await explorer.fetch(request, env, context);
-				
-				// Add CORS headers to API responses
-				response.headers.set('Access-Control-Allow-Origin', '*');
-				response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-				response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-				
-				return response;
+
+				// Add CORS headers to ALL API responses (including errors)
+				const newHeaders = new Headers(response.headers);
+				newHeaders.set('Access-Control-Allow-Origin', '*');
+				newHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
+				newHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length');
+
+				return new Response(response.body, {
+					status: response.status,
+					statusText: response.statusText,
+					headers: newHeaders,
+				});
 			} catch (error) {
 				// Return error with CORS headers
 				return new Response(JSON.stringify({
@@ -104,8 +110,8 @@ export default {
 					headers: {
 						'Content-Type': 'application/json',
 						'Access-Control-Allow-Origin': '*',
-						'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-						'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+						'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS, HEAD',
+						'Access-Control-Allow-Headers': 'Content-Type, Authorization, Content-Length',
 					},
 				});
 			}

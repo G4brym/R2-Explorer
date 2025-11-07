@@ -63,6 +63,8 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	}
 
 	const app = new Hono<{ Bindings: AppEnv; Variables: AppVariables }>();
+
+	// Configure to handle large request bodies (Workers Unbound supports up to 500MB)
 	app.use("*", async (c, next) => {
 		c.set("config", config);
 		await next();
