@@ -7,6 +7,10 @@ account_id = "484a9ce3fd2308c387998c60ae605819"
 [ai]
 binding = "AI"
 
+# Workers Unbound configuration - supports up to 500MB request body
+[limits]
+cpu_ms = 30000  # 30 seconds CPU time (enables Unbound pricing model)
+
 # R2 Buckets
 [[r2_buckets]]
 binding = "secure-uploads"
