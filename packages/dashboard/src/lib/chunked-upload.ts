@@ -5,9 +5,10 @@ import { api } from "./api";
  * Uses R2 multipart upload API with parallel uploads
  */
 
-const CHUNK_SIZE = 90 * 1024 * 1024; // 90MB chunks (close to 100MB limit for fewer chunks)
-const FILE_SIZE_THRESHOLD = 100 * 1024 * 1024; // 100MB threshold
-const MAX_CONCURRENT_UPLOADS = 3; // Upload 3 chunks in parallel for speed
+// Tuned defaults: smaller parts for better parallelism and fewer timeouts
+const CHUNK_SIZE = 16 * 1024 * 1024; // 16MB chunks
+const FILE_SIZE_THRESHOLD = 64 * 1024 * 1024; // 64MB threshold to switch to multipart
+const MAX_CONCURRENT_UPLOADS = 6; // Upload up to 6 chunks in parallel
 
 interface UploadProgress {
 	loaded: number;
@@ -38,22 +39,19 @@ export async function uploadFile(options: ChunkedUploadOptions) {
  * Regular upload for files < 100MB
  */
 async function regularUpload({ bucket, key, file, onProgress }: ChunkedUploadOptions) {
-	const formData = new FormData();
-	formData.append("file", file);
-
-	const response = await api.post(`/buckets/${bucket}/upload`, formData, {
+	// Send raw bytes directly; server expects application/octet-stream with base64 key param
+	const response = await api.post(`/buckets/${bucket}/upload`, file, {
 		headers: {
-			"Content-Type": "multipart/form-data",
+			"Content-Type": "application/octet-stream",
 		},
-		params: {
-			key,
-		},
+		params: { key },
 		onUploadProgress: (progressEvent) => {
-			if (progressEvent.total && onProgress) {
+			if (onProgress && typeof progressEvent.loaded === "number") {
+				const total = progressEvent.total || file.size;
 				onProgress({
 					loaded: progressEvent.loaded,
-					total: progressEvent.total,
-					percentage: Math.round((progressEvent.loaded * 100) / progressEvent.total),
+					total,
+					percentage: Math.min(100, Math.round((progressEvent.loaded * 100) / total)),
 				});
 			}
 		},
