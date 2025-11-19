@@ -137,7 +137,7 @@ export default defineComponent({
 			await apiHandler.renameObject(
 				this.selectedBucket,
 				this.row.key,
-				this.row.key.replace(this.row.name, this.renameInput),
+				this.row.key.split('/').slice(0, -1).concat(this.renameInput).join('/'),
 			);
 
 			this.$bus.emit("fetchFiles");
