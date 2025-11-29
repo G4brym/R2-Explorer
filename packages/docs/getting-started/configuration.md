@@ -23,7 +23,7 @@ Here is all the available options:
 For security reasons, by default your application will be in read only mode, to disable this, just update your
 `src/index.ts` file, like this:
 
-```ts:src/index.ts
+```ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({ readonly: false });
@@ -55,7 +55,7 @@ your worker -> Triggers. And click "Add Custom Domain".
 By default emails will go to the 1º bucket configured in your `wrangler.toml` file, but you can overwrite it
 in the `index.ts` file, like:
 
-```ts:src/index.ts
+```ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({
