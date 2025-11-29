@@ -385,4 +385,13 @@ export const apiHandler = {
 
 		return [...contentFolders, ...contentFiles];
 	},
+	createShareLink: (bucket, key, options) => {
+		return api.post(`/buckets/${bucket}/${encode(key)}/share`, options);
+	},
+	listShares: (bucket) => {
+		return api.get(`/buckets/${bucket}/shares`);
+	},
+	deleteShareLink: (bucket, shareId) => {
+		return api.delete(`/buckets/${bucket}/share/${shareId}`);
+	},
 };

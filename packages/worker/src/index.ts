@@ -11,10 +11,14 @@ import { z } from "zod";
 import { readOnlyMiddleware } from "./foundation/middlewares/readonly";
 import { settings } from "./foundation/settings";
 import { CreateFolder } from "./modules/buckets/createFolder";
+import { CreateShareLink } from "./modules/buckets/createShareLink";
 import { DeleteObject } from "./modules/buckets/deleteObject";
+import { DeleteShareLink } from "./modules/buckets/deleteShareLink";
 import { GetObject } from "./modules/buckets/getObject";
+import { GetShareLink } from "./modules/buckets/getShareLink";
 import { HeadObject } from "./modules/buckets/headObject";
 import { ListObjects } from "./modules/buckets/listObjects";
+import { ListShares } from "./modules/buckets/listShares";
 import { MoveObject } from "./modules/buckets/moveObject";
 import { CompleteUpload } from "./modules/buckets/multipart/completeUpload";
 import { CreateUpload } from "./modules/buckets/multipart/createUpload";
@@ -125,10 +129,20 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	openapi.post("/api/buckets/:bucket/delete", DeleteObject);
 	openapi.on("head", "/api/buckets/:bucket/:key", HeadObject);
 	openapi.get("/api/buckets/:bucket/:key/head", HeadObject); // There are some issues with calling the head method
+
+	// Share link routes
+	openapi.post("/api/buckets/:bucket/:key/share", CreateShareLink);
+	openapi.get("/api/buckets/:bucket/shares", ListShares);
+	openapi.delete("/api/buckets/:bucket/share/:shareId", DeleteShareLink);
+
+	// These object routes should be defined last
 	openapi.get("/api/buckets/:bucket/:key", GetObject);
 	openapi.post("/api/buckets/:bucket/:key", PutMetadata);
 
 	openapi.post("/api/emails/send", SendEmail);
+
+	// Public share access (no authentication required)
+	openapi.get("/share/:shareId", GetShareLink);
 
 	openapi.get("/", dashboardIndex);
 	openapi.get("*", dashboardRedirect);
@@ -146,8 +160,8 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 		) {
 			await receiveEmail(event, env, context, config);
 		},
-		async fetch(request: Request, env: AppEnv, context: ExecutionContext) {
-			return app.fetch(request, env, context);
+		async fetch(request: Request, env: unknown, context: ExecutionContext) {
+			return app.fetch(request, env as AppEnv, context);
 		},
 	};
 }
