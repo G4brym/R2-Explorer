@@ -6,7 +6,7 @@ Basic Auth was added in the `v1.0.2`, with support for multiple users.
 
 To enable this feature, update your `src/index.ts` file with the desired usernames and passwords.
 
-```ts:src/index.ts
+```ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({ readonly: false, basicAuth: [{
@@ -29,7 +29,7 @@ wrangler deploy
 
 You can also define just a single user like this:
 
-```ts:src/index.ts
+```ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({ readonly: false, basicAuth: {
@@ -54,7 +54,7 @@ In my account the team name is `r2explorer`.
 
 Now update your `src/index.ts` file with the team name, like this:
 
-```ts:src/index.ts
+```ts
 import { R2Explorer } from 'r2-explorer';
 
 export default R2Explorer({ readonly: false, cfAccessTeamName: 'r2explorer' });

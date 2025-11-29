@@ -39,14 +39,16 @@ export function createTestRequest(
 
 	if (body) {
 		// If Content-Type is application/json, always stringify if body is an object.
-		if (reqHeaders.get("Content-Type") === "application/json" && typeof body === "object") {
+		if (
+			reqHeaders.get("Content-Type") === "application/json" &&
+			typeof body === "object"
+		) {
 			bodyInit = JSON.stringify(body);
 		} else if (typeof body === "object" && !reqHeaders.has("Content-Type")) {
 			// If no Content-Type is set and body is an object, assume application/json.
 			reqHeaders.set("Content-Type", "application/json");
 			bodyInit = JSON.stringify(body);
-		}
-		 else {
+		} else {
 			bodyInit = body as BodyInit;
 		}
 	}

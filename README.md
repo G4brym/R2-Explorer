@@ -55,6 +55,7 @@ R2-Explorer transforms your Cloudflare R2 storage experience with a modern, user
   - Multi-part upload for large files
   - Right-click context menu for advanced options
   - HTTP/Custom metadata editing
+  - **Sharable Links** - Create secure, public URLs for files with optional password protection, expiration times, and download limits
 
 - **👀 File Handling**
   - In-browser file preview

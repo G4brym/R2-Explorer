@@ -12,9 +12,20 @@
     <q-item clickable v-close-popup @click="updateMetadataObject" v-if="prop.row.type === 'file'">
       <q-item-section>Update Metadata</q-item-section>
     </q-item>
-    <q-item clickable v-close-popup @click="shareObject">
-      <q-item-section>Get sharable link</q-item-section>
+    <q-separator />
+    <q-item clickable v-close-popup @click="createShareLink" v-if="prop.row.type === 'file'">
+      <q-item-section>
+        <q-item-label>Create Share Link</q-item-label>
+        <q-item-label caption>Public link with optional password</q-item-label>
+      </q-item-section>
     </q-item>
+    <q-item clickable v-close-popup @click="copyInternalLink">
+      <q-item-section>
+        <q-item-label>Copy Internal Link</q-item-label>
+        <q-item-label caption>Link to view in dashboard</q-item-label>
+      </q-item-section>
+    </q-item>
+    <q-separator />
     <q-item clickable v-close-popup @click="deleteObject">
       <q-item-section>Delete</q-item-section>
     </q-item>
@@ -57,7 +68,10 @@ export default {
 		deleteObject: function () {
 			this.$emit("deleteObject", this.prop.row);
 		},
-		shareObject: async function () {
+		createShareLink: function () {
+			this.$emit("createShareLink", this.prop.row);
+		},
+		copyInternalLink: async function () {
 			let url;
 			if (this.prop.row.type === "folder") {
 				url =

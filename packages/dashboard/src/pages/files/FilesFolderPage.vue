@@ -1,9 +1,21 @@
 <template>
   <q-page class="">
     <div class="q-pa-md" ref="pageContainer" @scroll="handleScroll" style="height: 100vh; overflow-y: auto;">
-      <q-breadcrumbs>
-        <q-breadcrumbs-el style="cursor: pointer" v-for="obj in breadcrumbs" :key="obj.name" :label="obj.name" @click="breadcrumbsClick(obj)" />
-      </q-breadcrumbs>
+      <div class="flex items-center q-mb-sm">
+        <q-breadcrumbs class="col">
+          <q-breadcrumbs-el style="cursor: pointer" v-for="obj in breadcrumbs" :key="obj.name" :label="obj.name" @click="breadcrumbsClick(obj)" />
+        </q-breadcrumbs>
+        <q-btn
+          flat
+          dense
+          icon="link"
+          color="primary"
+          label="Manage Shares"
+          @click="$refs.shareFile.openManageShares()"
+        >
+          <q-tooltip>View and manage all share links</q-tooltip>
+        </q-btn>
+      </div>
 
       <drag-and-drop ref="uploader">
 
@@ -54,7 +66,7 @@
               touch-position
               context-menu
             >
-              <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject"  />
+              <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject" @createShareLink="$refs.shareFile.openCreateShare" />
             </q-menu>
           </template>
 
@@ -62,7 +74,7 @@
             <td class="text-right">
               <q-btn round flat icon="more_vert" size="sm">
                 <q-menu>
-                  <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject" />
+                  <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject" @createShareLink="$refs.shareFile.openCreateShare" />
                 </q-menu>
               </q-btn>
             </td>
@@ -85,10 +97,12 @@
 
   <file-preview ref="preview"/>
   <file-options ref="options" />
+  <share-file ref="shareFile" />
 </template>
 
 <script>
 import FileOptions from "components/files/FileOptions.vue";
+import ShareFile from "components/files/ShareFile.vue";
 import FilePreview from "components/preview/FilePreview.vue";
 import DragAndDrop from "components/utils/DragAndDrop.vue";
 import FileContextMenu from "pages/files/FileContextMenu.vue";
@@ -99,7 +113,13 @@ import { ROOT_FOLDER, apiHandler, decode, encode } from "../../appUtils";
 
 export default defineComponent({
 	name: "FilesIndexPage",
-	components: { FileContextMenu, FileOptions, DragAndDrop, FilePreview },
+	components: {
+		FileContextMenu,
+		FileOptions,
+		DragAndDrop,
+		FilePreview,
+		ShareFile,
+	},
 	data: () => ({
 		loading: false,
 		loadingMore: false,

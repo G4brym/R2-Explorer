@@ -35,9 +35,20 @@ export class CompleteUpload extends OpenAPIRoute {
 
 		const bucket = c.env[data.params.bucket];
 
+		if (
+			!bucket ||
+			typeof bucket !== "object" ||
+			!("resumeMultipartUpload" in bucket)
+		) {
+			return Response.json(
+				{ error: `Bucket binding not found: ${data.params.bucket}` },
+				{ status: 500 },
+			);
+		}
+
 		const uploadId = data.body.uploadId;
 		const key = decodeURIComponent(escape(atob(data.body.key)));
-		const parts = data.body.parts;
+		const parts = data.body.parts as R2UploadedPart[];
 
 		const multipartUpload = await bucket.resumeMultipartUpload(key, uploadId);
 
