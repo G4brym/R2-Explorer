@@ -15,17 +15,7 @@ export class GetInfo extends OpenAPIRoute {
 		const buckets = [];
 
 		for (const [key, value] of Object.entries(c.env)) {
-			// Type guard to check if value is an R2Bucket (must have list method)
-			if (
-				value &&
-				typeof value === "object" &&
-				"get" in value &&
-				"put" in value &&
-				"list" in value &&
-				typeof value.get === "function" &&
-				typeof value.put === "function" &&
-				typeof value.list === "function"
-			) {
+			if (value.constructor.name === "R2Bucket") {
 				buckets.push({ name: key });
 			}
 		}
