@@ -529,6 +529,7 @@ import LoadingOverlay from "@/components/ui/LoadingOverlay.vue";
 import LoadingSpinner from "@/components/ui/LoadingSpinner.vue";
 import Pagination from "@/components/ui/Pagination.vue";
 import { api } from "@/lib/api";
+import { safeBase64Encode } from "@/lib/browser";
 import {
 	handleError,
 	networkStatus,
@@ -698,13 +699,15 @@ async function loadFiles(resetPagination = false) {
 			const response = await deduplicateRequest(requestKey, async () => {
 				const params: any = {
 					limit: pageSize.value,
-					delimiter: '/', // Add delimiter to get folder listings
+					delimiter: "/", // Add delimiter to get folder listings
 				};
 
-				// Add prefix when inside a folder (base64 encoded)
+				// Add prefix when inside a folder (base64 encoded, Unicode-safe)
 				if (currentPath.value) {
-					const prefixPath = currentPath.value.endsWith('/') ? currentPath.value : `${currentPath.value}/`;
-					params.prefix = btoa(prefixPath);
+					const prefixPath = currentPath.value.endsWith("/")
+						? currentPath.value
+						: `${currentPath.value}/`;
+					params.prefix = safeBase64Encode(prefixPath);
 				}
 
 				if (cursor.value && currentPage.value > 1) {
@@ -756,8 +759,10 @@ async function loadFiles(resetPagination = false) {
 					// Handle root level vs subfolder prefixes
 					if (!currentPrefix) {
 						// Root level: extract top-level folder name
-						const folderPath = prefix.endsWith('/') ? prefix.slice(0, -1) : prefix;
-						const folderName = folderPath.split('/')[0]; // Get first part for root level
+						const folderPath = prefix.endsWith("/")
+							? prefix.slice(0, -1)
+							: prefix;
+						const folderName = folderPath.split("/")[0]; // Get first part for root level
 						if (folderName) {
 							folderNames.add(folderName);
 						}
@@ -765,8 +770,10 @@ async function loadFiles(resetPagination = false) {
 						// Subfolder: extract relative folder name
 						if (prefix.startsWith(currentPrefix)) {
 							const relativePath = prefix.substring(currentPrefix.length);
-							const folderPath = relativePath.endsWith('/') ? relativePath.slice(0, -1) : relativePath;
-							const folderName = folderPath.split('/')[0]; // Get first part of relative path
+							const folderPath = relativePath.endsWith("/")
+								? relativePath.slice(0, -1)
+								: relativePath;
+							const folderName = folderPath.split("/")[0]; // Get first part of relative path
 							if (folderName) {
 								folderNames.add(folderName);
 							}
@@ -1021,13 +1028,23 @@ function bulkDownload() {
 async function downloadAllAsZip() {
 	try {
 		loading.value = true;
-		toast.info("Preparing ZIP archive... This may take a while for large folders.");
+		toast.info(
+			"Preparing ZIP archive... This may take a while for large folders.",
+		);
 
-		// Fetch the ZIP file with authentication
+		// Fetch the ZIP file with authentication (Unicode-safe encoding)
 		const response = await api.get(
 			`/buckets/${currentBucket.value}/download/zip`,
 			{
-				params: currentPath.value ? { prefix: btoa(currentPath.value.endsWith('/') ? currentPath.value : `${currentPath.value}/`) } : {},
+				params: currentPath.value
+					? {
+							prefix: safeBase64Encode(
+								currentPath.value.endsWith("/")
+									? currentPath.value
+									: `${currentPath.value}/`,
+							),
+						}
+					: {},
 				responseType: "blob",
 				timeout: 300000, // 5 minute timeout for large downloads
 			},
@@ -1058,7 +1075,8 @@ async function downloadAllAsZip() {
 		toast.success("ZIP archive downloaded successfully");
 	} catch (error: any) {
 		console.error("Download failed:", error);
-		const errorMessage = error.response?.data?.error || "Failed to download files as ZIP";
+		const errorMessage =
+			error.response?.data?.error || "Failed to download files as ZIP";
 		toast.error(errorMessage);
 	} finally {
 		loading.value = false;
@@ -1068,7 +1086,9 @@ async function downloadAllAsZip() {
 async function downloadAllGroupsAsZip() {
 	try {
 		loading.value = true;
-		toast.info("Preparing complete archive of all health groups... This may take a while.");
+		toast.info(
+			"Preparing complete archive of all health groups... This may take a while.",
+		);
 
 		// Fetch the complete ZIP file with authentication
 		const response = await api.get(
@@ -1101,7 +1121,8 @@ async function downloadAllGroupsAsZip() {
 		toast.success("Complete archive downloaded successfully");
 	} catch (error: any) {
 		console.error("Download all groups failed:", error);
-		const errorMessage = error.response?.data?.error || "Failed to download all health groups";
+		const errorMessage =
+			error.response?.data?.error || "Failed to download all health groups";
 		toast.error(errorMessage);
 	} finally {
 		loading.value = false;
@@ -1125,7 +1146,7 @@ async function bulkDelete() {
 					await withRetry(
 						() =>
 							api.post(`/buckets/${currentBucket.value}/delete`, {
-								key: btoa(item.key),
+								key: safeBase64Encode(item.key),
 							}),
 						{ maxAttempts: 2 },
 					);

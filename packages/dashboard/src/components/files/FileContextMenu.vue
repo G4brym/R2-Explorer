@@ -131,6 +131,7 @@ import CardContent from "@/components/ui/CardContent.vue";
 import CardHeader from "@/components/ui/CardHeader.vue";
 import Input from "@/components/ui/Input.vue";
 import { api } from "@/lib/api";
+import { safeBase64Encode } from "@/lib/browser";
 import { toast } from "@/lib/toast";
 import {
 	DownloadIcon,
@@ -174,52 +175,56 @@ const newName = ref("");
 const loading = ref(false);
 const downloading = ref(false);
 const error = ref("");
-const menuPositionRef = ref({ left: '0px', top: '0px' });
+const menuPositionRef = ref({ left: "0px", top: "0px" });
 
 // Calculate smart positioning to keep menu within viewport
 function calculateMenuPosition() {
 	// Only calculate if menu is open and props are available
 	if (!props.isOpen || props.x === undefined || props.y === undefined) {
-		return { left: '0px', top: '0px' };
+		return { left: "0px", top: "0px" };
 	}
 
 	const MENU_WIDTH = 160;
 	const MENU_HEIGHT = 160; // Approximate height for 4 items
 	const PADDING = 8;
-	
+
 	// Get current viewport dimensions (recalculated each time)
 	const viewportWidth = window.innerWidth;
 	const viewportHeight = window.innerHeight;
-	
+
 	let left = props.x;
 	let top = props.y;
-	
+
 	// Adjust horizontal position if menu would go off right edge
 	if (left + MENU_WIDTH + PADDING > viewportWidth) {
 		left = Math.max(PADDING, props.x - MENU_WIDTH);
 	}
-	
+
 	// Adjust vertical position if menu would go off bottom edge
 	if (top + MENU_HEIGHT + PADDING > viewportHeight) {
 		top = Math.max(PADDING, props.y - MENU_HEIGHT);
 	}
-	
+
 	// Ensure menu doesn't go off left or top edges
 	left = Math.max(PADDING, left);
 	top = Math.max(PADDING, top);
-	
+
 	return {
 		left: `${left}px`,
-		top: `${top}px`
+		top: `${top}px`,
 	};
 }
 
 // Watch for prop changes and recalculate position
-watch([() => props.isOpen, () => props.x, () => props.y], () => {
-	if (props.isOpen) {
-		menuPositionRef.value = calculateMenuPosition();
-	}
-}, { immediate: true });
+watch(
+	[() => props.isOpen, () => props.x, () => props.y],
+	() => {
+		if (props.isOpen) {
+			menuPositionRef.value = calculateMenuPosition();
+		}
+	},
+	{ immediate: true },
+);
 
 async function download() {
 	if (!props.file) return;
@@ -227,8 +232,8 @@ async function download() {
 	downloading.value = true;
 
 	try {
-		// Encode the key with base64 as required by backend
-		const encodedKey = btoa(props.file.key);
+		// Encode the key with base64 as required by backend (Unicode-safe)
+		const encodedKey = safeBase64Encode(props.file.key);
 
 		// Fetch file with authentication
 		const response = await api.get(
@@ -306,9 +311,9 @@ async function confirmRename() {
 		const newKey = pathParts.join("/");
 
 		await api.post(`/buckets/${props.bucket}/move`, {
-			// Send base64-encoded keys to match API contract (server also accepts plain)
-			oldKey: btoa(oldKey),
-			newKey: btoa(newKey),
+			// Send base64-encoded keys to match API contract (Unicode-safe)
+			oldKey: safeBase64Encode(oldKey),
+			newKey: safeBase64Encode(newKey),
 		});
 
 		emit("renamed");
@@ -335,8 +340,8 @@ async function confirmDelete() {
 
 	try {
 		await api.post(`/buckets/${props.bucket}/delete`, {
-			// Encode to base64 for server consistency (fallback supported)
-			key: btoa(props.file.key),
+			// Encode to base64 for server consistency (Unicode-safe)
+			key: safeBase64Encode(props.file.key),
 		});
 
 		emit("deleted");

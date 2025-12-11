@@ -38,7 +38,12 @@ export async function uploadFile(options: ChunkedUploadOptions) {
 /**
  * Regular upload for files < 100MB
  */
-async function regularUpload({ bucket, key, file, onProgress }: ChunkedUploadOptions) {
+async function regularUpload({
+	bucket,
+	key,
+	file,
+	onProgress,
+}: ChunkedUploadOptions) {
 	// Send raw bytes directly; server expects application/octet-stream with base64 key param
 	const response = await api.post(`/buckets/${bucket}/upload`, file, {
 		headers: {
@@ -51,7 +56,10 @@ async function regularUpload({ bucket, key, file, onProgress }: ChunkedUploadOpt
 				onProgress({
 					loaded: progressEvent.loaded,
 					total,
-					percentage: Math.min(100, Math.round((progressEvent.loaded * 100) / total)),
+					percentage: Math.min(
+						100,
+						Math.round((progressEvent.loaded * 100) / total),
+					),
 				});
 			}
 		},
@@ -63,14 +71,25 @@ async function regularUpload({ bucket, key, file, onProgress }: ChunkedUploadOpt
 /**
  * Chunked multipart upload for files >= 100MB
  */
-async function chunkedMultipartUpload({ bucket, key, file, onProgress }: ChunkedUploadOptions) {
+async function chunkedMultipartUpload({
+	bucket,
+	key,
+	file,
+	onProgress,
+}: ChunkedUploadOptions) {
 	try {
 		// Step 1: Create multipart upload
-		console.log(`Starting multipart upload for ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+		console.log(
+			`Starting multipart upload for ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`,
+		);
 
-		const createResponse = await api.post(`/buckets/${bucket}/multipart/create`, null, {
-			params: { key },
-		});
+		const createResponse = await api.post(
+			`/buckets/${bucket}/multipart/create`,
+			null,
+			{
+				params: { key },
+			},
+		);
 
 		const uploadId = createResponse.data.uploadId;
 		console.log(`Multipart upload created with ID: ${uploadId}`);
@@ -80,7 +99,9 @@ async function chunkedMultipartUpload({ bucket, key, file, onProgress }: Chunked
 		const parts: Array<{ partNumber: number; etag: string }> = [];
 		const chunkProgress: Record<number, number> = {}; // Track progress per chunk
 
-		console.log(`Uploading ${totalChunks} chunks with ${MAX_CONCURRENT_UPLOADS} concurrent uploads...`);
+		console.log(
+			`Uploading ${totalChunks} chunks with ${MAX_CONCURRENT_UPLOADS} concurrent uploads...`,
+		);
 
 		// Helper function to upload a single chunk
 		const uploadChunk = async (chunkIndex: number) => {
@@ -89,7 +110,9 @@ async function chunkedMultipartUpload({ bucket, key, file, onProgress }: Chunked
 			const chunk = file.slice(start, end);
 			const partNumber = chunkIndex + 1;
 
-			console.log(`Starting chunk ${partNumber}/${totalChunks} (${(chunk.size / 1024 / 1024).toFixed(2)}MB)`);
+			console.log(
+				`Starting chunk ${partNumber}/${totalChunks} (${(chunk.size / 1024 / 1024).toFixed(2)}MB)`,
+			);
 
 			const partResponse = await api.post(
 				`/buckets/${bucket}/multipart/upload`,
@@ -108,7 +131,10 @@ async function chunkedMultipartUpload({ bucket, key, file, onProgress }: Chunked
 						chunkProgress[chunkIndex] = progressEvent.loaded;
 
 						// Calculate total progress across all chunks
-						const totalLoaded = Object.values(chunkProgress).reduce((sum, val) => sum + val, 0);
+						const totalLoaded = Object.values(chunkProgress).reduce(
+							(sum, val) => sum + val,
+							0,
+						);
 
 						if (onProgress) {
 							onProgress({
@@ -118,10 +144,12 @@ async function chunkedMultipartUpload({ bucket, key, file, onProgress }: Chunked
 							});
 						}
 					},
-				}
+				},
 			);
 
-			console.log(`Chunk ${partNumber}/${totalChunks} uploaded, etag: ${partResponse.data.etag}`);
+			console.log(
+				`Chunk ${partNumber}/${totalChunks} uploaded, etag: ${partResponse.data.etag}`,
+			);
 
 			return {
 				partNumber,
@@ -147,11 +175,14 @@ async function chunkedMultipartUpload({ bucket, key, file, onProgress }: Chunked
 		// Step 3: Complete multipart upload
 		console.log(`Completing multipart upload with ${parts.length} parts`);
 
-		const completeResponse = await api.post(`/buckets/${bucket}/multipart/complete`, {
-			uploadId,
-			key,
-			parts,
-		});
+		const completeResponse = await api.post(
+			`/buckets/${bucket}/multipart/complete`,
+			{
+				uploadId,
+				key,
+				parts,
+			},
+		);
 
 		console.log(`Multipart upload completed successfully`);
 

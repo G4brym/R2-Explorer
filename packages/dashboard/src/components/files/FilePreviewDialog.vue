@@ -87,6 +87,7 @@ import Card from "@/components/ui/Card.vue";
 import CardContent from "@/components/ui/CardContent.vue";
 import CardHeader from "@/components/ui/CardHeader.vue";
 import { api } from "@/lib/api";
+import { safeBase64Encode } from "@/lib/browser";
 import { toast } from "@/lib/toast";
 import {
 	AlertCircleIcon,
@@ -190,8 +191,8 @@ async function downloadFile() {
 	if (!props.file) return;
 
 	try {
-		// Encode the key with base64 as required by backend
-		const encodedKey = btoa(props.file.key);
+		// Encode the key with base64 as required by backend (Unicode-safe)
+		const encodedKey = safeBase64Encode(props.file.key);
 
 		// Fetch the file with authentication
 		const response = await api.get(
@@ -234,7 +235,7 @@ async function loadFileContent() {
 	try {
 		// For text files, fetch as text
 		if (isText.value) {
-			const encodedKey = btoa(props.file.key);
+			const encodedKey = safeBase64Encode(props.file.key);
 			const response = await api.get(
 				`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`,
 				{
@@ -245,7 +246,7 @@ async function loadFileContent() {
 		}
 		// For images and PDFs, fetch as blob and create object URL
 		else if (isImage.value || isPdf.value) {
-			const encodedKey = btoa(props.file.key);
+			const encodedKey = safeBase64Encode(props.file.key);
 			const response = await api.get(
 				`/buckets/${props.bucket}/${encodeURIComponent(encodedKey)}`,
 				{

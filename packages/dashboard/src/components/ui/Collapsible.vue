@@ -1,7 +1,15 @@
 <script setup lang="ts">
-import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger } from 'radix-vue'
+import {
+	CollapsibleContent,
+	CollapsibleRoot,
+	CollapsibleTrigger,
+} from "radix-vue";
 
-export { CollapsibleRoot as Collapsible, CollapsibleContent, CollapsibleTrigger }
+export {
+	CollapsibleRoot as Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+};
 </script>
 
 <template>

@@ -50,6 +50,7 @@ import CardContent from "@/components/ui/CardContent.vue";
 import CardHeader from "@/components/ui/CardHeader.vue";
 import Input from "@/components/ui/Input.vue";
 import { api } from "@/lib/api";
+import { safeBase64Encode } from "@/lib/browser";
 import { LoaderIcon, XIcon } from "lucide-vue-next";
 import { ref, watch } from "vue";
 
@@ -92,8 +93,8 @@ async function createFolder() {
 			: `${folderName.value.trim()}/`;
 
 		await api.post(`/buckets/${props.bucket}/folder`, {
-			// Worker expects base64-encoded key
-			key: btoa(folderPath),
+			// Worker expects base64-encoded key (Unicode-safe)
+			key: safeBase64Encode(folderPath),
 		});
 
 		console.log(`Created folder: ${folderPath}`);

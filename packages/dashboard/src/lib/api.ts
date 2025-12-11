@@ -1,9 +1,13 @@
+import { safeStorageRemove } from "@/lib/browser";
 import axios from "axios";
 
 // SpendRule: Point to the correct worker API URL
 // In production, use deployed worker; in development, use local or override with VITE_API_BASE_URL
-const API_BASE = import.meta.env.VITE_API_BASE_URL ||
-	(import.meta.env.DEV ? "/api" : "https://spendrule-dev.oluwamakinwa.workers.dev/api");
+const API_BASE =
+	import.meta.env.VITE_API_BASE_URL ||
+	(import.meta.env.DEV
+		? "/api"
+		: "https://spendrule-dev.oluwamakinwa.workers.dev/api");
 
 export const api = axios.create({
 	baseURL: API_BASE,
@@ -34,9 +38,8 @@ api.interceptors.response.use(
 
 		// Handle auth errors
 		if (error.response?.status === 401) {
-			// Clear stored tokens on auth error
-			localStorage.removeItem("explorer_session_token");
-			sessionStorage.removeItem("explorer_session_token");
+			// Clear stored tokens on auth error (safe for private browsing)
+			safeStorageRemove("explorer_session_token");
 		}
 
 		return Promise.reject(error);

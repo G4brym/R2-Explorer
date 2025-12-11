@@ -180,6 +180,7 @@
 
 <script setup lang="ts">
 import Button from "@/components/ui/Button.vue";
+import { safeLocalStorageGet, safeLocalStorageSet } from "@/lib/browser";
 import { formatBytes } from "@/lib/utils";
 import { useAuthStore } from "@/stores/auth";
 import {
@@ -220,10 +221,10 @@ function toggleTheme() {
 	isDark.value = !isDark.value;
 	if (isDark.value) {
 		document.documentElement.classList.add("dark");
-		localStorage.setItem("theme", "dark");
+		safeLocalStorageSet("theme", "dark");
 	} else {
 		document.documentElement.classList.remove("dark");
-		localStorage.setItem("theme", "light");
+		safeLocalStorageSet("theme", "light");
 	}
 }
 
@@ -272,11 +273,10 @@ async function handleLogout() {
 }
 
 onMounted(() => {
-	// Initialize theme
-	const savedTheme = localStorage.getItem("theme");
-	const systemPrefersDark = window.matchMedia(
-		"(prefers-color-scheme: dark)",
-	).matches;
+	// Initialize theme (safe for private browsing)
+	const savedTheme = safeLocalStorageGet("theme");
+	const systemPrefersDark =
+		window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ?? false;
 
 	isDark.value = savedTheme === "dark" || (!savedTheme && systemPrefersDark);
 

@@ -69,6 +69,7 @@ import Button from "@/components/ui/Button.vue";
 import Card from "@/components/ui/Card.vue";
 import CardContent from "@/components/ui/CardContent.vue";
 import CardHeader from "@/components/ui/CardHeader.vue";
+import { safeLocalStorageGet, safeLocalStorageSet } from "@/lib/browser";
 import { FileTextIcon, InfoIcon, XIcon } from "lucide-vue-next";
 import { onMounted, ref } from "vue";
 
@@ -80,13 +81,13 @@ const showHint = ref(true);
 
 function hideHint() {
 	showHint.value = false;
-	// Store preference in localStorage
-	localStorage.setItem("spendrule-hide-category-hint", "true");
+	// Store preference in localStorage (safe for private browsing)
+	safeLocalStorageSet("spendrule-hide-category-hint", "true");
 }
 
 onMounted(() => {
-	// Check if user has hidden the hint before
-	const hidePreference = localStorage.getItem("spendrule-hide-category-hint");
+	// Check if user has hidden the hint before (safe for private browsing)
+	const hidePreference = safeLocalStorageGet("spendrule-hide-category-hint");
 	if (hidePreference === "true") {
 		showHint.value = false;
 	}

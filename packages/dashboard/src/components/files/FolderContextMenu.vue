@@ -203,52 +203,56 @@ const newFolderName = ref("");
 const newName = ref("");
 const loading = ref(false);
 const error = ref("");
-const menuPositionRef = ref({ left: '0px', top: '0px' });
+const menuPositionRef = ref({ left: "0px", top: "0px" });
 
 // Calculate smart positioning to keep menu within viewport
 function calculateMenuPosition() {
 	// Only calculate if menu is open and props are available
 	if (!props.isOpen || props.x === undefined || props.y === undefined) {
-		return { left: '0px', top: '0px' };
+		return { left: "0px", top: "0px" };
 	}
 
 	const MENU_WIDTH = 160;
 	const MENU_HEIGHT = 140; // Approximate height for 3 items
 	const PADDING = 8;
-	
+
 	// Get current viewport dimensions (recalculated each time)
 	const viewportWidth = window.innerWidth;
 	const viewportHeight = window.innerHeight;
-	
+
 	let left = props.x;
 	let top = props.y;
-	
+
 	// Adjust horizontal position if menu would go off right edge
 	if (left + MENU_WIDTH + PADDING > viewportWidth) {
 		left = Math.max(PADDING, props.x - MENU_WIDTH);
 	}
-	
+
 	// Adjust vertical position if menu would go off bottom edge
 	if (top + MENU_HEIGHT + PADDING > viewportHeight) {
 		top = Math.max(PADDING, props.y - MENU_HEIGHT);
 	}
-	
+
 	// Ensure menu doesn't go off left or top edges
 	left = Math.max(PADDING, left);
 	top = Math.max(PADDING, top);
-	
+
 	return {
 		left: `${left}px`,
-		top: `${top}px`
+		top: `${top}px`,
 	};
 }
 
 // Watch for prop changes and recalculate position
-watch([() => props.isOpen, () => props.x, () => props.y], () => {
-	if (props.isOpen) {
-		menuPositionRef.value = calculateMenuPosition();
-	}
-}, { immediate: true });
+watch(
+	[() => props.isOpen, () => props.x, () => props.y],
+	() => {
+		if (props.isOpen) {
+			menuPositionRef.value = calculateMenuPosition();
+		}
+	},
+	{ immediate: true },
+);
 
 function createSubfolder() {
 	newFolderName.value = "";

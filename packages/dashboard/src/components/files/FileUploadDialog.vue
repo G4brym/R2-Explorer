@@ -141,6 +141,7 @@ import Card from "@/components/ui/Card.vue";
 import CardContent from "@/components/ui/CardContent.vue";
 import CardHeader from "@/components/ui/CardHeader.vue";
 import { api } from "@/lib/api";
+import { safeBase64Encode } from "@/lib/browser";
 import { uploadFile as uploadFileToR2 } from "@/lib/chunked-upload";
 import { handleError, networkStatus, withRetry } from "@/lib/errors";
 import { toast } from "@/lib/toast";
@@ -426,7 +427,10 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 			// Skip AI analysis for files over 25MB to avoid request size limits
 			// Note: Base64 encoding adds 33% overhead, so 25MB becomes ~33MB
 			const fileSizeMB = uploadFile.file.size / (1024 * 1024);
-			const isAiEligible = fileSizeMB <= 25 && (uploadFile.file.type === "application/pdf" || uploadFile.file.type.startsWith("image/"));
+			const isAiEligible =
+				fileSizeMB <= 25 &&
+				(uploadFile.file.type === "application/pdf" ||
+					uploadFile.file.type.startsWith("image/"));
 
 			if (isAiEligible) {
 				try {
@@ -504,7 +508,7 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 					test_user: "test_group",
 				};
 				const healthGroup = healthGroupMapping[username] || "unknown_group";
-				
+
 				// Admin users don't need health group prefix
 				if (username === "spendrule_admin") {
 					uploadPath = `${documentType}/${uploadFile.file.name}`;
@@ -513,8 +517,8 @@ async function uploadSingleFile(uploadFile: UploadingFile) {
 				}
 			}
 
-			// Base64 encode the key as expected by the backend
-			const encodedKey = btoa(uploadPath);
+			// Base64 encode the key as expected by the backend (Unicode-safe)
+			const encodedKey = safeBase64Encode(uploadPath);
 
 			// Use chunked upload helper which automatically handles files >100MB
 			const response = await uploadFileToR2({
