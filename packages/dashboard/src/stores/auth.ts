@@ -16,9 +16,19 @@ function utf8ToBase64(str: string): string {
 }
 
 // Safe storage access (handles private browsing mode)
+// Try sessionStorage first, then localStorage, handling errors independently
 function safeGetItem(key: string): string | null {
+	// Try sessionStorage first
 	try {
-		return sessionStorage.getItem(key) || localStorage.getItem(key);
+		const sessionValue = sessionStorage.getItem(key);
+		if (sessionValue) return sessionValue;
+	} catch {
+		// sessionStorage not available, continue to localStorage
+	}
+
+	// Try localStorage
+	try {
+		return localStorage.getItem(key);
 	} catch {
 		return null;
 	}
