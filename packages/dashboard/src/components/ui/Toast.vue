@@ -35,7 +35,7 @@ import {
 	InfoIcon,
 	XIcon,
 } from "lucide-vue-next";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 
 export interface ToastProps {
 	type?: "success" | "error" | "warning" | "info";
@@ -55,6 +55,7 @@ const emit = defineEmits<{
 }>();
 
 const isVisible = ref(true);
+let dismissTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const iconComponent = computed(() => {
 	switch (props.type) {
@@ -92,9 +93,16 @@ function dismiss() {
 
 onMounted(() => {
 	if (props.duration > 0) {
-		setTimeout(() => {
+		dismissTimeout = setTimeout(() => {
 			dismiss();
 		}, props.duration);
+	}
+});
+
+onUnmounted(() => {
+	if (dismissTimeout) {
+		clearTimeout(dismissTimeout);
+		dismissTimeout = null;
 	}
 });
 </script>

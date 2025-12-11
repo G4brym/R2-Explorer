@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { safeBase64Decode } from "./browser";
 
 /**
  * Chunked upload for files larger than 100MB
@@ -189,7 +190,7 @@ async function chunkedMultipartUpload({
 		return {
 			success: true,
 			result: completeResponse.data,
-			path: atob(key), // Decode key to show path
+			path: safeBase64Decode(key), // Decode key to show path (Unicode-safe)
 		};
 	} catch (error: any) {
 		console.error("Chunked upload failed:", error);

@@ -266,12 +266,16 @@ async function loadFileContent() {
 						contentType.includes("application/json")))
 			) {
 				// Response is likely HTML/JSON error, read as text to get error message
-				const errorText = await response.data.text();
-				throw new Error(
-					errorText.includes('"error"')
-						? JSON.parse(errorText).error
-						: "Invalid response from server",
-				);
+				try {
+					const errorText = await response.data.text();
+					throw new Error(
+						errorText.includes('"error"')
+							? JSON.parse(errorText).error
+							: "Invalid response from server",
+					);
+				} catch (parseError) {
+					throw new Error("Invalid response from server");
+				}
 			}
 
 			// Clean up old blob URL if exists
