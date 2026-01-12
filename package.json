@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"workers-ci": "export WORKERS_CI=1 && node packages/github-action/prepareDeploy.js",
-		"lint": "npx @biomejs/biome check template/ packages/dashboard/src packages/worker/src || (npx @biomejs/biome check --write template/ packages/dashboard/src packages/worker/src/; exit 1)",
+		"lint": "npx @biomejs/biome check packages/dashboard/src packages/worker/src || (npx @biomejs/biome check --write packages/dashboard/src packages/worker/src/; exit 1)",
 		"build-dashboard": "pnpm run --filter r2-explorer-dashboard build",
 		"build-worker": "pnpm run --filter r2-explorer build",
 		"test": "pnpm run --filter r2-explorer test",
