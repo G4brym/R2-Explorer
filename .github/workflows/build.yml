@@ -38,7 +38,7 @@ jobs:
       - name: Package artifact
         run: pnpm package
       - name: Archive package
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: r2-explorer-npm-package
           path: packages/worker/r2-explorer-*
