@@ -1,15 +1,31 @@
-import { cloudflareAccess } from "@hono/cloudflare-access";
 import {
 	type OpenAPIObjectConfigV31,
 	extendZodWithOpenApi,
 	fromHono,
 } from "chanfana";
 import { type ExecutionContext, Hono } from "hono";
-import { basicAuth } from "hono/basic-auth";
 import { cors } from "hono/cors";
 import { z } from "zod";
+import {
+	initAuthMiddleware,
+	parseAuthMode,
+	requireAdmin,
+	requireAuth,
+	sessionAuthMiddleware,
+} from "./foundation/middlewares/auth";
 import { readOnlyMiddleware } from "./foundation/middlewares/readonly";
 import { settings } from "./foundation/settings";
+import {
+	GrantAccess,
+	ListUserAccess,
+	RevokeAccess,
+} from "./modules/auth/admin/access";
+import { ForgotPassword } from "./modules/auth/forgotPassword";
+import { Login } from "./modules/auth/login";
+import { Logout } from "./modules/auth/logout";
+import { GetMe } from "./modules/auth/me";
+import { Register } from "./modules/auth/register";
+import { ResetPassword } from "./modules/auth/resetPassword";
 import { CreateFolder } from "./modules/buckets/createFolder";
 import { CreateShareLink } from "./modules/buckets/createShareLink";
 import { DeleteObject } from "./modules/buckets/deleteObject";
@@ -29,18 +45,25 @@ import { dashboardIndex, dashboardRedirect } from "./modules/dashboard";
 import { receiveEmail } from "./modules/emails/receiveEmail";
 import { SendEmail } from "./modules/emails/sendEmail";
 import { GetInfo } from "./modules/server/getInfo";
-import type {
-	AppContext,
-	AppEnv,
-	AppVariables,
-	BasicAuthType,
-	R2ExplorerConfig,
-} from "./types";
+import { GetSettings } from "./modules/settings/getSettings";
+import { UpdateSettings } from "./modules/settings/updateSettings";
+import type { AppEnv, AppVariables, R2ExplorerConfig } from "./types";
+
+// Re-export admin users from the correct file
+import {
+	CreateUser as AdminCreateUser,
+	DeleteUser as AdminDeleteUser,
+	ListUsers as AdminListUsers,
+	UpdateUser as AdminUpdateUser,
+} from "./modules/auth/admin/users";
 
 export function R2Explorer(config?: R2ExplorerConfig) {
 	extendZodWithOpenApi(z);
 	config = config || {};
 	if (config.readonly !== false) config.readonly = true;
+
+	// Parse auth mode
+	const authMode = parseAuthMode(config.auth);
 
 	const openapiSchema: OpenAPIObjectConfigV31 = {
 		openapi: "3.1.0",
@@ -50,15 +73,18 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 		},
 	};
 
-	if (config.basicAuth) {
+	// Add security scheme based on auth mode
+	if (authMode === "session") {
 		openapiSchema["security"] = [
 			{
-				basicAuth: [],
+				cookieAuth: [],
 			},
 		];
 	}
 
 	const app = new Hono<{ Bindings: AppEnv; Variables: AppVariables }>();
+
+	// Inject config into context
 	app.use("*", async (c, next) => {
 		c.set("config", config);
 		await next();
@@ -70,55 +96,55 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 		generateOperationIds: false,
 	});
 
+	// Register security scheme for session auth
+	if (authMode === "session") {
+		openapi.registry.registerComponent("securitySchemes", "cookieAuth", {
+			type: "apiKey",
+			in: "cookie",
+			name: "r2_explorer_session",
+		});
+	}
+
+	// CORS middleware (optional)
 	if (config.cors === true) {
 		app.use("/api/*", cors());
 	}
 
+	// ReadOnly middleware
 	if (config.readonly === true) {
 		app.use("/api/*", readOnlyMiddleware);
 	}
 
-	if (config.cfAccessTeamName) {
-		app.use("/api/*", cloudflareAccess(config.cfAccessTeamName));
-		app.use("/api/*", async (c, next) => {
-			c.set("authentication_type", "cloudflare-access");
-			c.set("authentication_username", c.get("accessPayload").email);
-			await next();
-		});
+	// Auth initialization middleware
+	app.use("/api/*", initAuthMiddleware);
+
+	// Session auth middleware (extracts session from cookie)
+	if (authMode === "session") {
+		app.use("/api/*", sessionAuthMiddleware);
 	}
 
-	if (config.basicAuth) {
-		openapi.registry.registerComponent("securitySchemes", "basicAuth", {
-			type: "http",
-			scheme: "basic",
-		});
-		app.use(
-			"/api/*",
-			basicAuth({
-				invalidUserMessage: "Authentication error: Basic Auth required",
-				verifyUser: (username, password, c: AppContext) => {
-					const users = (
-						Array.isArray(c.get("config").basicAuth)
-							? c.get("config").basicAuth
-							: [c.get("config").basicAuth]
-					) as BasicAuthType[];
+	// Public auth endpoints (no auth required)
+	openapi.post("/api/v1/auth/register", Register);
+	openapi.post("/api/v1/auth/login", Login);
+	openapi.post("/api/v1/auth/logout", Logout);
+	openapi.get("/api/v1/auth/me", GetMe);
+	openapi.post("/api/v1/auth/forgot-password", ForgotPassword);
+	openapi.post("/api/v1/auth/reset-password", ResetPassword);
 
-					for (const user of users) {
-						if (user.username === username && user.password === password) {
-							c.set("authentication_type", "basic-auth");
-							c.set("authentication_username", username);
-							return true;
-						}
-					}
+	// Public settings endpoint
+	openapi.get("/api/v1/settings", GetSettings);
 
-					return false;
-				},
-			}),
-		);
+	// Protected API routes - require authentication
+	if (authMode !== "disabled") {
+		app.use("/api/server/*", requireAuth);
+		app.use("/api/buckets/*", requireAuth);
+		app.use("/api/emails/*", requireAuth);
 	}
 
+	// Server info endpoint
 	openapi.get("/api/server/config", GetInfo);
 
+	// Bucket endpoints
 	openapi.get("/api/buckets/:bucket", ListObjects);
 	openapi.post("/api/buckets/:bucket/move", MoveObject);
 	openapi.post("/api/buckets/:bucket/folder", CreateFolder);
@@ -128,22 +154,37 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	openapi.post("/api/buckets/:bucket/multipart/complete", CompleteUpload);
 	openapi.post("/api/buckets/:bucket/delete", DeleteObject);
 	openapi.on("head", "/api/buckets/:bucket/:key", HeadObject);
-	openapi.get("/api/buckets/:bucket/:key/head", HeadObject); // There are some issues with calling the head method
+	openapi.get("/api/buckets/:bucket/:key/head", HeadObject);
 
 	// Share link routes
 	openapi.post("/api/buckets/:bucket/:key/share", CreateShareLink);
 	openapi.get("/api/buckets/:bucket/shares", ListShares);
 	openapi.delete("/api/buckets/:bucket/share/:shareId", DeleteShareLink);
 
-	// These object routes should be defined last
+	// Object routes (should be defined last among bucket routes)
 	openapi.get("/api/buckets/:bucket/:key", GetObject);
 	openapi.post("/api/buckets/:bucket/:key", PutMetadata);
 
+	// Email endpoint
 	openapi.post("/api/emails/send", SendEmail);
+
+	// Admin endpoints - require admin privileges
+	if (authMode === "session") {
+		app.use("/api/v1/admin/*", requireAdmin);
+		openapi.get("/api/v1/admin/users", AdminListUsers);
+		openapi.post("/api/v1/admin/users", AdminCreateUser);
+		openapi.put("/api/v1/admin/users/:userId", AdminUpdateUser);
+		openapi.delete("/api/v1/admin/users/:userId", AdminDeleteUser);
+		openapi.get("/api/v1/admin/users/:userId/access", ListUserAccess);
+		openapi.post("/api/v1/admin/access", GrantAccess);
+		openapi.delete("/api/v1/admin/access", RevokeAccess);
+		openapi.put("/api/v1/settings", UpdateSettings);
+	}
 
 	// Public share access (no authentication required)
 	openapi.get("/share/:shareId", GetShareLink);
 
+	// Dashboard routes
 	openapi.get("/", dashboardIndex);
 	openapi.get("*", dashboardRedirect);
 
@@ -152,7 +193,6 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	);
 
 	return {
-		// TODO: improve event type
 		async email(
 			event: { raw: unknown; rawSize: unknown },
 			env: AppEnv,

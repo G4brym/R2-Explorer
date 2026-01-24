@@ -15,6 +15,10 @@
 	"dependencies": {
 		"@quasar/cli": "^2.4.1",
 		"@quasar/extras": "^1.16.15",
+		"@tiptap/extension-placeholder": "^3.17.0",
+		"@tiptap/extension-typography": "^3.17.0",
+		"@tiptap/starter-kit": "^3.17.0",
+		"@tiptap/vue-3": "^3.17.0",
 		"axios": "^1.2.1",
 		"fflate": "^0.8.1",
 		"html-to-text": "^9.0.5",

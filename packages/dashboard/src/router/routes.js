@@ -13,6 +13,21 @@ const routes = [
 				name: "login",
 				component: () => import("pages/auth/LoginPage.vue"),
 			},
+			{
+				path: "register",
+				name: "register",
+				component: () => import("pages/auth/RegisterPage.vue"),
+			},
+			{
+				path: "forgot-password",
+				name: "forgot-password",
+				component: () => import("pages/auth/ForgotPasswordPage.vue"),
+			},
+			{
+				path: "reset-password",
+				name: "reset-password",
+				component: () => import("pages/auth/ResetPasswordPage.vue"),
+			},
 		],
 	},
 	{
@@ -54,6 +69,25 @@ const routes = [
 				path: "/:bucket/email/:folder/:file",
 				name: "email-file",
 				component: () => import("pages/email/EmailFilePage.vue"),
+			},
+
+			{
+				path: "/:bucket/notes",
+				name: "notes-home",
+				component: () => import("pages/notes/NotesListPage.vue"),
+			},
+			{
+				path: "/:bucket/notes/:note",
+				name: "notes-note",
+				component: () => import("pages/notes/NoteEditorPage.vue"),
+			},
+
+			// Admin routes
+			{
+				path: "/admin/settings",
+				name: "admin-settings",
+				component: () => import("pages/admin/SettingsPage.vue"),
+				meta: { requiresAdmin: true },
 			},
 
 			// backwards compatibility

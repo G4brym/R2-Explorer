@@ -2,13 +2,19 @@
   <q-page class='flex flex-center'>
     <q-card class='q-pa-md shadow-2' bordered style="min-width: 350px;">
       <q-card-section class='text-center'>
-        <div class='text-grey-9 text-h5 text-weight-bold'>Sign in</div>
-        <div class='text-grey-8'>Enter your email and password to access the dashboard.</div>
+        <div class='text-grey-9 text-h5 text-weight-bold'>Create Account</div>
+        <div class='text-grey-8'>Enter your details to create a new account.</div>
       </q-card-section>
 
       <q-card-section v-if='showError'>
         <q-banner inline-actions class="text-white bg-red">
           {{ showError }}
+        </q-banner>
+      </q-card-section>
+
+      <q-card-section v-if='showSuccess'>
+        <q-banner inline-actions class="text-white bg-green">
+          {{ showSuccess }}
         </q-banner>
       </q-card-section>
 
@@ -23,7 +29,10 @@
             label="Email"
             lazy-rules
             type='email'
-            :rules="[val => val && val.length > 0 || 'Email is required']"
+            :rules="[
+              val => val && val.length > 0 || 'Email is required',
+              val => /.+@.+\..+/.test(val) || 'Please enter a valid email'
+            ]"
           />
 
           <q-input
@@ -32,25 +41,35 @@
             label="Password"
             lazy-rules
             type='password'
-            :rules="[val => val && val.length > 0 || 'Password is required']"
+            :rules="[
+              val => val && val.length > 0 || 'Password is required',
+              val => val.length >= 8 || 'Password must be at least 8 characters'
+            ]"
           />
 
-          <q-toggle v-model="form.remember" label="Remember me" />
+          <q-input
+            filled
+            v-model="form.confirmPassword"
+            label="Confirm Password"
+            lazy-rules
+            type='password'
+            :rules="[
+              val => val && val.length > 0 || 'Please confirm your password',
+              val => val === form.password || 'Passwords do not match'
+            ]"
+          />
 
           <div>
-            <q-btn :loading="loading" label="Sign in" type="submit" color="primary" class="full-width"/>
+            <q-btn :loading="loading" label="Create Account" type="submit" color="primary" class="full-width"/>
           </div>
         </q-form>
       </q-card-section>
 
-      <q-card-section class="text-center q-pt-none" v-if="authStore.canRegister || authStore.canResetPassword">
+      <q-card-section class="text-center q-pt-none">
         <div class="text-grey-8">
-          <router-link v-if="authStore.canResetPassword" :to="{ name: 'forgot-password' }" class="text-primary">
-            Forgot password?
-          </router-link>
-          <span v-if="authStore.canRegister && authStore.canResetPassword"> | </span>
-          <router-link v-if="authStore.canRegister" :to="{ name: 'register' }" class="text-primary">
-            Create an account
+          Already have an account?
+          <router-link :to="{ name: 'login' }" class="text-primary">
+            Sign in
           </router-link>
         </div>
       </q-card-section>
@@ -64,7 +83,7 @@ import { useMainStore } from "stores/main-store";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-	name: "LoginPage",
+	name: "RegisterPage",
 	setup() {
 		const authStore = useAuthStore();
 		const mainStore = useMainStore();
@@ -74,10 +93,11 @@ export default defineComponent({
 		return {
 			loading: false,
 			showError: "",
+			showSuccess: "",
 			form: {
 				email: "",
 				password: "",
-				remember: true,
+				confirmPassword: "",
 			},
 		};
 	},
@@ -85,22 +105,30 @@ export default defineComponent({
 		// Initialize auth to get settings
 		await this.authStore.initialize();
 
-		// If already authenticated, redirect
+		// If registration is closed or already authenticated, redirect
+		if (!this.authStore.canRegister) {
+			await this.$router.replace({ name: "login" });
+			return;
+		}
+
 		if (this.authStore.isAuthenticated) {
 			await this.mainStore.loadServerConfigs(this.$router, this.$q);
 		}
 	},
 	methods: {
 		async onSubmit() {
+			if (this.form.password !== this.form.confirmPassword) {
+				this.showError = "Passwords do not match";
+				return;
+			}
+
 			this.loading = true;
 			this.showError = "";
+			this.showSuccess = "";
 
 			try {
-				await this.authStore.login(
-					this.form.email,
-					this.form.password,
-					this.form.remember,
-				);
+				await this.authStore.register(this.form.email, this.form.password);
+				this.showSuccess = "Account created successfully!";
 				await this.mainStore.loadServerConfigs(this.$router, this.$q);
 			} catch (error) {
 				this.showError = error.message;

@@ -43,64 +43,71 @@
         </q-menu>
       </q-btn>
 
-      <q-btn class="q-mb-sm" @click="gotoFiles" color="blue" icon="folder_copy" label="Files" stack />
-      <q-btn v-if="mainStore.config && mainStore.config.emailRouting !== false" class="q-mb-sm" @click="gotoEmail" color="blue" icon="email" label="Email" stack />
+      <q-btn
+        v-if="appSettings.appDriveEnabled"
+        class="q-mb-sm"
+        @click="gotoFiles"
+        color="blue"
+        icon="folder_copy"
+        label="Files"
+        stack
+      />
+      <q-btn
+        v-if="appSettings.appEmailEnabled && mainStore.config && mainStore.config.emailRouting !== false"
+        class="q-mb-sm"
+        @click="gotoEmail"
+        color="blue"
+        icon="email"
+        label="Email"
+        stack
+      />
+      <q-btn
+        v-if="appSettings.appNotesEnabled"
+        class="q-mb-sm"
+        @click="gotoNotes"
+        color="blue"
+        icon="sticky_note_2"
+        label="Notes"
+        stack
+      />
 
-      <q-btn class="q-mb-sm q-mt-auto q-mb-0" @click="infoPopup=true" color="secondary" icon="question_mark"
-             label="Info"
-             stack />
+      <!-- Settings button - only visible to admins -->
+      <q-btn
+        v-if="authStore.isAdmin"
+        class="q-mb-sm q-mt-auto q-mb-0"
+        @click="$refs.settingsModal.open()"
+        color="secondary"
+        icon="settings"
+        label="Settings"
+        stack
+      />
     </div>
   </div>
 
-  <q-dialog v-model="infoPopup" persistent no-route-dismiss>
-    <q-card>
-      <q-card-section>
-        <div class="text-h6">🎉 Thank you for using R2-Explorer! 🚀</div>
-      </q-card-section>
-
-      <q-card-section class="q-pt-none">
-        You are running version <b>{{ mainStore.version }}</b><br>
-        <template v-if="updateAvailable">
-          Latest version is <b>{{latestVersion}}</b>, learn how to <a href="https://r2explorer.com/getting-started/updating-your-project/" target="_blank">update your instance here</a>.<br>
-        </template>
-        <br>
-        <template v-if="mainStore.auth">
-          <b>Authentication</b><br>
-          Method: {{ mainStore.auth.type }}<br>
-          Username: {{ mainStore.auth.username }}
-        </template>
-        <template v-else>
-          Not authenticated
-        </template>
-        <br><br>
-        <b>Server Configuration</b><br>
-        {{ JSON.stringify(mainStore.config, null, 2) }}
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn flat label="OK" color="primary" v-close-popup />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
-
+  <settings-modal ref="settingsModal" />
   <create-folder ref="createFolder" />
   <create-file ref="createFile" />
 </template>
 
 <script>
+import { api } from "boot/axios";
 import CreateFile from "components/files/CreateFile.vue";
 import CreateFolder from "components/files/CreateFolder.vue";
+import SettingsModal from "components/settings/SettingsModal.vue";
+import { useAuthStore } from "stores/auth-store";
 import { useMainStore } from "stores/main-store";
 import { defineComponent } from "vue";
 
 export default defineComponent({
 	name: "LeftSidebar",
 	data: () => ({
-		infoPopup: false,
-		updateAvailable: false,
-		latestVersion: "",
+		appSettings: {
+			appDriveEnabled: true,
+			appEmailEnabled: true,
+			appNotesEnabled: true,
+		},
 	}),
-	components: { CreateFolder, CreateFile },
+	components: { CreateFolder, CreateFile, SettingsModal },
 	methods: {
 		gotoEmail: function () {
 			if (this.selectedApp !== "email") this.changeApp("email");
@@ -108,29 +115,31 @@ export default defineComponent({
 		gotoFiles: function () {
 			if (this.selectedApp !== "files") this.changeApp("files");
 		},
+		gotoNotes: function () {
+			if (this.selectedApp !== "notes") this.changeApp("notes");
+		},
 		changeApp: function (app) {
 			this.$router.push({
 				name: `${app}-home`,
 				params: { bucket: this.selectedBucket },
 			});
 		},
-		isUpdateAvailable: (currentVersion, latestVersion) => {
-			// Split versions into parts and convert to numbers
-			const current = currentVersion.split(".").map(Number);
-			const latest = latestVersion.split(".").map(Number);
-
-			// Compare major version
-			if (latest[0] > current[0]) return true;
-			if (latest[0] < current[0]) return false;
-
-			// Compare minor version
-			if (latest[1] > current[1]) return true;
-			if (latest[1] < current[1]) return false;
-
-			// Compare patch version
-			if (latest[2] > current[2]) return true;
-
-			return false;
+		async loadAppSettings() {
+			// Load app settings from the auth store initialization
+			if (this.authStore.authMode === "session") {
+				try {
+					const response = await api.get("/v1/settings");
+					if (response.data.success) {
+						this.appSettings = {
+							appDriveEnabled: response.data.settings.appDriveEnabled,
+							appEmailEnabled: response.data.settings.appEmailEnabled,
+							appNotesEnabled: response.data.settings.appNotesEnabled,
+						};
+					}
+				} catch (error) {
+					console.error("Failed to load app settings:", error);
+				}
+			}
 		},
 	},
 	computed: {
@@ -142,28 +151,27 @@ export default defineComponent({
 		},
 	},
 	async mounted() {
-		const resp = await fetch(
-			"https://api.github.com/repos/G4brym/R2-Explorer/releases/latest",
-		);
-		if (!resp.ok) {
-			console.log("Unable to retrieve latest r2-explorer updates :(");
-			console.log(
-				"Manually check them here: https://github.com/G4brym/R2-Explorer/releases",
-			);
-		} else {
-			const parsed = await resp.json();
-			const latestVersion = parsed.tag_name.replace("v", "");
-			if (this.isUpdateAvailable(this.mainStore.version, latestVersion)) {
-				this.latestVersion = latestVersion;
-				this.updateAvailable = true;
-			}
-		}
+		await this.loadAppSettings();
+
+		// Listen for settings updates from the modal
+		this.$bus.on("settingsUpdated", (settings) => {
+			this.appSettings = {
+				appDriveEnabled: settings.appDriveEnabled,
+				appEmailEnabled: settings.appEmailEnabled,
+				appNotesEnabled: settings.appNotesEnabled,
+			};
+		});
+	},
+	beforeUnmount() {
+		this.$bus.off("settingsUpdated");
 	},
 	setup() {
 		const mainStore = useMainStore();
+		const authStore = useAuthStore();
 
 		return {
 			mainStore,
+			authStore,
 		};
 	},
 });

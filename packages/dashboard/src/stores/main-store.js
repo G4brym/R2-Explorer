@@ -1,5 +1,6 @@
 import { api } from "boot/axios";
 import { defineStore } from "pinia";
+import { useAuthStore } from "stores/auth-store";
 
 export const useMainStore = defineStore("main", {
 	state: () => ({
@@ -12,7 +13,16 @@ export const useMainStore = defineStore("main", {
 
 		// Frontend data
 		buckets: [],
+
+		// Admin settings (for admin users)
+		adminSettings: {
+			showHiddenFiles: false,
+			registerEnabled: null,
+			recoveryEmailFrom: null,
+			recoveryEmailEnabled: false,
+		},
 	}),
+
 	getters: {
 		serverUrl() {
 			if (process.env.NODE_ENV === "development") {
@@ -21,9 +31,10 @@ export const useMainStore = defineStore("main", {
 			return window.location.origin;
 		},
 	},
+
 	actions: {
-		async loadServerConfigs(router, q, handleError = false) {
-			// This is the initial requests to server, that also checks if user needs auth
+		async loadServerConfigs(router, q) {
+			const authStore = useAuthStore();
 
 			try {
 				const response = await api.get("/server/config", {
@@ -41,16 +52,29 @@ export const useMainStore = defineStore("main", {
 				if (url.searchParams.get("next")) {
 					await router.replace(url.searchParams.get("next"));
 				} else if (url.pathname === "/" || url.pathname === "/auth/login") {
-					await router.push({
-						name: "files-home",
-						params: { bucket: this.buckets[0].name },
-					});
+					if (this.buckets.length > 0) {
+						await router.push({
+							name: "files-home",
+							params: { bucket: this.buckets[0].name },
+						});
+					}
 				}
 
 				return true;
 			} catch (error) {
 				console.log(error);
-				if (error.response.status === 302) {
+
+				// Handle authentication errors
+				if (error.response?.status === 401) {
+					// Not authenticated - redirect to login
+					await router.push({
+						name: "login",
+						query: { next: router.currentRoute.value.fullPath },
+					});
+					return false;
+				}
+
+				if (error.response?.status === 302) {
 					// Handle cloudflare access login page
 					const nextUrl = error.response.headers.Location;
 					if (nextUrl) {
@@ -58,27 +82,69 @@ export const useMainStore = defineStore("main", {
 					}
 				}
 
-				if (handleError) {
-					const respText = await error.response.data;
-					if (respText === "Authentication error: Basic Auth required") {
-						await router.push({
-							name: "login",
-							query: { next: router.currentRoute.value.fullPath },
-						});
-						return;
-					}
-
+				if (q) {
 					q.notify({
 						type: "negative",
-						message: respText,
-						timeout: 10000, // we will timeout it in 10s
+						message: error.response?.data?.error || error.message,
+						timeout: 10000,
 					});
-				} else {
-					throw error;
 				}
+
+				return false;
+			}
+		},
+
+		/**
+		 * Load admin settings (admin only)
+		 */
+		async loadAdminSettings() {
+			const authStore = useAuthStore();
+
+			if (!authStore.isAdmin || authStore.authMode !== "session") {
+				return;
 			}
 
-			return false;
+			try {
+				const response = await api.get("/v1/settings");
+				if (response.data.success) {
+					this.adminSettings = {
+						showHiddenFiles: response.data.settings.showHiddenFiles,
+						registerEnabled: response.data.settings?.registerEnabled ?? null,
+						recoveryEmailFrom:
+							response.data.settings?.recoveryEmailFrom ?? null,
+						recoveryEmailEnabled:
+							response.data.settings?.recoveryEmailEnabled ?? false,
+					};
+				}
+			} catch (error) {
+				console.error("Failed to load admin settings:", error);
+			}
+		},
+
+		/**
+		 * Update admin settings (admin only)
+		 */
+		async updateAdminSettings(settings) {
+			const authStore = useAuthStore();
+
+			if (!authStore.isAdmin || authStore.authMode !== "session") {
+				throw new Error("Admin privileges required");
+			}
+
+			try {
+				const response = await api.put("/v1/settings", settings);
+				if (response.data.success) {
+					this.adminSettings = response.data.settings;
+					// Also update showHiddenFiles in main config
+					if (settings.showHiddenFiles !== undefined) {
+						this.showHiddenFiles = settings.showHiddenFiles;
+					}
+					return true;
+				}
+				throw new Error(response.data.error || "Failed to update settings");
+			} catch (error) {
+				throw new Error(error.response?.data?.error || error.message);
+			}
 		},
 	},
 });

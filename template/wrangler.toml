@@ -8,3 +8,11 @@ assets = { directory = "node_modules/r2-explorer/dashboard", binding = "ASSETS",
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "bucket"
+
+# D1 Database for session auth (required when auth = 'session')
+# To create the database, run: wrangler d1 create r2-explorer-db
+# Then update the database_id below with the ID from the output
+[[d1_databases]]
+binding = "R2_EXPLORER_DB"
+database_name = "r2-explorer-db"
+database_id = "your-database-id"
