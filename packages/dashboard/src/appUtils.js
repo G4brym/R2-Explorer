@@ -290,7 +290,7 @@ export const apiHandler = {
 			const folders = response.data.delimitedPrefixes
 				.map((obj) => ({
 					name: obj.replace(prefix, ""),
-					hash: encode(obj.key),
+					hash: encode(obj),
 					key: obj,
 					lastModified: "--",
 					timestamp: 0,
@@ -360,7 +360,7 @@ export const apiHandler = {
 				const folders = response.data.delimitedPrefixes
 					.map((obj) => ({
 						name: obj.replace(prefix, ""),
-						hash: encode(obj.key),
+						hash: encode(obj),
 						key: obj,
 						lastModified: "--",
 						timestamp: 0,
