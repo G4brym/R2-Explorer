@@ -7,6 +7,7 @@ const R2EXPLORER_BUCKETS = process.env.R2EXPLORER_BUCKETS;
 const R2EXPLORER_CONFIG = process.env.R2EXPLORER_CONFIG;
 const R2EXPLORER_DOMAIN = process.env.R2EXPLORER_DOMAIN;
 const CF_API_TOKEN = process.env.CF_API_TOKEN;
+const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID;
 
 let baseDir = __dirname;
 if (WORKERS_CI === "1") {
@@ -15,6 +16,10 @@ if (WORKERS_CI === "1") {
 } else {
 	if (!CF_API_TOKEN) {
 		console.error("CF_API_TOKEN variable is required to continue!");
+		process.exit(1);
+	}
+	if (!CF_ACCOUNT_ID) {
+		console.error("CF_ACCOUNT_ID variable is required to continue!");
 		process.exit(1);
 	}
 }
@@ -40,6 +45,16 @@ compatibility_date = "2024-11-06"
 main = "src/index.ts"
 assets = { directory = "node_modules/r2-explorer/dashboard", binding = "ASSETS", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
 `;
+
+if (CF_ACCOUNT_ID) {
+	wranglerConfig = `
+name = "${R2EXPLORER_WORKER_NAME}"
+account_id = "${CF_ACCOUNT_ID}"
+compatibility_date = "2024-11-06"
+main = "src/index.ts"
+assets = { directory = "node_modules/r2-explorer/dashboard", binding = "ASSETS", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
+`;
+}
 
 if (R2EXPLORER_DOMAIN) {
 	wranglerConfig += `
