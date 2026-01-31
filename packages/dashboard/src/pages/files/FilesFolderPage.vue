@@ -5,6 +5,21 @@
         <q-breadcrumbs class="col">
           <q-breadcrumbs-el style="cursor: pointer" v-for="obj in breadcrumbs" :key="obj.name" :label="obj.name" @click="breadcrumbsClick(obj)" />
         </q-breadcrumbs>
+        <q-input
+          dense
+          outlined
+          v-model="searchQuery"
+          placeholder="Search by prefix..."
+          clearable
+          class="q-mr-sm"
+          style="width: 200px"
+          @keyup.enter="handleSearch"
+          @clear="clearSearch"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" class="cursor-pointer" @click="handleSearch" />
+          </template>
+        </q-input>
         <q-btn
           flat
           dense
@@ -126,6 +141,7 @@ export default defineComponent({
 		rows: [],
 		cursor: null,
 		hasMore: true,
+		searchQuery: "",
 		columns: [
 			{
 				name: "name",
@@ -193,6 +209,9 @@ export default defineComponent({
 			}
 			return "";
 		},
+		searchPrefix: function () {
+			return this.selectedFolder + this.searchQuery;
+		},
 		breadcrumbs: function () {
 			if (this.selectedFolder) {
 				return [
@@ -224,9 +243,11 @@ export default defineComponent({
 	},
 	watch: {
 		selectedBucket(newVal) {
+			this.searchQuery = "";
 			this.resetAndFetchFiles();
 		},
 		selectedFolder(newVal) {
+			this.searchQuery = "";
 			this.resetAndFetchFiles();
 		},
 	},
@@ -284,6 +305,13 @@ export default defineComponent({
 			this.hasMore = true;
 			await this.fetchFiles();
 		},
+		handleSearch: function () {
+			this.resetAndFetchFiles();
+		},
+		clearSearch: function () {
+			this.searchQuery = "";
+			this.resetAndFetchFiles();
+		},
 		fetchFiles: async function () {
 			if (this.loading || this.loadingMore || !this.hasMore) {
 				return;
@@ -293,9 +321,10 @@ export default defineComponent({
 
 			const result = await apiHandler.fetchFilePage(
 				this.selectedBucket,
-				this.selectedFolder,
+				this.searchPrefix,
 				"/",
 				this.cursor,
+				this.selectedFolder,
 			);
 
 			this.rows = result.files;
@@ -312,9 +341,10 @@ export default defineComponent({
 
 			const result = await apiHandler.fetchFilePage(
 				this.selectedBucket,
-				this.selectedFolder,
+				this.searchPrefix,
 				"/",
 				this.cursor,
+				this.selectedFolder,
 			);
 
 			this.rows = [...this.rows, ...result.files];
