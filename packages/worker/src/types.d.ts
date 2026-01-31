@@ -6,6 +6,10 @@ export type BasicAuthType = {
 	password: string;
 };
 
+export type BucketConfig = {
+	publicUrl?: string;
+};
+
 export type R2ExplorerConfig = {
 	readonly?: boolean;
 	cors?: boolean;
@@ -18,6 +22,7 @@ export type R2ExplorerConfig = {
 		| false;
 	showHiddenFiles?: boolean;
 	basicAuth?: BasicAuth | BasicAuth[];
+	buckets?: Record<string, BucketConfig>;
 };
 
 export type AppEnv = {

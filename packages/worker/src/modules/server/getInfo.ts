@@ -10,13 +10,16 @@ export class GetInfo extends OpenAPIRoute {
 	};
 
 	async handle(c: AppContext) {
-		const { basicAuth, ...config } = c.get("config");
+		const { basicAuth, buckets: bucketsConfig, ...config } = c.get("config");
 
 		const buckets = [];
 
 		for (const [key, value] of Object.entries(c.env)) {
 			if (value.constructor.name === "R2Bucket") {
-				buckets.push({ name: key });
+				buckets.push({
+					name: key,
+					publicUrl: bucketsConfig?.[key]?.publicUrl || null,
+				});
 			}
 		}
 
