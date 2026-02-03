@@ -254,7 +254,13 @@ export const apiHandler = {
 			},
 		);
 	},
-	fetchFilePage: async (bucket, prefix, delimiter = "/", cursor = null, displayPrefix = null) => {
+	fetchFilePage: async (
+		bucket,
+		prefix,
+		delimiter = "/",
+		cursor = null,
+		displayPrefix = null,
+	) => {
 		const mainStore = useMainStore();
 		const contentFiles = [];
 		const contentFolders = [];

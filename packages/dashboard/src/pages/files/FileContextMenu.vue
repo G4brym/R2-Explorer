@@ -62,7 +62,7 @@ export default {
 		},
 		bucketPublicUrl: function () {
 			const bucket = this.mainStore.buckets.find(
-				(b) => b.name === this.selectedBucket
+				(b) => b.name === this.selectedBucket,
 			);
 			return bucket?.publicUrl || null;
 		},
