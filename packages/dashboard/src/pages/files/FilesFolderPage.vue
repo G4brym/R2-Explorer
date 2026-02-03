@@ -46,8 +46,19 @@
           </template>
 
           <template v-slot:no-data>
-            <div class="full-width q-my-lg" v-if="!loading">
-              <h6 class="flex items-center justify-center"><q-icon name="folder" color="orange" size="lg" />This folder is empty</h6>
+            <div class="files-empty-state" v-if="!loading">
+              <div class="empty-state-icon-wrapper">
+                <q-icon name="folder_open" size="80px" color="grey-4" />
+              </div>
+              <h3 class="text-h5 text-weight-medium q-mt-md q-mb-sm">This folder is empty</h3>
+              <p class="text-body2 text-grey-7 q-mb-lg">
+                Get started by uploading files or creating a new folder.<br/>
+                You can drag and drop files anywhere on this page.
+              </p>
+              <div class="empty-state-actions" v-if="!mainStore.apiReadonly">
+                <q-btn unelevated color="primary" icon="upload_file" label="Upload Files" @click="$refs.uploader.openFileDialog()" class="q-mr-sm" />
+                <q-btn outline color="primary" icon="create_new_folder" label="New Folder" @click="$refs.uploader.createFolder()" />
+              </div>
             </div>
           </template>
 
@@ -390,5 +401,32 @@ export default defineComponent({
   width: 100%;
   justify-content: center;
 
+}
+
+.files-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.empty-state-icon-wrapper {
+  width: 120px;
+  height: 120px;
+  background: #f9fafb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.empty-state-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 </style>

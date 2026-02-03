@@ -9,13 +9,13 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer :width="100" show-if-above v-model="leftDrawerOpen" side="left" bordered>
+    <q-drawer :width="240" show-if-above v-model="leftDrawerOpen" side="left" bordered>
       <left-sidebar/>
     </q-drawer>
 
-<!--    <q-drawer show-if-above v-model="rightDrawerOpen" side="right" bordered>-->
-<!--      <right-sidebar @updateDrawer="updateRightDrawer" />-->
-<!--    </q-drawer>-->
+    <q-drawer :width="350" show-if-above v-model="rightDrawerOpen" side="right" bordered>
+      <file-details-sidebar />
+    </q-drawer>
 
     <q-page-container>
       <router-view />
@@ -26,13 +26,13 @@
 
 <script>
 import LeftSidebar from "components/main/LeftSidebar.vue";
-import RightSidebar from "components/main/RightSidebar.vue";
+import FileDetailsSidebar from "components/files/FileDetailsSidebar.vue";
 import TopBar from "components/main/Topbar.vue";
 import { ref } from "vue";
 
 export default {
 	name: "MainLayout",
-	components: { TopBar, RightSidebar, LeftSidebar },
+	components: { TopBar, FileDetailsSidebar, LeftSidebar },
 	setup() {
 		const leftDrawerOpen = ref(false);
 		const rightDrawerOpen = ref(false);
@@ -50,7 +50,20 @@ export default {
 		};
 	},
 	mounted() {
-		this.updateRightDrawer(false);
+		// Listen for file details events
+		this.$bus.on('openFileDetails', () => {
+			this.rightDrawerOpen = true;
+		});
+
+		// Close right drawer when route changes to email or notes
+		this.$watch('$route', (to) => {
+			if (to.name && (to.name.startsWith('email') || to.name.startsWith('notes'))) {
+				this.rightDrawerOpen = false;
+			}
+		});
+	},
+	beforeUnmount() {
+		this.$bus.off('openFileDetails');
 	},
 };
 </script>

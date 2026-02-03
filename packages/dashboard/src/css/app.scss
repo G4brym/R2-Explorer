@@ -1,8 +1,102 @@
-// app global css in SCSS form
-.bg-green {
-  background-color: #4CAE4F;
+// Tailwind CSS v4 - only utilities, no preflight to avoid conflicts with Quasar
+@import "tailwindcss/utilities";
+
+// shadcn-like CSS variables
+:root {
+  --primary: 142 76% 36%;
+  --primary-foreground: 0 0% 100%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 142 76% 36%;
+  --radius: 0.5rem;
+  --muted-foreground: 240 3.8% 46.1%;
 }
 
+// Base typography (since we don't use preflight)
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 600;
+}
+
+h1 { font-size: 1.5rem; line-height: 2rem; }
+h2 { font-size: 1.25rem; line-height: 1.75rem; }
+h3 { font-size: 1.125rem; line-height: 1.5rem; }
+
+p {
+  margin: 0;
+}
+
+// Ensure consistent box-sizing
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+// Override Quasar components with cleaner styling
+.q-card {
+  border-radius: var(--radius);
+  border: 1px solid hsl(var(--border));
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.q-btn {
+  border-radius: calc(var(--radius) - 2px);
+  font-weight: 500;
+}
+
+.q-field--outlined .q-field__control {
+  border-radius: calc(var(--radius) - 2px);
+}
+
+.q-field--outlined .q-field__control:before {
+  border-color: hsl(var(--input));
+}
+
+.q-field--outlined.q-field--focused .q-field__control:before {
+  border-color: hsl(var(--ring)) !important;
+}
+
+.q-toggle__track {
+  opacity: 1 !important;
+}
+
+.q-dialog__inner > .q-card {
+  border-radius: var(--radius);
+}
+
+// Primary color override
+.bg-green, .q-btn.bg-green {
+  background-color: hsl(var(--primary)) !important;
+}
+
+.text-green, .text-primary {
+  color: hsl(var(--primary)) !important;
+}
+
+// Sidebar styling
+.q-drawer {
+  border-color: hsl(var(--border)) !important;
+}
+
+// Custom utility classes for our theme
+.btn-primary {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+// Link styles
+a.link-primary {
+  color: hsl(var(--primary));
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Responsive containers
 $xs-breakpoint: 718px;
 $sm-breakpoint: 1024px;
 $md-breakpoint: 1439px;
@@ -19,35 +113,25 @@ $lg-breakpoint: 1920px;
 }
 
 @media (min-width: $xs-breakpoint) {
-  .container,
-  .container-sm {
+  .container, .container-sm {
     max-width: 540px;
   }
 }
 
 @media (min-width: $sm-breakpoint) {
-  .container,
-  .container-sm,
-  .container-md {
+  .container, .container-sm, .container-md {
     max-width: 920px;
   }
 }
 
 @media (min-width: $md-breakpoint) {
-  .container,
-  .container-sm,
-  .container-md,
-  .container-lg {
+  .container, .container-sm, .container-md, .container-lg {
     max-width: 1140px;
   }
 }
 
 @media (min-width: $lg-breakpoint) {
-  .container,
-  .container-sm,
-  .container-md,
-  .container-lg,
-  .container-xl {
+  .container, .container-sm, .container-md, .container-lg, .container-xl {
     max-width: 1440px;
   }
 }

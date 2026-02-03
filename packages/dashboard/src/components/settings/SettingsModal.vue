@@ -1,178 +1,93 @@
 <template>
-  <q-dialog v-model="showModal" persistent no-route-dismiss>
-    <q-card style="width: 700px; max-width: 90vw; min-height: 450px;">
+  <q-dialog v-model="showModal">
+    <q-card style="width: 100%; max-width: 650px;">
+      <!-- Header -->
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6">Settings</div>
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
-      <q-separator />
+      <q-separator class="q-mt-md" />
 
-      <q-card-section class="q-pa-none" style="min-height: 380px;">
-        <div class="row" style="height: 100%;">
-          <!-- Side menu -->
-          <div class="col-3 bg-grey-2 q-pa-md" style="border-right: 1px solid #ddd;">
-            <q-list>
-              <q-item
-                clickable
-                v-ripple
-                :active="activeTab === 'info'"
-                active-class="bg-primary text-white"
-                @click="activeTab = 'info'"
-              >
-                <q-item-section avatar>
-                  <q-icon name="info" />
-                </q-item-section>
-                <q-item-section>Info</q-item-section>
-              </q-item>
+      <!-- Content -->
+      <div class="q-pa-md" style="min-height: 400px;">
+        <!-- Info Section -->
+        <div>
+          <div class="text-subtitle1 text-weight-medium q-mb-md">System Information</div>
 
-              <q-item
-                clickable
-                v-ripple
-                :active="activeTab === 'apps'"
-                active-class="bg-primary text-white"
-                @click="activeTab = 'apps'"
+          <!-- Version -->
+          <div class="row items-start q-py-md" style="border-bottom: 1px solid #f3f4f6;">
+            <div class="col">
+              <div class="text-body2 text-weight-medium">Version</div>
+              <div class="text-body2 text-grey-7">{{ mainStore.version }}</div>
+            </div>
+            <div v-if="updateAvailable" class="col-auto text-right">
+              <q-badge color="amber" text-color="black" label="Update available" />
+              <div class="text-caption text-grey-7 q-mt-xs">{{ latestVersion }}</div>
+              <a
+                href="https://r2explorer.com/getting-started/updating-your-project/"
+                target="_blank"
+                class="link-primary text-caption"
               >
-                <q-item-section avatar>
-                  <q-icon name="apps" />
-                </q-item-section>
-                <q-item-section>Apps</q-item-section>
-              </q-item>
-            </q-list>
+                Learn how to update
+              </a>
+            </div>
           </div>
 
-          <!-- Content area -->
-          <div class="col-9 q-pa-md">
-            <!-- Info Tab -->
-            <div v-if="activeTab === 'info'">
-              <div class="text-h6 q-mb-md">System Information</div>
-
-              <div class="q-mb-md">
-                <div class="text-weight-bold">Version</div>
-                <div class="text-grey-8">{{ mainStore.version }}</div>
-                <div v-if="updateAvailable" class="text-orange q-mt-xs">
-                  Update available: {{ latestVersion }}
-                  <a href="https://r2explorer.com/getting-started/updating-your-project/" target="_blank" class="text-primary">
-                    Learn how to update
-                  </a>
-                </div>
-              </div>
-
-              <q-separator class="q-my-md" />
-
-              <div class="q-mb-md">
-                <div class="text-weight-bold">Authentication</div>
-                <div class="text-grey-8">
-                  <template v-if="mainStore.auth">
-                    Mode: {{ authStore.authMode }}<br>
-                    Email: {{ mainStore.auth.username }}
-                  </template>
-                  <template v-else>
-                    <span v-if="authStore.authMode === 'disabled'">Authentication disabled</span>
-                    <span v-else>Not authenticated</span>
-                  </template>
-                </div>
-              </div>
-
-              <q-separator class="q-my-md" />
-
-              <div class="q-mb-md">
-                <div class="text-weight-bold">Configuration</div>
-                <div class="text-grey-8">
-                  <div>Read-only: {{ mainStore.apiReadonly ? 'Yes' : 'No' }}</div>
-                  <div>Show hidden files: {{ mainStore.showHiddenFiles ? 'Yes' : 'No' }}</div>
-                </div>
-              </div>
-
-              <q-separator class="q-my-md" />
-
-              <div class="text-center q-mt-lg">
-                <a href="https://r2explorer.com" target="_blank" class="text-primary">
-                  R2-Explorer Documentation
-                </a>
-                <span class="q-mx-sm">|</span>
-                <a href="https://github.com/G4brym/R2-Explorer" target="_blank" class="text-primary">
-                  GitHub
-                </a>
-              </div>
+          <!-- Authentication -->
+          <div class="q-py-md" style="border-bottom: 1px solid #f3f4f6;">
+            <div class="text-body2 text-weight-medium q-mb-xs">Authentication</div>
+            <div class="text-body2 text-grey-7">
+              <template v-if="mainStore.auth">
+                <div>Mode: <span class="text-grey-9" style="font-family: monospace;">{{ authStore.authMode }}</span></div>
+                <div>Email: <span class="text-grey-9" style="font-family: monospace;">{{ mainStore.auth.username }}</span></div>
+              </template>
+              <template v-else>
+                <span v-if="authStore.authMode === 'disabled'" style="color: #d97706;">Authentication disabled</span>
+                <span v-else>Not authenticated</span>
+              </template>
             </div>
+          </div>
 
-            <!-- Apps Tab -->
-            <div v-if="activeTab === 'apps'">
-              <div class="text-h6 q-mb-md">Applications</div>
-              <div class="text-grey-7 q-mb-lg">
-                Enable or disable individual applications. Changes take effect immediately.
+          <!-- Configuration -->
+          <div class="q-py-md" style="border-bottom: 1px solid #f3f4f6;">
+            <div class="text-body2 text-weight-medium q-mb-xs">Configuration</div>
+            <div class="text-body2 text-grey-7">
+              <div :style="{ color: mainStore.apiReadonly ? '#d97706' : '#16a34a' }">
+                {{ mainStore.apiReadonly ? 'Read-only mode' : 'Read-write mode' }}
               </div>
-
-              <div class="q-gutter-md">
-                <q-item tag="label" v-ripple>
-                  <q-item-section avatar>
-                    <q-icon name="folder_copy" color="blue" size="md" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Drive</q-item-label>
-                    <q-item-label caption>File storage and management</q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-toggle
-                      v-model="appSettings.appDriveEnabled"
-                      @update:model-value="saveAppSettings"
-                      :disable="saving"
-                    />
-                  </q-item-section>
-                </q-item>
-
-                <q-item tag="label" v-ripple>
-                  <q-item-section avatar>
-                    <q-icon name="email" color="blue" size="md" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Email</q-item-label>
-                    <q-item-label caption>Email inbox and management</q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-toggle
-                      v-model="appSettings.appEmailEnabled"
-                      @update:model-value="saveAppSettings"
-                      :disable="saving"
-                    />
-                  </q-item-section>
-                </q-item>
-
-                <q-item tag="label" v-ripple>
-                  <q-item-section avatar>
-                    <q-icon name="sticky_note_2" color="blue" size="md" />
-                  </q-item-section>
-                  <q-item-section>
-                    <q-item-label>Notes</q-item-label>
-                    <q-item-label caption>Markdown notes editor</q-item-label>
-                  </q-item-section>
-                  <q-item-section side>
-                    <q-toggle
-                      v-model="appSettings.appNotesEnabled"
-                      @update:model-value="saveAppSettings"
-                      :disable="saving"
-                    />
-                  </q-item-section>
-                </q-item>
-              </div>
-
-              <div v-if="saveError" class="q-mt-md">
-                <q-banner class="bg-negative text-white">
-                  {{ saveError }}
-                </q-banner>
-              </div>
+              <div>Hidden files: {{ mainStore.showHiddenFiles ? 'Visible' : 'Hidden' }}</div>
             </div>
+          </div>
+
+          <!-- Links -->
+          <div class="q-pt-lg row justify-center q-gutter-md text-body2">
+            <a
+              href="https://r2explorer.com"
+              target="_blank"
+              class="text-grey-7"
+              style="text-decoration: none;"
+            >
+              Documentation
+            </a>
+            <span class="text-grey-4">|</span>
+            <a
+              href="https://github.com/G4brym/R2-Explorer"
+              target="_blank"
+              class="text-grey-7"
+              style="text-decoration: none;"
+            >
+              GitHub
+            </a>
           </div>
         </div>
-      </q-card-section>
+      </div>
     </q-card>
   </q-dialog>
 </template>
 
 <script>
-import { api } from "boot/axios";
 import { useAuthStore } from "stores/auth-store";
 import { useMainStore } from "stores/main-store";
 import { defineComponent } from "vue";
@@ -181,16 +96,8 @@ export default defineComponent({
 	name: "SettingsModal",
 	data: () => ({
 		showModal: false,
-		activeTab: "info",
 		updateAvailable: false,
 		latestVersion: "",
-		appSettings: {
-			appDriveEnabled: true,
-			appEmailEnabled: true,
-			appNotesEnabled: true,
-		},
-		saving: false,
-		saveError: null,
 	}),
 	setup() {
 		const mainStore = useMainStore();
@@ -200,52 +107,10 @@ export default defineComponent({
 	methods: {
 		async open() {
 			this.showModal = true;
-			this.activeTab = "info";
-			await this.loadSettings();
 			await this.checkForUpdates();
 		},
 		close() {
 			this.showModal = false;
-		},
-		async loadSettings() {
-			try {
-				const response = await api.get("/v1/settings");
-				if (response.data.success) {
-					this.appSettings = {
-						appDriveEnabled: response.data.settings.appDriveEnabled,
-						appEmailEnabled: response.data.settings.appEmailEnabled,
-						appNotesEnabled: response.data.settings.appNotesEnabled,
-					};
-				}
-			} catch (error) {
-				console.error("Failed to load settings:", error);
-			}
-		},
-		async saveAppSettings() {
-			if (this.saving) return;
-
-			this.saving = true;
-			this.saveError = null;
-
-			try {
-				await api.put("/v1/settings", this.appSettings);
-				this.$q.notify({
-					type: "positive",
-					message: "Settings saved",
-					timeout: 2000,
-				});
-				// Emit event to notify sidebar of changes
-				this.$bus.emit("settingsUpdated", this.appSettings);
-			} catch (error) {
-				this.saveError = error.response?.data?.error || error.message;
-				this.$q.notify({
-					type: "negative",
-					message: this.saveError,
-					timeout: 5000,
-				});
-			} finally {
-				this.saving = false;
-			}
 		},
 		async checkForUpdates() {
 			try {

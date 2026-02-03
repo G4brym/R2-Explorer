@@ -1,18 +1,18 @@
 {
 	"name": "r2-explorer",
-	"version": "1.1.13",
+	"version": "2.0.0",
 	"description": "A Google Drive Interface for your Cloudflare R2 Buckets",
-	"main": "./dist/index.js",
-	"module": "./dist/index.mjs",
+	"main": "./dist/index.mjs",
 	"types": "./dist/index.d.ts",
-	"files": [
+  "type": "module",
+  "files": [
 		"dashboard",
 		"dist",
 		"LICENSE",
 		"README.md"
 	],
 	"scripts": {
-		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
+		"build": "tsup src/index.ts --format esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
 		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
 		"test": "tsc && npx vitest run --config tests/vitest.config.mts",
 		"package": "npm run build && npm pack",

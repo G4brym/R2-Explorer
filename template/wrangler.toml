@@ -3,16 +3,12 @@ compatibility_date = "2024-11-06"
 main = "src/index.ts"
 assets = { directory = "node_modules/r2-explorer/dashboard", binding = "ASSETS", html_handling = "auto-trailing-slash", not_found_handling = "single-page-application" }
 
+[[d1_databases]]
+binding = "R2_EXPLORER_DB"
+database_name = "r2-explorer-db"
+
 # Bind R2 Buckets to your application.
 # Docs: https://r2explorer.com/getting-started/add-r2-buckets/
 [[r2_buckets]]
 binding = "BUCKET"
-bucket_name = "bucket"
-
-# D1 Database for session auth (required when auth = 'session')
-# To create the database, run: wrangler d1 create r2-explorer-db
-# Then update the database_id below with the ID from the output
-[[d1_databases]]
-binding = "R2_EXPLORER_DB"
-database_name = "r2-explorer-db"
-database_id = "your-database-id"
+bucket_name = "r2-explorer-bucket"

@@ -427,12 +427,19 @@ export class DatabaseService {
 			return value === "true";
 		};
 
+		// Parse registerEnabled - undefined or "null" means smart mode (null)
+		const registerEnabledValue = settingsMap.get("registerEnabled");
+		let registerEnabled: boolean | null = null;
+		if (
+			registerEnabledValue !== undefined &&
+			registerEnabledValue !== "null"
+		) {
+			registerEnabled = registerEnabledValue === "true";
+		}
+
 		return {
 			showHiddenFiles: settingsMap.get("showHiddenFiles") === "true",
-			registerEnabled:
-				settingsMap.get("registerEnabled") === null
-					? null
-					: settingsMap.get("registerEnabled") === "true",
+			registerEnabled,
 			recoveryEmailFrom: settingsMap.get("recoveryEmailFrom") || null,
 			recoveryEmailEnabled: settingsMap.get("recoveryEmailEnabled") === "true",
 			// App toggles (default to true)

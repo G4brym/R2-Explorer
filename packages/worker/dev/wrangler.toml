@@ -9,3 +9,9 @@ binding = 'teste'
 bucket_name = 'teste'
 preview_bucket_name = 'teste'
 
+[[d1_databases]]
+binding = "R2_EXPLORER_DB"
+database_name = "r2-explorer-db"
+
+[vars]
+READONLY = false

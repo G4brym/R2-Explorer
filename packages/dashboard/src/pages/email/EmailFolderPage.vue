@@ -72,11 +72,17 @@
           </template>
 
           <template v-slot:no-data>
-            <div class="full-width q-my-lg" v-if="!loading">
-              <h6 class="flex items-center justify-center">
-                <q-icon name="alternate_email" color="orange" size="lg" />
-                This bucket doesn't have Emails
-              </h6>
+            <div class="email-empty-state" v-if="!loading">
+              <div class="empty-state-icon-wrapper">
+                <q-icon name="inbox" size="80px" color="grey-4" />
+              </div>
+              <h3 class="text-h5 text-weight-medium q-mt-md q-mb-sm">No emails yet</h3>
+              <p class="text-body2 text-grey-7 q-mb-md">
+                Configure Cloudflare Email Routing to start receiving emails in this bucket.<br/>
+                Once set up, all incoming emails will appear here automatically.
+              </p>
+              <q-btn outline color="primary" icon="help_outline" label="Setup Email Routing"
+                     href="https://r2explorer.com" target="_blank" type="a" />
             </div>
           </template>
 
@@ -87,9 +93,9 @@
             </q-td>
           </template>
         </q-table>
-        <template v-if="!hasMorePages">
+        <template v-if="!hasMorePages && rows.length > 0 && !loading">
           <div class="row justify-center q-my-md">
-            <span>No more emails to load</span>
+            <span class="text-grey-6">No more emails to load</span>
           </div>
         </template>
         <template v-slot:loading>
@@ -380,28 +386,28 @@ export default defineComponent({
   text-overflow: ellipsis;
 }
 
-.email-list table, .email-list tbody, .email-list thead {
+.email-list table,
+.email-list tbody,
+.email-list thead {
   width: 100%;
   display: block;
 }
 
-.email-list thead {
-  th {
-    border: 0;
+.email-list thead th {
+  border: 0;
+}
 
-     &:hover {
-       border: 0;
-     }
-  }
+.email-list thead th:hover {
+  border: 0;
 }
 
 .email-list td {
   vertical-align: middle !important;
+}
 
-  @media (max-width: 992px) {
-    &:not(.email-sender) {
-      display: none;
-    }
+@media (max-width: 992px) {
+  .email-list td:not(.email-sender) {
+    display: none;
   }
 }
 
@@ -409,12 +415,31 @@ export default defineComponent({
   display: flex;
   width: 100%;
   justify-content: center;
+}
 
-//width: 100%; //display: block;
+.email-list tbody tr:hover {
+  box-shadow: 0 2px 2px -2px gray;
+  z-index: 10;
+}
 
-  &:hover {
-    box-shadow: 0 2px 2px -2px gray;
-    z-index: 10
-  }
+.email-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 40px;
+  text-align: center;
+  width: 100%;
+}
+
+.email-empty-state .empty-state-icon-wrapper {
+  width: 120px;
+  height: 120px;
+  background: #f9fafb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px auto;
 }
 </style>

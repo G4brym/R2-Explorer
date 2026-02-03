@@ -18,5 +18,9 @@ export default defineComponent({
 			mainStore: useMainStore(),
 		};
 	},
+	async mounted() {
+		// Load server configs and redirect to files page
+		await this.mainStore.loadServerConfigs(this.$router, this.$q);
+	},
 });
 </script>

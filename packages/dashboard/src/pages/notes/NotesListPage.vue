@@ -1,93 +1,71 @@
 <template>
-  <q-page class="">
-    <div class="">
+  <q-page class="notes-page">
+    <div class="notes-page-container">
+      <!-- Header -->
+      <div class="notes-header">
+        <div>
+          <h1 class="text-h4 text-weight-bold q-mb-xs">Notes</h1>
+          <p class="text-body2 text-grey-7">Create and manage your markdown notes</p>
+        </div>
+        <div class="notes-header-actions">
+          <q-btn flat round dense icon="refresh" :loading="loading" @click="fetchNotes" class="q-mr-sm">
+            <q-tooltip>Refresh</q-tooltip>
+          </q-btn>
+          <q-btn v-if="!mainStore.apiReadonly" unelevated color="primary" icon="add" label="New Note" @click="$refs.createNote.open()" />
+        </div>
+      </div>
+
+      <!-- Notes List -->
       <q-infinite-scroll ref="infScroll" :disable="loadMoreAutomatically" @load="loadNextPage" :offset="250"
                          :debounce="100">
-        <q-table
-          ref="table"
-          :rows="rows"
-          :columns="columns"
-          row-key="key"
-          :loading="loading"
-          :hide-pagination="true"
-          :rows-per-page-options="[0]"
-          :flat="true"
-          table-class="notes-list"
-          @row-click="rowClick">
+        <!-- Loading State -->
+        <div v-if="loading && rows.length === 0" class="notes-loading">
+          <q-spinner color="primary" size="xl" />
+          <div class="q-mt-md text-grey-7">Loading notes...</div>
+        </div>
 
-          <template v-slot:loading>
-            <div class="full-width q-my-lg">
-              <h6 class="flex items-center justify-center">
-                <q-spinner
-                  color="primary"
-                  size="xl"
-                />
-              </h6>
+        <div v-else class="notes-grid">
+
+          <!-- Note Cards -->
+          <div v-for="note in rows" :key="note.key"
+               class="note-card"
+               @click="rowClick($event, note)">
+            <div class="note-card-header">
+              <q-icon name="sticky_note_2" color="primary" size="20px" />
+              <span class="note-card-date">{{ note.lastModified }}</span>
             </div>
-          </template>
-
-          <template v-slot:header>
-            <tr class="q-mb-md">
-              <th class="text-left">
-                <q-btn color="green" icon="refresh" :loading="loading" @click="fetchNotes" class="q-mr-sm">
-                  <template v-slot:loading>
-                    <q-spinner
-                      color="white"
-                    />
-                  </template>
-                </q-btn>
-                <q-btn v-if="!mainStore.apiReadonly" color="primary" icon="add" label="New Note" @click="$refs.createNote.open()" />
-              </th>
-            </tr>
-          </template>
-
-          <template v-slot:body-cell-title="prop">
-            <q-td :props="prop" class="note-title">
-              <div class="flex column">
-                <div class="flex">
-                  <div class="note-title-text">
-                    {{ prop.value || 'Untitled' }}
-                  </div>
-                  <div class="note-last-modified mobile-preview">
-                    {{ prop.row.lastModified }}
-                  </div>
-                </div>
-                <div class="note-preview mobile-preview">
-                  {{ prop.row.preview }}
-                </div>
-              </div>
-            </q-td>
-          </template>
-
-          <template v-slot:body-cell-preview="prop">
-            <q-td :props="prop" class="note-preview-cell">
-              {{ prop.value }}
-            </q-td>
-          </template>
-
-          <template v-slot:no-data>
-            <div class="full-width q-my-lg" v-if="!loading">
-              <h6 class="flex items-center justify-center">
-                <q-icon name="sticky_note_2" color="orange" size="lg" />
-                No notes yet
-              </h6>
-              <div class="flex items-center justify-center q-mt-md" v-if="!mainStore.apiReadonly">
-                <q-btn color="primary" icon="add" label="Create your first note" @click="$refs.createNote.open()" />
-              </div>
+            <h3 class="note-card-title">{{ note.title || 'Untitled' }}</h3>
+            <p class="note-card-preview">{{ note.preview || 'No content yet...' }}</p>
+            <div class="note-card-footer">
+              <q-icon name="description" size="16px" class="text-grey-5" />
+              <span class="text-caption text-grey-6">Markdown note</span>
             </div>
-          </template>
-        </q-table>
-        <template v-if="!hasMorePages && rows.length > 0">
-          <div class="row justify-center q-my-md">
-            <span>No more notes to load</span>
           </div>
-        </template>
+
+          <!-- Empty State -->
+          <div v-if="rows.length === 0 && !loading" class="notes-empty-state">
+            <div class="empty-state-icon">
+              <q-icon name="note_add" size="80px" color="grey-4" />
+            </div>
+            <h3 class="text-h5 text-weight-medium q-mt-md q-mb-sm">No notes yet</h3>
+            <p class="text-body2 text-grey-7 q-mb-lg">
+              Start capturing your thoughts and ideas with markdown notes.<br/>
+              Format text, add lists, embed code, and more.
+            </p>
+            <q-btn v-if="!mainStore.apiReadonly" unelevated color="primary" icon="add" label="Create your first note" @click="$refs.createNote.open()" />
+          </div>
+        </div>
         <template v-slot:loading>
-          <div class="row justify-center q-my-md">
+          <div class="notes-loading-more">
             <q-spinner-dots color="primary" size="40px" />
           </div>
         </template>
       </q-infinite-scroll>
+
+      <div v-if="!hasMorePages && rows.length > 0" class="notes-end-message">
+        <q-icon name="check_circle" size="20px" class="text-grey-5" />
+        <span class="text-grey-6 q-ml-sm">You've reached the end</span>
+      </div>
     </div>
 
     <create-note ref="createNote" @created="onNoteCreated" />
@@ -187,8 +165,12 @@ export default defineComponent({
 			this.hasMorePages = true;
 
 			await this.loadPage();
-			await this.$refs.infScroll.setIndex(0);
-			await this.$refs.infScroll.poll();
+
+			// Check if infScroll ref exists before calling methods
+			if (this.$refs.infScroll) {
+				await this.$refs.infScroll.setIndex(0);
+				await this.$refs.infScroll.poll();
+			}
 
 			this.loadMoreAutomatically = false;
 			this.loading = false;
@@ -250,91 +232,157 @@ export default defineComponent({
 });
 </script>
 
-<style>
-.notes-list table, .notes-list tbody, .notes-list thead {
-  width: 100%;
-  display: block;
+<style scoped>
+.notes-page {
+  background: #fafafa;
+  min-height: 100vh;
 }
 
-.notes-list thead {
-  th {
-    border: 0;
-
-    &:hover {
-      border: 0;
-    }
-  }
+.notes-page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
-.notes-list td {
-  vertical-align: middle !important;
-
-  @media (max-width: 992px) {
-    &:not(.note-title) {
-      display: none;
-    }
-  }
-}
-
-.notes-list tbody tr {
+.notes-header {
   display: flex;
-  width: 100%;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.notes-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notes-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-
-  &:hover {
-    box-shadow: 0 2px 2px -2px gray;
-    z-index: 10;
-    cursor: pointer;
-  }
+  min-height: 400px;
 }
 
-.note-title {
-  width: 250px;
-  overflow-x: hidden;
-  white-space: nowrap;
-  flex-shrink: 0;
-  text-overflow: ellipsis;
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
 
-  .mobile-preview {
-    display: none;
+.note-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.note-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #22c55e;
+  transform: translateY(-2px);
+}
+
+.note-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.note-card-date {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.note-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 8px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-card-preview {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 16px 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: 40px;
+}
+
+.note-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: 12px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.notes-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  text-align: center;
+  background: white;
+  border: 2px dashed #e5e7eb;
+  border-radius: 12px;
+  padding: 48px;
+}
+
+.empty-state-icon {
+  width: 120px;
+  height: 120px;
+  background: #f9fafb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.notes-loading-more {
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.notes-end-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+  .notes-page-container {
+    padding: 16px;
   }
 
-  @media (max-width: 992px) {
+  .notes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .notes-header-actions {
     width: 100%;
-    height: auto !important;
-
-    .mobile-preview {
-      display: block;
-    }
-
-    .note-title-text {
-      font-size: 18px;
-      font-weight: 500;
-    }
-
-    .note-last-modified {
-      margin-right: 0;
-      margin-left: auto;
-      align-self: end;
-    }
-
-    .note-preview {
-      font-size: 14px;
-      max-width: 100%;
-      color: #666;
-    }
+    justify-content: space-between;
   }
-}
-
-.note-title-text {
-  font-weight: 500;
-}
-
-.note-preview-cell {
-  overflow-x: hidden;
-  white-space: nowrap;
-  flex-grow: 1;
-  text-overflow: ellipsis;
-  color: #666;
 }
 </style>

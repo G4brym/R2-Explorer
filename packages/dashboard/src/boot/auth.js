@@ -5,10 +5,7 @@ import { useMainStore } from "stores/main-store";
 export default boot(async ({ app, router, store }) => {
 	// Check if theres any auth token stored, if there is, try to fetch or redirect
 	const authStore = useAuthStore(store);
-	const authResp = await authStore.CheckLoginInStorage(
-		router,
-		app.config.globalProperties.$q,
-	);
+	const authResp = await authStore.initialize();
 
 	if (authResp === false) {
 		// No auth token stored, try to fetch without auth or redirect
