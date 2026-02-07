@@ -45,7 +45,7 @@ export async function hashPassword(password: string): Promise<string> {
 	const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
 	const derivedKey = await deriveKey(password, salt);
 
-	const saltHex = arrayBufferToHex(salt);
+	const saltHex = arrayBufferToHex(salt.buffer);
 	const keyHex = arrayBufferToHex(derivedKey);
 
 	// Format: salt:hash

@@ -33,7 +33,7 @@ packages/worker/dist
 packages/worker/dashboard
 packages/worker/r2-explorer-*
 
-packages/worker/dev/.wrangler
+packages/dev/.wrangler
 
 packages/github-action/wrangler.toml
 packages/github-action/src

@@ -51,10 +51,7 @@ export const useMainStore = defineStore("main", {
 				const url = new URL(window.location.href);
 				if (url.searchParams.get("next")) {
 					await router.replace(url.searchParams.get("next"));
-				} else if (
-					url.pathname === "/" ||
-					url.pathname.startsWith("/auth/")
-				) {
+				} else if (url.pathname === "/" || url.pathname.startsWith("/auth/")) {
 					if (this.buckets.length > 0) {
 						await router.push({
 							name: "files-home",

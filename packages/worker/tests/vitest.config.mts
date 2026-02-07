@@ -9,7 +9,7 @@ export default defineWorkersConfig({
 		poolOptions: {
 			workers: {
         singleWorker: true,
-				wrangler: { configPath: "../dev/wrangler.toml" },
+				wrangler: { configPath: "../../dev/wrangler.toml" },
 				miniflare: {
 					compatibilityDate: "2024-11-06", // Or your project's compatibility date
 					compatibilityFlags: ["nodejs_compat"], // Add any necessary flags

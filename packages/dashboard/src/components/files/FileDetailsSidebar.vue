@@ -145,95 +145,99 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { apiHandler } from '../../appUtils';
+import { defineComponent } from "vue";
+import { apiHandler } from "../../appUtils";
 
 export default defineComponent({
-  name: 'FileDetailsSidebar',
-  data() {
-    return {
-      selectedFile: null,
-      downloading: false,
-    };
-  },
-  computed: {
-    hasHttpMetadata() {
-      if (!this.selectedFile?.httpMetadata) return false;
-      const meta = this.selectedFile.httpMetadata;
-      return meta.cacheControl || meta.contentDisposition ||
-             meta.contentEncoding || meta.contentLanguage;
-    }
-  },
-  methods: {
-    open(file) {
-      this.selectedFile = file;
-    },
-    formatBytes(bytes) {
-      if (bytes === 0) return '0 Bytes';
-      if (!bytes) return 'N/A';
+	name: "FileDetailsSidebar",
+	data() {
+		return {
+			selectedFile: null,
+			downloading: false,
+		};
+	},
+	computed: {
+		hasHttpMetadata() {
+			if (!this.selectedFile?.httpMetadata) return false;
+			const meta = this.selectedFile.httpMetadata;
+			return (
+				meta.cacheControl ||
+				meta.contentDisposition ||
+				meta.contentEncoding ||
+				meta.contentLanguage
+			);
+		},
+	},
+	methods: {
+		open(file) {
+			this.selectedFile = file;
+		},
+		formatBytes(bytes) {
+			if (bytes === 0) return "0 Bytes";
+			if (!bytes) return "N/A";
 
-      const k = 1024;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
+			const k = 1024;
+			const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+			const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-    },
-    formatRelativeTime(timestamp) {
-      if (!timestamp) return '';
+			return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+		},
+		formatRelativeTime(timestamp) {
+			if (!timestamp) return "";
 
-      const now = Date.now();
-      const diff = now - timestamp;
+			const now = Date.now();
+			const diff = now - timestamp;
 
-      const seconds = Math.floor(diff / 1000);
-      const minutes = Math.floor(seconds / 60);
-      const hours = Math.floor(minutes / 60);
-      const days = Math.floor(hours / 24);
-      const months = Math.floor(days / 30);
-      const years = Math.floor(months / 12);
+			const seconds = Math.floor(diff / 1000);
+			const minutes = Math.floor(seconds / 60);
+			const hours = Math.floor(minutes / 60);
+			const days = Math.floor(hours / 24);
+			const months = Math.floor(days / 30);
+			const years = Math.floor(months / 12);
 
-      if (years > 0) return `${years} year${years > 1 ? 's' : ''} ago`;
-      if (months > 0) return `${months} month${months > 1 ? 's' : ''} ago`;
-      if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
-      if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-      if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-      return 'Just now';
-    },
-    async downloadFile() {
-      if (!this.selectedFile || this.selectedFile.type === 'folder') return;
+			if (years > 0) return `${years} year${years > 1 ? "s" : ""} ago`;
+			if (months > 0) return `${months} month${months > 1 ? "s" : ""} ago`;
+			if (days > 0) return `${days} day${days > 1 ? "s" : ""} ago`;
+			if (hours > 0) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+			if (minutes > 0) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+			return "Just now";
+		},
+		async downloadFile() {
+			if (!this.selectedFile || this.selectedFile.type === "folder") return;
 
-      this.downloading = true;
-      try {
-        await apiHandler.downloadObjectFile(
-          this.$route.params.bucket,
-          this.selectedFile.key,
-          this.selectedFile.name
-        );
-        this.$q.notify({
-          type: 'positive',
-          message: 'Download started',
-        });
-      } catch (error) {
-        console.error('Error downloading file:', error);
-        this.$q.notify({
-          type: 'negative',
-          message: 'Failed to download file',
-        });
-      } finally {
-        this.downloading = false;
-      }
-    },
-    openFile() {
-      if (!this.selectedFile) return;
-      // Emit event that the FilesFolderPage is listening to
-      this.$emit('openObject', this.selectedFile);
-    }
-  },
-  mounted() {
-    this.$bus.on('openFileDetails', this.open);
-  },
-  beforeUnmount() {
-    this.$bus.off('openFileDetails', this.open);
-  }
+			this.downloading = true;
+			try {
+				await apiHandler.downloadObjectFile(
+					this.$route.params.bucket,
+					this.selectedFile.key,
+					this.selectedFile.name,
+				);
+				this.$q.notify({
+					type: "positive",
+					message: "Download started",
+				});
+			} catch (error) {
+				console.error("Error downloading file:", error);
+				this.$q.notify({
+					type: "negative",
+					message: "Failed to download file",
+				});
+			} finally {
+				this.downloading = false;
+			}
+		},
+		openFile() {
+			if (!this.selectedFile) return;
+			// Emit event that the FilesFolderPage is listening to
+			this.$emit("openObject", this.selectedFile);
+		},
+	},
+	mounted() {
+		this.$bus.on("openFileDetails", this.open);
+	},
+	beforeUnmount() {
+		this.$bus.off("openFileDetails", this.open);
+	},
 });
 </script>
 

@@ -168,7 +168,12 @@ export default defineComponent({
 		},
 		scheduleAutoSave: function () {
 			// Don't auto-save if readonly, loading, or already saving
-			if (this.mainStore.apiReadonly || this.loading || this.saving || this.isAutoSaving) {
+			if (
+				this.mainStore.apiReadonly ||
+				this.loading ||
+				this.saving ||
+				this.isAutoSaving
+			) {
 				return;
 			}
 

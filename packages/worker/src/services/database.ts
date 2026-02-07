@@ -430,10 +430,7 @@ export class DatabaseService {
 		// Parse registerEnabled - undefined or "null" means smart mode (null)
 		const registerEnabledValue = settingsMap.get("registerEnabled");
 		let registerEnabled: boolean | null = null;
-		if (
-			registerEnabledValue !== undefined &&
-			registerEnabledValue !== "null"
-		) {
+		if (registerEnabledValue !== undefined && registerEnabledValue !== "null") {
 			registerEnabled = registerEnabledValue === "true";
 		}
 

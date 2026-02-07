@@ -4,7 +4,9 @@ updates:
     directories:
       - "/pnpm-lock.yaml"
       - "/packages/worker"
-      - "/packages/worker/dev"
+      - "/packages/dashboard"
+      - "/packages/docs"
+      - "/packages/dev"
       - "/packages/github-action"
     schedule:
       interval: "weekly"

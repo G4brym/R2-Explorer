@@ -24,7 +24,7 @@
                   {{ mainStore.apiReadonly ? 'Enabled' : 'Disabled' }}
                 </q-chip>
                 <span class="text-caption text-grey-6 q-ml-sm">
-                  Edit <code>packages/worker/dev/index.ts</code> → <code>readonly</code> property
+                  Edit <code>packages/dev/index.ts</code> → <code>readonly</code> property
                 </span>
               </div>
             </div>

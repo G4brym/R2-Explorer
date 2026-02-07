@@ -39,8 +39,6 @@ export class ListObjects extends OpenAPIRoute {
 			});
 		}
 
-		c.header("Access-Control-Allow-Credentials", "asads");
-
 		return await bucket.list({
 			limit: data.query.limit,
 			prefix: data.query.prefix

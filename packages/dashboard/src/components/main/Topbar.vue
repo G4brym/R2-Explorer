@@ -88,8 +88,8 @@
 <script>
 import BucketPicker from "components/main/BucketPicker.vue";
 import SettingsModal from "components/settings/SettingsModal.vue";
-import { useMainStore } from "stores/main-store";
 import { useAuthStore } from "stores/auth-store";
+import { useMainStore } from "stores/main-store";
 import { defineComponent } from "vue";
 import { useRouter } from "vue-router";
 

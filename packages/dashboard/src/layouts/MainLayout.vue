@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import LeftSidebar from "components/main/LeftSidebar.vue";
 import FileDetailsSidebar from "components/files/FileDetailsSidebar.vue";
+import LeftSidebar from "components/main/LeftSidebar.vue";
 import TopBar from "components/main/Topbar.vue";
 import { ref } from "vue";
 
@@ -51,19 +51,22 @@ export default {
 	},
 	mounted() {
 		// Listen for file details events
-		this.$bus.on('openFileDetails', () => {
+		this.$bus.on("openFileDetails", () => {
 			this.rightDrawerOpen = true;
 		});
 
 		// Close right drawer when route changes to email or notes
-		this.$watch('$route', (to) => {
-			if (to.name && (to.name.startsWith('email') || to.name.startsWith('notes'))) {
+		this.$watch("$route", (to) => {
+			if (
+				to.name &&
+				(to.name.startsWith("email") || to.name.startsWith("notes"))
+			) {
 				this.rightDrawerOpen = false;
 			}
 		});
 	},
 	beforeUnmount() {
-		this.$bus.off('openFileDetails');
+		this.$bus.off("openFileDetails");
 	},
 };
 </script>

@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     paths-ignore:
-      - 'docs/**'
+      - 'packages/docs/**'
       - 'README.md'
       - 'LICENSE'
       - '.editorconfig'
@@ -11,7 +11,7 @@ on:
       - main
   pull_request:
     paths-ignore:
-      - 'docs/**'
+      - 'packages/docs/**'
       - 'README.md'
       - 'LICENSE'
       - '.editorconfig'

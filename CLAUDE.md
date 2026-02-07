@@ -55,7 +55,7 @@ The worker entry point (`packages/worker/src/index.ts`) creates a Hono app with 
 Config injection → CORS (optional) → ReadOnly mode → Authentication → API Routes
 ```
 
-Authentication supports Basic Auth or Cloudflare Access. ReadOnly mode (default: true) blocks write operations.
+Authentication supports session-based auth (default) or can be disabled. ReadOnly mode (default: true) blocks write operations.
 
 ### Key Patterns
 
@@ -93,10 +93,8 @@ Users configure R2Explorer in their worker entry point:
 import { R2Explorer } from "r2-explorer";
 export default R2Explorer({
   readonly: false,           // Default: true
-  basicAuth: { username: "admin", password: "secret" },
-  // Or: cfAccessTeamName: "my-team"
+  auth: "session",           // "session" (default) or "disabled"
   cors: true,
-  showHiddenFiles: false,
   emailRouting: { targetBucket: "my-bucket" },
 });
 ```
