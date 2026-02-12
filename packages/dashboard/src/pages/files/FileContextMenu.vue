@@ -25,6 +25,12 @@
         <q-item-label caption>Link to view in dashboard</q-item-label>
       </q-item-section>
     </q-item>
+    <q-item clickable v-close-popup @click="copyPublicUrl" v-if="prop.row.type === 'file' && bucketPublicUrl">
+      <q-item-section>
+        <q-item-label>Copy Public URL</q-item-label>
+        <q-item-label caption>Direct link via public domain</q-item-label>
+      </q-item-section>
+    </q-item>
     <q-separator />
     <q-item clickable v-close-popup @click="deleteObject">
       <q-item-section>Delete</q-item-section>
@@ -53,6 +59,12 @@ export default {
 				return decode(this.$route.params.folder);
 			}
 			return "";
+		},
+		bucketPublicUrl: function () {
+			const bucket = this.mainStore.buckets.find(
+				(b) => b.name === this.selectedBucket,
+			);
+			return bucket?.publicUrl || null;
 		},
 	},
 	methods: {
@@ -102,6 +114,25 @@ export default {
 				await navigator.clipboard.writeText(url);
 				this.q.notify({
 					message: "Link to file copied to clipboard!",
+					timeout: 5000,
+					type: "positive",
+				});
+			} catch (err) {
+				this.q.notify({
+					message: `Failed to copy: ${err}`,
+					timeout: 5000,
+					type: "negative",
+				});
+			}
+		},
+		copyPublicUrl: async function () {
+			const baseUrl = this.bucketPublicUrl.replace(/\/+$/, "");
+			const url = `${baseUrl}/${this.prop.row.key}`;
+
+			try {
+				await navigator.clipboard.writeText(url);
+				this.q.notify({
+					message: "Public URL copied to clipboard!",
 					timeout: 5000,
 					type: "positive",
 				});

@@ -254,10 +254,17 @@ export const apiHandler = {
 			},
 		);
 	},
-	fetchFilePage: async (bucket, prefix, delimiter = "/", cursor = null) => {
+	fetchFilePage: async (
+		bucket,
+		prefix,
+		delimiter = "/",
+		cursor = null,
+		displayPrefix = null,
+	) => {
 		const mainStore = useMainStore();
 		const contentFiles = [];
 		const contentFolders = [];
+		const namePrefix = displayPrefix !== null ? displayPrefix : prefix;
 
 		const response = await apiHandler.listObjects(
 			bucket,
@@ -273,7 +280,7 @@ export const apiHandler = {
 						!(obj.key.endsWith("/") && delimiter !== "") && obj.key !== prefix
 					); // Remove selected folder when delimiter is defined
 				})
-				.map((obj) => mapFile(obj, prefix))
+				.map((obj) => mapFile(obj, namePrefix))
 				.filter((obj) => {
 					// Remove hidden files
 					return !(

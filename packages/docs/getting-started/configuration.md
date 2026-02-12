@@ -11,12 +11,19 @@ Here is all the available options:
 | `cfAccessTeamName` | `string`  or `undefined`  | When set enforces Cloudflare Access in all requests                           | `radar`  (taken from https://radar.cloudflareaccess.com/) |
 | `emailRouting`     | `object`  or `undefined`  | Customize Email Explorer, read more [here](/guides/setup-email-explorer.html) | `https://demo.r2explorer.com`                             |
 | `cacheAssets`      | `boolean`  or `undefined` | Cache dashboard assets by 5 minutes, default: `true`                          | `true`                                                    |
+| `buckets`          | `object`  or `undefined`  | Configure bucket-specific settings like public URLs                           | `{ BUCKET: { publicUrl: "https://cdn.example.com" } }`    |
 
 `emailRouting` options:
 
 | Name           | Type(s)                  | Description                              | Examples                                               |
 |----------------|--------------------------|------------------------------------------|--------------------------------------------------------|
 | `targetBucket` | `string`  or `undefined` | Bucket name that will receive the emails | `my-emails` (assuming my-emails is a real bucket name) |
+
+`buckets` options (per bucket):
+
+| Name        | Type(s)                  | Description                              | Examples                  |
+|-------------|--------------------------|------------------------------------------|---------------------------|
+| `publicUrl` | `string` or `undefined`  | Public URL prefix for the bucket's files | `https://cdn.example.com` |
 
 ## Disabling readonly mode
 
@@ -70,3 +77,25 @@ After this, just deploy your application normally with:
 ```bash
 wrangler deploy
 ```
+
+## Configuring Bucket Public URLs
+
+If your R2 bucket is connected to a public domain (via Custom Domains or r2.dev), you can configure a public URL for it. This enables the "Copy Public URL" option in the file context menu, allowing you to quickly copy shareable links to your files.
+
+```ts
+import { R2Explorer } from 'r2-explorer';
+
+export default R2Explorer({
+  buckets: {
+    'my-bucket': {
+      publicUrl: 'https://cdn.example.com'
+    }
+  }
+});
+```
+
+When configured, right-clicking a file in the specified bucket will show a "Copy Public URL" option that copies a URL like `https://cdn.example.com/path/to/file.jpg` to your clipboard.
+
+:::tip
+The `publicUrl` should be the base URL without a trailing slash. The file path will be appended automatically.
+:::
