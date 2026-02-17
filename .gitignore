@@ -42,6 +42,7 @@ packages/dashboard/.env
 packages/dashboard/.quasar
 .dev.vars
 
+package-lock.json
 template/package-lock.json
 template/node_modules/
 
