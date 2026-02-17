@@ -1,6 +1,6 @@
 {
 	"name": "r2-explorer",
-	"version": "1.1.9",
+	"version": "1.1.14",
 	"description": "A Google Drive Interface for your Cloudflare R2 Buckets",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -14,7 +14,7 @@
 	"scripts": {
 		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE .",
 		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
-		"test": "npx vitest run --config tests/vitest.config.mts",
+		"test": "tsc && npx vitest run --config tests/vitest.config.mts",
 		"package": "npm run build && npm pack",
 		"publish-npm": "npm publish"
 	},
@@ -52,20 +52,20 @@
 		"url": "https://github.com/G4brym/R2-Explorer/issues"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.8.38",
-		"@cloudflare/workers-types": "^4.20241127.0",
-		"@types/node": "^22.10.1",
-		"@vitest/coverage-istanbul": "^3.2.3",
-		"hono": "^4.6.15",
-		"tsup": "^8.3.5",
-		"typescript": "^5.7.2",
-		"vitest": "^3.2.3",
-		"wrangler": "^3.91.0"
+		"@cloudflare/vitest-pool-workers": "^0.10.11",
+		"@cloudflare/workers-types": "^4.20251128.0",
+		"@types/node": "^24.10.1",
+		"@vitest/coverage-istanbul": "^3.2.4",
+		"hono": "^4.10.7",
+		"tsup": "^8.5.1",
+		"typescript": "^5.9.3",
+		"vitest": "^3.2.4",
+		"wrangler": "^4.51.0"
 	},
 	"dependencies": {
-		"@hono/cloudflare-access": "^0.2.0",
-		"chanfana": "^2.5.1",
-		"postal-mime": "^2.3.2",
-		"zod": "^3.24.1"
+		"@hono/cloudflare-access": "^0.3.1",
+		"chanfana": "^2.8.3",
+		"postal-mime": "^2.6.1",
+		"zod": "^3.25.76"
 	}
 }

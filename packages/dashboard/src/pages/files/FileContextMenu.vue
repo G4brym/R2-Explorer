@@ -12,9 +12,26 @@
     <q-item clickable v-close-popup @click="updateMetadataObject" v-if="prop.row.type === 'file'">
       <q-item-section>Update Metadata</q-item-section>
     </q-item>
-    <q-item clickable v-close-popup @click="shareObject">
-      <q-item-section>Get sharable link</q-item-section>
+    <q-separator />
+    <q-item clickable v-close-popup @click="createShareLink" v-if="prop.row.type === 'file'">
+      <q-item-section>
+        <q-item-label>Create Share Link</q-item-label>
+        <q-item-label caption>Public link with optional password</q-item-label>
+      </q-item-section>
     </q-item>
+    <q-item clickable v-close-popup @click="copyInternalLink">
+      <q-item-section>
+        <q-item-label>Copy Internal Link</q-item-label>
+        <q-item-label caption>Link to view in dashboard</q-item-label>
+      </q-item-section>
+    </q-item>
+    <q-item clickable v-close-popup @click="copyPublicUrl" v-if="prop.row.type === 'file' && bucketPublicUrl">
+      <q-item-section>
+        <q-item-label>Copy Public URL</q-item-label>
+        <q-item-label caption>Direct link via public domain</q-item-label>
+      </q-item-section>
+    </q-item>
+    <q-separator />
     <q-item clickable v-close-popup @click="deleteObject">
       <q-item-section>Delete</q-item-section>
     </q-item>
@@ -43,6 +60,12 @@ export default {
 			}
 			return "";
 		},
+		bucketPublicUrl: function () {
+			const bucket = this.mainStore.buckets.find(
+				(b) => b.name === this.selectedBucket,
+			);
+			return bucket?.publicUrl || null;
+		},
 	},
 	methods: {
 		renameObject: function () {
@@ -57,7 +80,10 @@ export default {
 		deleteObject: function () {
 			this.$emit("deleteObject", this.prop.row);
 		},
-		shareObject: async function () {
+		createShareLink: function () {
+			this.$emit("createShareLink", this.prop.row);
+		},
+		copyInternalLink: async function () {
 			let url;
 			if (this.prop.row.type === "folder") {
 				url =
@@ -88,6 +114,25 @@ export default {
 				await navigator.clipboard.writeText(url);
 				this.q.notify({
 					message: "Link to file copied to clipboard!",
+					timeout: 5000,
+					type: "positive",
+				});
+			} catch (err) {
+				this.q.notify({
+					message: `Failed to copy: ${err}`,
+					timeout: 5000,
+					type: "negative",
+				});
+			}
+		},
+		copyPublicUrl: async function () {
+			const baseUrl = this.bucketPublicUrl.replace(/\/+$/, "");
+			const url = `${baseUrl}/${this.prop.row.key}`;
+
+			try {
+				await navigator.clipboard.writeText(url);
+				this.q.notify({
+					message: "Public URL copied to clipboard!",
 					timeout: 5000,
 					type: "positive",
 				});

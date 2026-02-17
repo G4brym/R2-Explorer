@@ -1,9 +1,36 @@
 <template>
   <q-page class="">
-    <div class="q-pa-md">
-      <q-breadcrumbs>
-        <q-breadcrumbs-el style="cursor: pointer" v-for="obj in breadcrumbs" :key="obj.name" :label="obj.name" @click="breadcrumbsClick(obj)" />
-      </q-breadcrumbs>
+    <div class="q-pa-md" ref="pageContainer" @scroll="handleScroll" style="height: 100vh; overflow-y: auto;">
+      <div class="flex items-center q-mb-sm">
+        <q-breadcrumbs class="col">
+          <q-breadcrumbs-el style="cursor: pointer" v-for="obj in breadcrumbs" :key="obj.name" :label="obj.name" @click="breadcrumbsClick(obj)" />
+        </q-breadcrumbs>
+        <q-input
+          dense
+          outlined
+          v-model="searchQuery"
+          placeholder="Search by prefix..."
+          clearable
+          class="q-mr-sm"
+          style="width: 200px"
+          @keyup.enter="handleSearch"
+          @clear="clearSearch"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" class="cursor-pointer" @click="handleSearch" />
+          </template>
+        </q-input>
+        <q-btn
+          flat
+          dense
+          icon="link"
+          color="primary"
+          label="Manage Shares"
+          @click="$refs.shareFile.openManageShares()"
+        >
+          <q-tooltip>View and manage all share links</q-tooltip>
+        </q-btn>
+      </div>
 
       <drag-and-drop ref="uploader">
 
@@ -54,7 +81,7 @@
               touch-position
               context-menu
             >
-              <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject"  />
+              <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject" @createShareLink="$refs.shareFile.openCreateShare" />
             </q-menu>
           </template>
 
@@ -62,12 +89,21 @@
             <td class="text-right">
               <q-btn round flat icon="more_vert" size="sm">
                 <q-menu>
-                  <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject" />
+                  <FileContextMenu :prop="prop" @openObject="openObject" @deleteObject="$refs.options.deleteObject" @renameObject="$refs.options.renameObject" @updateMetadataObject="$refs.options.updateMetadataObject" @createShareLink="$refs.shareFile.openCreateShare" />
                 </q-menu>
               </q-btn>
             </td>
           </template>
         </q-table>
+
+        <div v-if="loadingMore" class="q-pa-md text-center">
+          <q-spinner color="primary" size="md" />
+          <div class="q-mt-sm text-grey">Loading more files...</div>
+        </div>
+
+        <div v-if="!hasMore && rows.length > 0 && !loading" class="q-pa-md text-center text-grey">
+          No more files to load
+        </div>
 
       </drag-and-drop>
 
@@ -76,10 +112,12 @@
 
   <file-preview ref="preview"/>
   <file-options ref="options" />
+  <share-file ref="shareFile" />
 </template>
 
 <script>
 import FileOptions from "components/files/FileOptions.vue";
+import ShareFile from "components/files/ShareFile.vue";
 import FilePreview from "components/preview/FilePreview.vue";
 import DragAndDrop from "components/utils/DragAndDrop.vue";
 import FileContextMenu from "pages/files/FileContextMenu.vue";
@@ -90,10 +128,20 @@ import { ROOT_FOLDER, apiHandler, decode, encode } from "../../appUtils";
 
 export default defineComponent({
 	name: "FilesIndexPage",
-	components: { FileContextMenu, FileOptions, DragAndDrop, FilePreview },
+	components: {
+		FileContextMenu,
+		FileOptions,
+		DragAndDrop,
+		FilePreview,
+		ShareFile,
+	},
 	data: () => ({
 		loading: false,
+		loadingMore: false,
 		rows: [],
+		cursor: null,
+		hasMore: true,
+		searchQuery: "",
 		columns: [
 			{
 				name: "name",
@@ -161,6 +209,9 @@ export default defineComponent({
 			}
 			return "";
 		},
+		searchPrefix: function () {
+			return this.selectedFolder + this.searchQuery;
+		},
 		breadcrumbs: function () {
 			if (this.selectedFolder) {
 				return [
@@ -192,10 +243,12 @@ export default defineComponent({
 	},
 	watch: {
 		selectedBucket(newVal) {
-			this.fetchFiles();
+			this.searchQuery = "";
+			this.resetAndFetchFiles();
 		},
 		selectedFolder(newVal) {
-			this.fetchFiles();
+			this.searchQuery = "";
+			this.resetAndFetchFiles();
 		},
 	},
 	methods: {
@@ -246,15 +299,73 @@ export default defineComponent({
 				this.$refs.preview.openFile(row);
 			}
 		},
+		resetAndFetchFiles: async function () {
+			this.rows = [];
+			this.cursor = null;
+			this.hasMore = true;
+			await this.fetchFiles();
+		},
+		handleSearch: function () {
+			this.resetAndFetchFiles();
+		},
+		clearSearch: function () {
+			this.searchQuery = "";
+			this.resetAndFetchFiles();
+		},
 		fetchFiles: async function () {
+			if (this.loading || this.loadingMore || !this.hasMore) {
+				return;
+			}
+
 			this.loading = true;
 
-			this.rows = await apiHandler.fetchFile(
+			const result = await apiHandler.fetchFilePage(
 				this.selectedBucket,
-				this.selectedFolder,
+				this.searchPrefix,
 				"/",
+				this.cursor,
+				this.selectedFolder,
 			);
+
+			this.rows = result.files;
+			this.cursor = result.cursor;
+			this.hasMore = result.truncated;
 			this.loading = false;
+		},
+		loadMoreFiles: async function () {
+			if (this.loadingMore || !this.hasMore || this.loading) {
+				return;
+			}
+
+			this.loadingMore = true;
+
+			const result = await apiHandler.fetchFilePage(
+				this.selectedBucket,
+				this.searchPrefix,
+				"/",
+				this.cursor,
+				this.selectedFolder,
+			);
+
+			this.rows = [...this.rows, ...result.files];
+			this.cursor = result.cursor;
+			this.hasMore = result.truncated;
+			this.loadingMore = false;
+		},
+		handleScroll: function (event) {
+			const container = this.$refs.pageContainer;
+			if (!container || this.loadingMore || !this.hasMore) {
+				return;
+			}
+
+			const scrollTop = container.scrollTop;
+			const scrollHeight = container.scrollHeight;
+			const clientHeight = container.clientHeight;
+
+			// Load more when user is within 200px of the bottom
+			if (scrollTop + clientHeight >= scrollHeight - 200) {
+				this.loadMoreFiles();
+			}
 		},
 		openPreviewFromKey: async function () {
 			let key = `${decode(this.$route.params.file)}`;
@@ -267,12 +378,12 @@ export default defineComponent({
 		},
 	},
 	created() {
-		this.fetchFiles();
+		this.resetAndFetchFiles();
 	},
 	mounted() {
 		this.$refs.table.sort("name");
 
-		this.$bus.on("fetchFiles", this.fetchFiles);
+		this.$bus.on("fetchFiles", this.resetAndFetchFiles);
 
 		if (this.$route.params.file) {
 			this.openPreviewFromKey();

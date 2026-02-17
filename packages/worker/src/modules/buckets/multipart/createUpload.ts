@@ -32,6 +32,17 @@ export class CreateUpload extends OpenAPIRoute {
 
 		const bucket = c.env[data.params.bucket];
 
+		if (
+			!bucket ||
+			typeof bucket !== "object" ||
+			!("createMultipartUpload" in bucket)
+		) {
+			return Response.json(
+				{ error: `Bucket binding not found: ${data.params.bucket}` },
+				{ status: 500 },
+			);
+		}
+
 		const key = decodeURIComponent(escape(atob(data.query.key)));
 
 		let customMetadata = undefined;

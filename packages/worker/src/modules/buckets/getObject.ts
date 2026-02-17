@@ -37,10 +37,14 @@ export class GetObject extends OpenAPIRoute {
 		let filePath;
 		try {
 			filePath = decodeURIComponent(escape(atob(data.params.key)));
-		} catch (e) {
-			filePath = decodeURIComponent(
-				escape(atob(decodeURIComponent(data.params.key))),
-			);
+		} catch {
+			try {
+				filePath = decodeURIComponent(
+					escape(atob(decodeURIComponent(data.params.key))),
+				);
+			} catch {
+				filePath = escape(atob(decodeURIComponent(data.params.key)));
+			}
 		}
 
 		const object = await bucket.get(filePath);
@@ -52,6 +56,7 @@ export class GetObject extends OpenAPIRoute {
 		const headers = new Headers();
 		object.writeHttpMetadata(headers);
 		headers.set("etag", object.httpEtag);
+		headers.set("content-length", object.size.toString());
 		headers.set(
 			"Content-Disposition",
 			`attachment; filename="${filePath.split("/").pop()}"`,

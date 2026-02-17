@@ -27,7 +27,9 @@ export async function receiveEmail(
 	let bucket;
 
 	if (
-		config?.emailRouting?.targetBucket &&
+		config?.emailRouting &&
+		typeof config.emailRouting === "object" &&
+		config.emailRouting.targetBucket &&
 		env[config.emailRouting.targetBucket]
 	) {
 		bucket = env[config.emailRouting.targetBucket];

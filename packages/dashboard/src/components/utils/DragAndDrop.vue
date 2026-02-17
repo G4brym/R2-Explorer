@@ -148,11 +148,6 @@ export default {
 			let uploadCount = 0;
 			let uploadSize = 0;
 			for (const [folder, files] of Object.entries(folders)) {
-				notif({
-					message: `Uploading files ${uploadCount + 1}/${filenames.length}...`,
-					caption: `${Number.parseInt(((uploadCount + 1) * 100) / filenames.length)}%`, // +1 because still needs to delete the folder
-				});
-
 				let targetFolder = this.selectedFolder + folder;
 				if (targetFolder.length > 0 && targetFolder.slice(-1) !== "/") {
 					targetFolder += "/";
@@ -164,6 +159,12 @@ export default {
 
 				for (const file of files) {
 					uploadCount += 1;
+
+					// Update notification with current file count
+					notif({
+						message: `Uploading files ${uploadCount}/${filenames.length}...`,
+					});
+
 					const key = targetFolder + file.name;
 
 					const chunkSize = 95 * 1024 * 1024;

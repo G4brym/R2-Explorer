@@ -20,7 +20,7 @@ Now switch to the variables tab and create the following variables:
 
 - `R2EXPLORER_WORKER_NAME` this is the worker named used to identify the worker in your Cloudflare account.
 - `R2EXPLORER_CONFIG` object with the R2-explorer configuration, [read more here](./configuration.md).
-- `R2EXPLORER_BUCKETS` buckets in the format `{r2-explorer name}:{bucket name}`, define one bucket per line.
+- `R2EXPLORER_BUCKETS` buckets in the format `{r2-explorer name}:{bucket name}[:{jurisdiction}]`, define one bucket per line. The jurisdiction parameter is optional and can be used to specify the R2 bucket jurisdiction (e.g., `eu` for European Union).
 - `R2EXPLORER_DOMAIN` **optional** domain name used to serve the R2-explorer instance, when not set, you will be given a workers.dev domain.
 
 
@@ -28,7 +28,7 @@ Example variables:
 
 - `R2EXPLORER_WORKER_NAME => my-r2-explorer`
 - `R2EXPLORER_CONFIG => { readonly: true }`
-- `R2EXPLORER_BUCKETS => example-1:r2-explorer-example-1`
+- `R2EXPLORER_BUCKETS => example-1:r2-explorer-example-1` or with jurisdiction `example-1:r2-explorer-example-1:eu`
 - `R2EXPLORER_DOMAIN => my-domain.com`
 
 
