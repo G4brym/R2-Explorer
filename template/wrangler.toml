@@ -8,3 +8,7 @@ assets = { directory = "node_modules/r2-explorer/dashboard", binding = "ASSETS",
 [[r2_buckets]]
 binding = "BUCKET"
 bucket_name = "bucket"
+
+[[r2_buckets]]
+binding = "AUDIO"
+bucket_name = "pathology-bites-audio"
