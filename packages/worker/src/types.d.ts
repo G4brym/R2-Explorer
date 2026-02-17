@@ -21,7 +21,7 @@ export type R2ExplorerConfig = {
 		  }
 		| false;
 	showHiddenFiles?: boolean;
-	basicAuth?: BasicAuth | BasicAuth[];
+	basicAuth?: BasicAuthType | BasicAuthType[];
 	buckets?: Record<string, BucketConfig>;
 };
 

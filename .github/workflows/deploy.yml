@@ -23,6 +23,7 @@ jobs:
           R2EXPLORER_CONFIG: ${{ vars.R2EXPLORER_CONFIG }}
           R2EXPLORER_BUCKETS: ${{ vars.R2EXPLORER_BUCKETS }}
           R2EXPLORER_DOMAIN: ${{ vars.R2EXPLORER_DOMAIN }}
+          R2EXPLORER_BASIC_AUTH: ${{ secrets.R2EXPLORER_BASIC_AUTH }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
         run: node packages/github-action/prepareDeploy.js
       - name: Get latest version

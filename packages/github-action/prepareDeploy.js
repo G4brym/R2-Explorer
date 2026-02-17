@@ -6,6 +6,7 @@ let R2EXPLORER_WORKER_NAME = process.env.R2EXPLORER_WORKER_NAME;
 const R2EXPLORER_BUCKETS = process.env.R2EXPLORER_BUCKETS;
 const R2EXPLORER_CONFIG = process.env.R2EXPLORER_CONFIG;
 const R2EXPLORER_DOMAIN = process.env.R2EXPLORER_DOMAIN;
+const R2EXPLORER_BASIC_AUTH = process.env.R2EXPLORER_BASIC_AUTH;
 const CF_API_TOKEN = process.env.CF_API_TOKEN;
 
 let baseDir = __dirname;
@@ -85,16 +86,32 @@ if (!fs.existsSync(`${baseDir}/src/`)) {
 	fs.mkdirSync(`${baseDir}/src/`);
 }
 
-console.log(`
+let workerSource;
+if (R2EXPLORER_BASIC_AUTH) {
+	// Validate that the basic auth secret is valid JSON
+	try {
+		JSON.parse(R2EXPLORER_BASIC_AUTH);
+	} catch (e) {
+		console.error("R2EXPLORER_BASIC_AUTH is not valid JSON!");
+		console.error('Expected format: [{"username":"user1","password":"pass1"}]');
+		process.exit(1);
+	}
+
+	workerSource = `
+import { R2Explorer } from "r2-explorer";
+
+const config = ${R2EXPLORER_CONFIG};
+config.basicAuth = ${R2EXPLORER_BASIC_AUTH};
+
+export default R2Explorer(config);
+`;
+} else {
+	workerSource = `
 import { R2Explorer } from "r2-explorer";
 
 export default R2Explorer(${R2EXPLORER_CONFIG});
-`);
-fs.writeFileSync(
-	`${baseDir}/src/index.ts`,
-	`
-import { R2Explorer } from "r2-explorer";
+`;
+}
 
-export default R2Explorer(${R2EXPLORER_CONFIG});
-`,
-);
+console.log(workerSource);
+fs.writeFileSync(`${baseDir}/src/index.ts`, workerSource);
