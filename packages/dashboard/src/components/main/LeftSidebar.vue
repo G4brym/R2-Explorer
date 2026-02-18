@@ -138,7 +138,7 @@ export default defineComponent({
 			return this.$route.params.bucket;
 		},
 		selectedApp: function () {
-			return this.$route.name.split("-")[0];
+			return this.$route.name?.split("-")[0] || "files";
 		},
 	},
 	async mounted() {
