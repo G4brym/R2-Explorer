@@ -39,6 +39,7 @@ export default defineConfig({
           items: [
             { text: 'Setup Email Explorer', link: '/guides/setup-email-explorer' },
             { text: 'Sharable Links', link: '/guides/sharable-links' },
+            { text: 'Troubleshooting', link: '/guides/troubleshooting' },
           ]
         }
       ],
