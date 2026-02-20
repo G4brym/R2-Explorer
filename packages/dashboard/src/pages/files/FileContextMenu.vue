@@ -39,7 +39,7 @@
 </template>
 <script>
 import { useQuasar } from "quasar";
-import { ROOT_FOLDER, decode, encode } from "src/appUtils";
+import { ROOT_FOLDER, apiHandler, decode, encode } from "src/appUtils";
 import { useMainStore } from "stores/main-store";
 
 export default {
@@ -144,15 +144,30 @@ export default {
 				});
 			}
 		},
-		downloadObject: function () {
-			const link = document.createElement("a");
-			link.download = this.prop.row.name;
+		downloadObject: async function () {
+			try {
+				const response = await apiHandler.downloadFile(
+					this.selectedBucket,
+					this.prop.row.key,
+					{ downloadType: "objectUrl" },
+				);
 
-			link.href = `${this.mainStore.serverUrl}/api/buckets/${this.selectedBucket}/${encode(this.prop.row.key)}`;
-
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
+				const blob = new Blob([response.data]);
+				const url = URL.createObjectURL(blob);
+				const link = document.createElement("a");
+				link.download = this.prop.row.name;
+				link.href = url;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				URL.revokeObjectURL(url);
+			} catch (err) {
+				this.q.notify({
+					message: `Download failed: ${err.message || err}`,
+					timeout: 5000,
+					type: "negative",
+				});
+			}
 		},
 	},
 	setup() {
