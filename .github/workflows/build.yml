@@ -44,3 +44,29 @@ jobs:
         with:
           name: r2-explorer-npm-package
           path: packages/worker/r2-explorer-*
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20.x'
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build dashboard
+        run: pnpm build-dashboard
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run E2E tests
+        run: pnpm test:e2e
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v6
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: packages/dashboard/test-results/
+          retention-days: 7

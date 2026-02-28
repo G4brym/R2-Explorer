@@ -15,7 +15,7 @@ test.describe("App loads", () => {
 	test("shows the file table when navigating to a bucket", async ({
 		page,
 	}) => {
-		await page.goto("/teste/files");
+		await page.goto("/my-bucket/files");
 
 		// The file listing table should render
 		await expect(page.locator(".q-table")).toBeVisible({ timeout: 10_000 });

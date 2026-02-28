@@ -19,9 +19,9 @@ export default defineConfig({
 		},
 	],
 	webServer: {
-		command:
-			"cd ../worker/dev && npx wrangler dev --port 8787",
+		command: "npx wrangler dev --port 8787 -c e2e/wrangler.toml",
 		url: "http://localhost:8787",
+		cwd: __dirname,
 		reuseExistingServer: !process.env.CI,
 		timeout: 30_000,
 	},
