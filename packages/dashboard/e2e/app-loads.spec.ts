@@ -6,7 +6,9 @@ test.describe("App loads", () => {
 		await page.goto("/");
 
 		// Header with app title should be visible
-		await expect(page.locator("text=R2-Explorer")).toBeVisible({
+		await expect(
+			page.locator(".q-toolbar").locator("text=R2-Explorer"),
+		).toBeVisible({
 			timeout: 10_000,
 		});
 

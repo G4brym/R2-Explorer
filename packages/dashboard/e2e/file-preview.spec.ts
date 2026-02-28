@@ -40,10 +40,8 @@ test.describe("File preview", () => {
 			timeout: 10_000,
 		});
 
-		// Double-click to open preview
 		await page.locator("text=e2e-preview.txt").dblclick();
 
-		// Preview dialog should open with file content
 		await expect(page.locator("text=Hello from E2E test!")).toBeVisible({
 			timeout: 10_000,
 		});
@@ -57,10 +55,25 @@ test.describe("File preview", () => {
 
 		await page.locator("text=e2e-preview.json").dblclick();
 
-		// JSON content should be displayed
 		await expect(page.locator("text=test")).toBeVisible({
 			timeout: 10_000,
 		});
+	});
+
+	test("previews a CSV file as a table", async ({ page }) => {
+		await page.goto(`/${BUCKET}/files`);
+		await expect(page.locator("text=e2e-preview.csv")).toBeVisible({
+			timeout: 10_000,
+		});
+
+		await page.locator("text=e2e-preview.csv").dblclick();
+
+		// CSV should render as an HTML table with headers and data
+		await expect(page.locator(".q-dialog th:has-text('name')")).toBeVisible({
+			timeout: 10_000,
+		});
+		await expect(page.locator(".q-dialog td:has-text('Alice')")).toBeVisible();
+		await expect(page.locator(".q-dialog td:has-text('Bob')")).toBeVisible();
 	});
 
 	test("previews a markdown file", async ({ page }) => {
@@ -76,6 +89,23 @@ test.describe("File preview", () => {
 		});
 	});
 
+	test("previews an HTML file", async ({ page }) => {
+		await page.goto(`/${BUCKET}/files`);
+		await expect(page.locator("text=e2e-preview.html")).toBeVisible({
+			timeout: 10_000,
+		});
+
+		await page.locator("text=e2e-preview.html").dblclick();
+
+		// HTML content is rendered via v-html in a <pre> tag
+		await expect(page.locator(".q-dialog").locator("text=Test HTML")).toBeVisible({
+			timeout: 10_000,
+		});
+		await expect(
+			page.locator(".q-dialog").locator("text=Hello world"),
+		).toBeVisible();
+	});
+
 	test("shows filename in preview header", async ({ page }) => {
 		await page.goto(`/${BUCKET}/files`);
 		await expect(page.locator("text=e2e-preview.txt")).toBeVisible({
@@ -84,11 +114,76 @@ test.describe("File preview", () => {
 
 		await page.locator("text=e2e-preview.txt").dblclick();
 
-		// Filename should appear in the preview header
 		await expect(
 			page.locator(".q-dialog").locator("text=e2e-preview.txt"),
 		).toBeVisible({
 			timeout: 10_000,
+		});
+	});
+});
+
+test.describe("File editing", () => {
+	test.beforeEach(async ({ request }) => {
+		await uploadFile(request, "e2e-editable.txt", "original content");
+	});
+
+	test.afterEach(async ({ request }) => {
+		await deleteObject(request, "e2e-editable.txt");
+	});
+
+	test("edits and saves a text file", async ({ page }) => {
+		await page.goto(`/${BUCKET}/files`);
+		await expect(page.locator("text=e2e-editable.txt")).toBeVisible({
+			timeout: 10_000,
+		});
+
+		await page.locator("text=e2e-editable.txt").dblclick();
+
+		// Wait for preview to load with original content
+		await expect(page.locator("text=original content")).toBeVisible({
+			timeout: 10_000,
+		});
+
+		// Click edit button (lowercase label "edit")
+		await page.locator(".q-dialog").getByRole("button", { name: "edit" }).click();
+
+		// Textarea should appear — fill with new content
+		const textarea = page.locator(".q-dialog textarea");
+		await expect(textarea).toBeVisible({ timeout: 5_000 });
+		await textarea.fill("updated content");
+
+		// Save
+		await page.locator(".q-dialog").getByRole("button", { name: "Save" }).click();
+
+		// After save, preview should reload with updated content
+		await expect(page.locator("text=updated content")).toBeVisible({
+			timeout: 10_000,
+		});
+	});
+
+	test("cancels edit without saving", async ({ page }) => {
+		await page.goto(`/${BUCKET}/files`);
+		await expect(page.locator("text=e2e-editable.txt")).toBeVisible({
+			timeout: 10_000,
+		});
+
+		await page.locator("text=e2e-editable.txt").dblclick();
+		await expect(page.locator("text=original content")).toBeVisible({
+			timeout: 10_000,
+		});
+
+		// Enter edit mode
+		await page.locator(".q-dialog").getByRole("button", { name: "edit" }).click();
+		const textarea = page.locator(".q-dialog textarea");
+		await expect(textarea).toBeVisible({ timeout: 5_000 });
+		await textarea.fill("should not be saved");
+
+		// Cancel edit
+		await page.locator(".q-dialog").getByRole("button", { name: "Cancel" }).click();
+
+		// Original content should still be displayed (not the unsaved edit)
+		await expect(page.locator("text=original content")).toBeVisible({
+			timeout: 5_000,
 		});
 	});
 });
