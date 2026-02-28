@@ -1,6 +1,10 @@
 {
   "name": "docs-new",
   "version": "1.0.0",
+  "files": [
+    "CHANGELOG.md",
+    "**/*.md"
+  ],
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
