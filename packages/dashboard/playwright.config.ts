@@ -26,7 +26,7 @@ export default defineConfig({
 			"npx wrangler dev --port 8787 -c packages/worker/dev/wrangler-e2e.toml",
 		url: "http://localhost:8787",
 		cwd: rootDir,
-		reuseExistingServer: !process.env.CI,
+		reuseExistingServer: false,
 		timeout: 30_000,
 	},
 });
