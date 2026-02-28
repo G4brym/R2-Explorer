@@ -7,7 +7,8 @@
 		"lint": "npx @biomejs/biome check packages/dashboard/src packages/worker/src || (npx @biomejs/biome check --write packages/dashboard/src packages/worker/src/; exit 1)",
 		"build-dashboard": "pnpm run --filter r2-explorer-dashboard build",
 		"build-worker": "pnpm run --filter r2-explorer build",
-		"test": "pnpm run --filter r2-explorer test",
+		"test": "pnpm run --filter r2-explorer test && pnpm run --filter r2-explorer-dashboard test",
+		"test:e2e": "pnpm build-dashboard && pnpm exec playwright test --config packages/dashboard/playwright.config.ts",
 		"build": "pnpm build-dashboard && pnpm build-worker",
 		"deploy-dashboard": "pnpm run --filter r2-explorer-dashboard deploy",
 		"deploy-dashboard-dev": "pnpm run --filter r2-explorer-dashboard deploy-dev",
@@ -20,6 +21,7 @@
 		"@biomejs/biome": "1.9.4",
 		"@changesets/changelog-github": "^0.5.2",
 		"@changesets/cli": "^2.29.8",
+		"@playwright/test": "^1.58.2",
 		"wrangler": "^4.20.1"
 	}
 }

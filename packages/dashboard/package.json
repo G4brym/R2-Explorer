@@ -6,7 +6,8 @@
 	"author": "Gabriel Massadas",
 	"private": true,
 	"scripts": {
-		"test": "echo \"No test specified\" && exit 0",
+		"test": "vitest run --config vitest.config.ts",
+		"test:watch": "vitest --config vitest.config.ts",
 		"dev": "quasar dev",
 		"build": "quasar build",
 		"deploy": "wrangler pages deploy --branch main --project-name r2-explorer-dashboard dist/spa/",
@@ -28,9 +29,13 @@
 	},
 	"devDependencies": {
 		"@quasar/app-vite": "^1.8.0",
+		"@vitejs/plugin-vue": "^5.2.4",
+		"@vue/test-utils": "^2.4.6",
 		"autoprefixer": "^10.4.2",
 		"dotenv": "^16.3.1",
-		"postcss": "^8.4.14"
+		"happy-dom": "^17.6.3",
+		"postcss": "^8.4.14",
+		"vitest": "^3.2.4"
 	},
 	"engines": {
 		"node": "^24 || ^22 || ^20 || ^18",
