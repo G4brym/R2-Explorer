@@ -14,7 +14,7 @@
 		"README.md"
 	],
 	"scripts": {
-		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE . && cp ../../CHANGELOG.md . && mkdir -p docs/getting-started docs/guides && cp ../docs/index.md docs/ && cp ../docs/getting-started/*.md docs/getting-started/ && cp ../docs/guides/*.md docs/guides/",
+		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE . && mkdir -p docs/getting-started docs/guides && cp ../docs/index.md docs/ && cp ../docs/getting-started/*.md docs/getting-started/ && cp ../docs/guides/*.md docs/guides/",
 		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
 		"test": "tsc && npx vitest run --config tests/vitest.config.mts",
 		"package": "npm run build && npm pack",
