@@ -1,4 +1,7 @@
 import { defineConfig } from "@playwright/test";
+import path from "node:path";
+
+const rootDir = path.resolve(__dirname, "../..");
 
 export default defineConfig({
 	testDir: "./e2e",
@@ -19,9 +22,10 @@ export default defineConfig({
 		},
 	],
 	webServer: {
-		command: "npx wrangler dev --port 8787 -c e2e/wrangler.toml",
+		command:
+			"npx wrangler dev --port 8787 -c packages/worker/dev/wrangler-e2e.toml",
 		url: "http://localhost:8787",
-		cwd: __dirname,
+		cwd: rootDir,
 		reuseExistingServer: !process.env.CI,
 		timeout: 30_000,
 	},

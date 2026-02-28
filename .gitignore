@@ -40,6 +40,7 @@ packages/github-action/src
 
 packages/dashboard/.env
 packages/dashboard/.quasar
+packages/dashboard/test-results
 .dev.vars
 
 template/package-lock.json

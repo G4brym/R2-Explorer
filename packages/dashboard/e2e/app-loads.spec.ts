@@ -8,8 +8,8 @@ test.describe("App loads", () => {
 		await expect(page.locator("text=R2-Explorer")).toBeVisible();
 
 		// Sidebar navigation buttons should be visible
-		await expect(page.locator("text=Files")).toBeVisible();
-		await expect(page.locator("text=Info")).toBeVisible();
+		await expect(page.getByRole("button", { name: "Files" })).toBeVisible();
+		await expect(page.getByRole("button", { name: "Info" })).toBeVisible();
 	});
 
 	test("shows the file table when navigating to a bucket", async ({
