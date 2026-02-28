@@ -13,10 +13,13 @@
 		"deploy-dashboard-dev": "pnpm run --filter r2-explorer-dashboard deploy-dev",
 		"deploy-dev-worker": "pnpm run --filter r2-explorer-dev-worker deploy",
 		"package": "pnpm run --filter r2-explorer package",
-		"publish-npm": "pnpm run --filter r2-explorer publish-npm"
+		"changeset": "changeset",
+		"release": "pnpm build && pnpm --filter r2-explorer publint && changeset publish"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
+		"@changesets/changelog-github": "^0.5.2",
+		"@changesets/cli": "^2.29.8",
 		"wrangler": "^4.20.1"
 	}
 }

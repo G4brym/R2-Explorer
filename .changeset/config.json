@@ -1,0 +1,14 @@
+{
+  "$schema": "https://github.com/changesets/changesets/blob/main/packages/config/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "G4brym/R2-Explorer" }
+  ],
+  "commit": false,
+  "fixed": [],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": ["r2-explorer-dashboard", "r2-explorer-github-action", "docs-new"]
+}
