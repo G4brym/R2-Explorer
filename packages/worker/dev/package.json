@@ -1,5 +1,6 @@
 {
 	"name": "r2-explorer-dev-worker",
+	"private": true,
 	"devDependencies": {
 		"wrangler": "^4.52.1"
 	},

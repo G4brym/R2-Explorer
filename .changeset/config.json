@@ -10,5 +10,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["r2-explorer-dashboard", "r2-explorer-github-action", "docs-new"]
+  "ignore": ["r2-explorer-dashboard", "r2-explorer-github-action", "docs-new", "r2-explorer-dev-worker"]
 }
