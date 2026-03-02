@@ -40,7 +40,7 @@ jobs:
       - name: Package artifact
         run: pnpm package
       - name: Archive package
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: r2-explorer-npm-package
           path: packages/worker/r2-explorer-*
@@ -64,7 +64,7 @@ jobs:
       - name: Run E2E tests
         run: pnpm test:e2e
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
