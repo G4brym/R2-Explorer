@@ -57,9 +57,14 @@ export class GetObject extends OpenAPIRoute {
 		object.writeHttpMetadata(headers);
 		headers.set("etag", object.httpEtag);
 		headers.set("content-length", object.size.toString());
+
+		const fileName = filePath.split("/").pop() || "download";
+		const asciiFileName = fileName
+			.replace(/[^\x20-\x7E]/g, "_")
+			.replace(/"/g, "'");
 		headers.set(
 			"Content-Disposition",
-			`attachment; filename="${filePath.split("/").pop()}"`,
+			`attachment; filename="${asciiFileName}"; filename*=UTF-8''${encodeURIComponent(fileName)}`,
 		);
 
 		return new Response(object.body, {
