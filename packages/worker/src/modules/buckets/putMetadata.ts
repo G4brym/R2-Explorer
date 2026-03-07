@@ -43,10 +43,14 @@ export class PutMetadata extends OpenAPIRoute {
 		let filePath;
 		try {
 			filePath = decodeURIComponent(escape(atob(data.params.key)));
-		} catch (e) {
-			filePath = decodeURIComponent(
-				escape(atob(decodeURIComponent(data.params.key))),
-			);
+		} catch {
+			try {
+				filePath = decodeURIComponent(
+					escape(atob(decodeURIComponent(data.params.key))),
+				);
+			} catch {
+				filePath = escape(atob(decodeURIComponent(data.params.key)));
+			}
 		}
 
 		const object = await bucket.get(filePath);
