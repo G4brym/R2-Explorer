@@ -111,7 +111,16 @@ export class GetShareLink extends OpenAPIRoute {
 			}
 		}
 
-		// Increment download counter
+		// Get the actual file before incrementing counter
+		const file = await bucket.get(shareMetadata.key);
+
+		if (!file) {
+			throw new HTTPException(404, {
+				message: "Shared file not found",
+			});
+		}
+
+		// Increment download counter only after confirming file exists
 		shareMetadata.currentDownloads++;
 		await bucket.put(
 			`.r2-explorer/sharable-links/${shareId}.json`,
@@ -124,15 +133,6 @@ export class GetShareLink extends OpenAPIRoute {
 				},
 			},
 		);
-
-		// Get the actual file
-		const file = await bucket.get(shareMetadata.key);
-
-		if (!file) {
-			throw new HTTPException(404, {
-				message: "Shared file not found",
-			});
-		}
 
 		// Return the file with proper headers
 		const headers = new Headers();
