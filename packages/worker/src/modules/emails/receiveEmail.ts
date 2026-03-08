@@ -46,6 +46,12 @@ export async function receiveEmail(
 		}
 	}
 
+	if (!bucket) {
+		throw new Error(
+			"No R2 bucket binding found for email routing. Configure emailRouting.targetBucket or add an R2 bucket binding.",
+		);
+	}
+
 	const rawEmail = await streamToArrayBuffer(event.raw, event.rawSize);
 	const parser = new PostalMime();
 	const parsedEmail = await parser.parse(rawEmail);
