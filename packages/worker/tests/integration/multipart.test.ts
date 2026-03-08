@@ -107,6 +107,48 @@ describe("Multipart Upload Endpoints", () => {
 			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(400);
 		});
+
+		it("should return 400 for malformed customMetadata", async () => {
+			if (!MY_TEST_BUCKET_1)
+				throw new Error("MY_TEST_BUCKET_1 not available");
+
+			const objectKey = "bad-metadata.dat";
+			const base64ObjectKey = btoa(objectKey);
+			const badCustomMetadata = btoa("not-valid-json");
+
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/multipart/create?key=${encodeURIComponent(base64ObjectKey)}&customMetadata=${encodeURIComponent(badCustomMetadata)}`,
+				"POST",
+				undefined,
+				{ "Content-Type": "application/json" },
+			);
+
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(400);
+			const body = await response.text();
+			expect(body).toContain("Invalid customMetadata");
+		});
+
+		it("should return 400 for malformed httpMetadata", async () => {
+			if (!MY_TEST_BUCKET_1)
+				throw new Error("MY_TEST_BUCKET_1 not available");
+
+			const objectKey = "bad-metadata.dat";
+			const base64ObjectKey = btoa(objectKey);
+			const badHttpMetadata = btoa("{broken json");
+
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/multipart/create?key=${encodeURIComponent(base64ObjectKey)}&httpMetadata=${encodeURIComponent(badHttpMetadata)}`,
+				"POST",
+				undefined,
+				{ "Content-Type": "application/json" },
+			);
+
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(400);
+			const body = await response.text();
+			expect(body).toContain("Invalid httpMetadata");
+		});
 	});
 
 	describe("PartUpload (POST /api/buckets/:bucket/multipart/upload)", () => {
