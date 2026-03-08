@@ -268,6 +268,56 @@ describe("Bucket Endpoints", () => {
 			expect(await r2Object?.text()).toBe(newObjectContent);
 		});
 
+		it("should return 400 for malformed customMetadata", async () => {
+			if (!MY_TEST_BUCKET_1)
+				throw new Error("MY_TEST_BUCKET_1 binding not available");
+
+			const objectKey = "bad-metadata.txt";
+			const base64ObjectKey = btoa(objectKey);
+			const blobBody = new Blob(["content"], {
+				type: "application/octet-stream",
+			});
+
+			const badCustomMetadata = btoa("not-valid-json");
+
+			const request = createTestRequest(
+				`/api/buckets/MY_TEST_BUCKET_1/upload?key=${encodeURIComponent(base64ObjectKey)}&customMetadata=${encodeURIComponent(badCustomMetadata)}`,
+				"POST",
+				blobBody,
+				{ "Content-Type": "application/octet-stream" },
+			);
+
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(400);
+			const body = await response.text();
+			expect(body).toContain("Invalid customMetadata");
+		});
+
+		it("should return 400 for malformed httpMetadata", async () => {
+			if (!MY_TEST_BUCKET_1)
+				throw new Error("MY_TEST_BUCKET_1 binding not available");
+
+			const objectKey = "bad-metadata.txt";
+			const base64ObjectKey = btoa(objectKey);
+			const blobBody = new Blob(["content"], {
+				type: "application/octet-stream",
+			});
+
+			const badHttpMetadata = btoa("{broken json");
+
+			const request = createTestRequest(
+				`/api/buckets/MY_TEST_BUCKET_1/upload?key=${encodeURIComponent(base64ObjectKey)}&httpMetadata=${encodeURIComponent(badHttpMetadata)}`,
+				"POST",
+				blobBody,
+				{ "Content-Type": "application/octet-stream" },
+			);
+
+			const response = await app.fetch(request, env, createExecutionContext());
+			expect(response.status).toBe(400);
+			const body = await response.text();
+			expect(body).toContain("Invalid httpMetadata");
+		});
+
 		it("POST /api/buckets/NON_EXISTENT_BUCKET/upload - should return 500 if bucket binding does not exist", async () => {
 			const base64ObjectKey = btoa("test.txt");
 			const blobBody = new Blob(["content"], {
