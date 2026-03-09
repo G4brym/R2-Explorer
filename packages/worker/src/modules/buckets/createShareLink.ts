@@ -1,7 +1,7 @@
 import { OpenAPIRoute } from "chanfana";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import type { AppContext } from "../../types";
+import type { AppContext, ShareMetadata } from "../../types";
 
 export class CreateShareLink extends OpenAPIRoute {
 	schema = {
@@ -105,7 +105,7 @@ export class CreateShareLink extends OpenAPIRoute {
 			: undefined;
 
 		// Create share metadata
-		const shareMetadata = {
+		const shareMetadata: ShareMetadata = {
 			bucket: bucketName,
 			key: key,
 			expiresAt: expiresAt,

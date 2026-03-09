@@ -25,6 +25,17 @@ export type R2ExplorerConfig = {
 	buckets?: Record<string, BucketConfig>;
 };
 
+export type ShareMetadata = {
+	bucket: string;
+	key: string;
+	expiresAt?: number;
+	passwordHash?: string;
+	maxDownloads?: number;
+	currentDownloads: number;
+	createdBy: string;
+	createdAt: number;
+};
+
 export type AppEnv = {
 	ASSETS: Fetcher;
 	[key: string]: R2Bucket;

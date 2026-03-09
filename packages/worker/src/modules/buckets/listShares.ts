@@ -1,7 +1,7 @@
 import { OpenAPIRoute } from "chanfana";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import type { AppContext } from "../../types";
+import type { AppContext, ShareMetadata } from "../../types";
 
 export class ListShares extends OpenAPIRoute {
 	schema = {
@@ -70,7 +70,7 @@ export class ListShares extends OpenAPIRoute {
 			const shareObject = await bucket.get(obj.key);
 			if (!shareObject) continue;
 
-			const metadata = JSON.parse(await shareObject.text());
+			const metadata = JSON.parse(await shareObject.text()) as ShareMetadata;
 
 			// Check if expired
 			const isExpired = !!(metadata.expiresAt && now > metadata.expiresAt);
