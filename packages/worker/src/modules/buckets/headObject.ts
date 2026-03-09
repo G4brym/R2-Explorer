@@ -7,7 +7,7 @@ export class HeadObject extends OpenAPIRoute {
 	schema = {
 		operationId: "Head-bucket-object",
 		tags: ["Buckets"],
-		summary: "Get Object",
+		summary: "Head Object",
 		request: {
 			params: z.object({
 				bucket: z.string(),
@@ -31,10 +31,14 @@ export class HeadObject extends OpenAPIRoute {
 		let filePath;
 		try {
 			filePath = decodeURIComponent(escape(atob(data.params.key)));
-		} catch (e) {
-			filePath = decodeURIComponent(
-				escape(atob(decodeURIComponent(data.params.key))),
-			);
+		} catch {
+			try {
+				filePath = decodeURIComponent(
+					escape(atob(decodeURIComponent(data.params.key))),
+				);
+			} catch {
+				filePath = escape(atob(decodeURIComponent(data.params.key)));
+			}
 		}
 
 		const objectMeta = await bucket.head(filePath);
