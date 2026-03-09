@@ -1,9 +1,7 @@
+import type { Next } from "hono";
 import type { AppContext } from "../../types";
 
-export async function readOnlyMiddleware(
-	c: AppContext,
-	next: CallableFunction,
-) {
+export async function readOnlyMiddleware(c: AppContext, next: Next) {
 	const config = c.get("config");
 
 	if (config.readonly === true && !["GET", "HEAD"].includes(c.req.method)) {

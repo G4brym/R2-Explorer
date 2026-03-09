@@ -1,7 +1,7 @@
 import { OpenAPIRoute } from "chanfana";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import type { AppContext } from "../../types";
+import type { AppContext, ShareMetadata } from "../../types";
 
 export class GetShareLink extends OpenAPIRoute {
 	schema = {
@@ -44,7 +44,7 @@ export class GetShareLink extends OpenAPIRoute {
 		const shareId = data.params.shareId;
 
 		// Search all buckets for the share metadata
-		let shareMetadata: any = null;
+		let shareMetadata: ShareMetadata | null = null;
 		let bucket: R2Bucket | null = null;
 
 		for (const key in c.env) {
@@ -60,7 +60,7 @@ export class GetShareLink extends OpenAPIRoute {
 			);
 
 			if (shareObject) {
-				shareMetadata = JSON.parse(await shareObject.text());
+				shareMetadata = JSON.parse(await shareObject.text()) as ShareMetadata;
 				bucket = currentBucket;
 				break;
 			}
