@@ -147,8 +147,8 @@ describe("Object Specific Endpoints", () => {
 			expect(response.headers.get("content-type")).toBe(TEST_OBJECT_CONTENT_TYPE);
 			expect(response.headers.get("content-length")).toBe(TEST_OBJECT_CONTENT.length.toString());
 			expect(response.headers.has("etag")).toBe(true);
-			// Default R2 GetObject includes Content-Disposition: attachment; filename="key"
-			expect(response.headers.get("content-disposition")).toBe(`attachment; filename="${TEST_OBJECT_KEY}"`);
+			// Default R2 GetObject includes Content-Disposition with sanitized filename and RFC 5987 filename*
+			expect(response.headers.get("content-disposition")).toBe(`attachment; filename="${TEST_OBJECT_KEY}"; filename*=UTF-8''${encodeURIComponent(TEST_OBJECT_KEY)}`);
 
 			const body = await response.text();
 			expect(body).toBe(TEST_OBJECT_CONTENT);
