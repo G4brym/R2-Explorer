@@ -54,16 +54,28 @@ export class PutObject extends OpenAPIRoute {
 
 		let customMetadata = undefined;
 		if (data.query.customMetadata) {
-			customMetadata = JSON.parse(
-				decodeURIComponent(escape(atob(data.query.customMetadata))),
-			);
+			try {
+				customMetadata = JSON.parse(
+					decodeURIComponent(escape(atob(data.query.customMetadata))),
+				);
+			} catch {
+				throw new HTTPException(400, {
+					message: "Invalid customMetadata: expected base64-encoded JSON",
+				});
+			}
 		}
 
 		let httpMetadata = undefined;
 		if (data.query.httpMetadata) {
-			httpMetadata = JSON.parse(
-				decodeURIComponent(escape(atob(data.query.httpMetadata))),
-			);
+			try {
+				httpMetadata = JSON.parse(
+					decodeURIComponent(escape(atob(data.query.httpMetadata))),
+				);
+			} catch {
+				throw new HTTPException(400, {
+					message: "Invalid httpMetadata: expected base64-encoded JSON",
+				});
+			}
 		}
 
 		return await bucket.put(key, c.req.raw.body, {
