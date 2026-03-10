@@ -9,6 +9,9 @@
     <q-item clickable v-close-popup @click="renameObject" v-if="prop.row.type === 'file'">
       <q-item-section>Rename</q-item-section>
     </q-item>
+    <q-item clickable v-close-popup @click="duplicateObject">
+      <q-item-section>Duplicate</q-item-section>
+    </q-item>
     <q-item clickable v-close-popup @click="updateMetadataObject" v-if="prop.row.type === 'file'">
       <q-item-section>Update Metadata</q-item-section>
     </q-item>
@@ -70,6 +73,9 @@ export default {
 	methods: {
 		renameObject: function () {
 			this.$emit("renameObject", this.prop.row);
+		},
+		duplicateObject: function () {
+			this.$emit("duplicateObject", this.prop.row);
 		},
 		updateMetadataObject: function () {
 			this.$emit("updateMetadataObject", this.prop.row);

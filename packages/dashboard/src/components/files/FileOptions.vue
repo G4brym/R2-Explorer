@@ -128,6 +128,74 @@ export default defineComponent({
 				);
 			}
 		},
+		generateCopyName: (key, isFolder) => {
+			if (isFolder) {
+				const base = key.replace(/\/$/, "");
+				return `${base} (copy)/`;
+			}
+			const lastDot = key.lastIndexOf(".");
+			const lastSlash = key.lastIndexOf("/");
+			if (lastDot > lastSlash + 1) {
+				return `${key.substring(0, lastDot)} (copy)${key.substring(lastDot)}`;
+			}
+			return `${key} (copy)`;
+		},
+		duplicateObject: async function (row) {
+			if (row.type === "folder") {
+				const folderContents = await apiHandler.fetchFile(
+					this.selectedBucket,
+					row.key,
+					"",
+				);
+
+				const sourcePrefix = row.key;
+				const destPrefix = this.generateCopyName(sourcePrefix, true);
+
+				const notif = this.q.notify({
+					group: false,
+					spinner: true,
+					message: "Duplicating folder...",
+					caption: "0%",
+					timeout: 0,
+				});
+
+				await apiHandler.createFolder(destPrefix, this.selectedBucket);
+
+				for (const [i, innerFile] of folderContents.entries()) {
+					if (innerFile.key && !innerFile.key.endsWith("/")) {
+						const newKey = innerFile.key.replace(sourcePrefix, destPrefix);
+						await apiHandler.copyObject(
+							this.selectedBucket,
+							innerFile.key,
+							newKey,
+						);
+					}
+					notif({
+						caption: `${Number.parseInt((i * 100) / folderContents.length)}%`,
+					});
+				}
+
+				notif({
+					icon: "done",
+					spinner: false,
+					caption: "100%",
+					message: "Folder duplicated!",
+					timeout: 2500,
+				});
+			} else {
+				const destKey = this.generateCopyName(row.key, false);
+				await apiHandler.copyObject(this.selectedBucket, row.key, destKey);
+				this.q.notify({
+					group: false,
+					icon: "done",
+					spinner: false,
+					message: "File duplicated!",
+					timeout: 2500,
+				});
+			}
+
+			this.$bus.emit("fetchFiles");
+		},
 		renameConfirm: async function () {
 			if (this.renameInput.length === 0) {
 				return;
