@@ -10,6 +10,7 @@ import { cors } from "hono/cors";
 import { z } from "zod";
 import { readOnlyMiddleware } from "./foundation/middlewares/readonly";
 import { settings } from "./foundation/settings";
+import { CopyObject } from "./modules/buckets/copyObject";
 import { CreateFolder } from "./modules/buckets/createFolder";
 import { CreateShareLink } from "./modules/buckets/createShareLink";
 import { DeleteObject } from "./modules/buckets/deleteObject";
@@ -121,6 +122,7 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 
 	openapi.get("/api/buckets/:bucket", ListObjects);
 	openapi.post("/api/buckets/:bucket/move", MoveObject);
+	openapi.post("/api/buckets/:bucket/copy", CopyObject);
 	openapi.post("/api/buckets/:bucket/folder", CreateFolder);
 	openapi.post("/api/buckets/:bucket/upload", PutObject);
 	openapi.post("/api/buckets/:bucket/multipart/create", CreateUpload);

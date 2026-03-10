@@ -109,6 +109,33 @@ test.describe("File operations", () => {
 		});
 	});
 
+	test.describe("Duplicate file", () => {
+		test.beforeEach(async ({ request }) => {
+			await uploadFile(request, "e2e-copy-source.txt", "duplicate me");
+		});
+
+		test.afterEach(async ({ request }) => {
+			await deleteObject(request, "e2e-copy-source.txt");
+			await deleteObject(request, "e2e-copy-source (copy).txt");
+		});
+
+		test("duplicates a file via context menu", async ({ page }) => {
+			await page.goto(`/${BUCKET}/files`);
+			await expect(page.locator("text=e2e-copy-source.txt")).toBeVisible({
+				timeout: 10_000,
+			});
+
+			await page.locator("text=e2e-copy-source.txt").click({ button: "right" });
+			await page.locator(".q-menu").getByText("Duplicate").click();
+
+			// Copy should appear in listing, original should still be there
+			await expect(page.locator("text=e2e-copy-source (copy).txt")).toBeVisible({
+				timeout: 5_000,
+			});
+			await expect(page.locator("text=e2e-copy-source.txt").first()).toBeVisible();
+		});
+	});
+
 	test.describe("Delete folder", () => {
 		test.beforeEach(async ({ request }) => {
 			await createFolder(request, "e2e-delete-folder");

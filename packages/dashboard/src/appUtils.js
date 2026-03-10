@@ -171,6 +171,12 @@ export const apiHandler = {
 			newKey: encode(newKey),
 		});
 	},
+	copyObject: (bucket, sourceKey, destinationKey) => {
+		return api.post(`/buckets/${bucket}/copy`, {
+			sourceKey: encode(sourceKey),
+			destinationKey: encode(destinationKey),
+		});
+	},
 	updateMetadata: async (bucket, key, customMetadata, httpMetadata = {}) => {
 		let prefix = "";
 		if (key.includes("/")) {
