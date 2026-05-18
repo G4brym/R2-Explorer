@@ -28,7 +28,7 @@ jobs:
       - name: Get latest version
         run: cd packages/github-action && npm install && npm install --save r2-explorer@latest
       - name: Deploy
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
