@@ -2,6 +2,7 @@ import { OpenAPIRoute } from "chanfana";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import type { AppContext } from "../../types";
+import { assertNotTrashDestination } from "./trash";
 
 export class MoveObject extends OpenAPIRoute {
 	schema = {
@@ -39,6 +40,14 @@ export class MoveObject extends OpenAPIRoute {
 
 		const oldKey = decodeURIComponent(escape(atob(data.body.oldKey)));
 		const newKey = decodeURIComponent(escape(atob(data.body.newKey)));
+
+		try {
+			assertNotTrashDestination(newKey);
+		} catch (error) {
+			throw new HTTPException(400, {
+				message: error instanceof Error ? error.message : String(error),
+			});
+		}
 
 		const object = await bucket.get(oldKey);
 

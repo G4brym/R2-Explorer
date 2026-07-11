@@ -7,4 +7,7 @@ export default R2Explorer({
 	// 	username: "username",
 	// 	password: "password",
 	// },
+	// trash: {
+	// 	retentionDays: 30,
+	// },
 });

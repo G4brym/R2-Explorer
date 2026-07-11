@@ -2,6 +2,7 @@ import { OpenAPIRoute } from "chanfana";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import type { AppContext } from "../../types";
+import { assertNotTrashDestination } from "./trash";
 
 export class CopyObject extends OpenAPIRoute {
 	schema = {
@@ -43,6 +44,14 @@ export class CopyObject extends OpenAPIRoute {
 		const destinationKey = decodeURIComponent(
 			escape(atob(data.body.destinationKey)),
 		);
+
+		try {
+			assertNotTrashDestination(destinationKey);
+		} catch (error) {
+			throw new HTTPException(400, {
+				message: error instanceof Error ? error.message : String(error),
+			});
+		}
 
 		const object = await bucket.get(sourceKey);
 

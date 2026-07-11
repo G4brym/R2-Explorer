@@ -157,7 +157,9 @@ describe("Bucket Endpoints", () => {
 			const request = createTestRequest("/api/buckets/NON_EXISTENT_BUCKET");
 			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(500);
-			expect(await response.text()).toBe("Bucket binding not found: NON_EXISTENT_BUCKET");
+			expect(await response.text()).toBe(
+				"Bucket binding not found: NON_EXISTENT_BUCKET",
+			);
 		});
 	});
 
@@ -358,9 +360,13 @@ describe("Bucket Endpoints", () => {
 			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(200);
 			const body = await response.json();
-			expect(body).toEqual({ success: true });
+			expect(body.success).toBe(true);
+			expect(body.trashed).toBe(true);
+			expect(body.trashKey).toMatch(
+				/^\.r2-explorer\/trash\/[a-z0-9]+\/to-be-deleted\.txt$/,
+			);
 
-			// Verify it's deleted
+			// Verify it's deleted from original location
 			r2Object = await MY_TEST_BUCKET_1.head(objectKey);
 			expect(r2Object).toBeNull();
 		});
@@ -411,7 +417,11 @@ describe("Bucket Endpoints", () => {
 			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(200);
 			const body = await response.json();
-			expect(body).toEqual({ success: true });
+			expect(body.success).toBe(true);
+			expect(body.trashed).toBe(true);
+			expect(body.trashKey).toMatch(
+				/^\.r2-explorer\/trash\/[a-z0-9]+\/folder\/path with spaces\/file\?name\.txt$/,
+			);
 
 			r2Object = await MY_TEST_BUCKET_1.head(objectKey);
 			expect(r2Object).toBeNull();

@@ -1,7 +1,7 @@
+import { Buffer } from "node:buffer"; // For btoa
+import { createExecutionContext, env } from "cloudflare:test";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createTestApp, createTestRequest } from "./setup";
-import { env, createExecutionContext } from "cloudflare:test";
-import { Buffer } from "node:buffer"; // For btoa
 
 // Helper function to convert ArrayBuffer to string
 function arrayBufferToString(buffer: ArrayBuffer) {
@@ -53,7 +53,9 @@ describe("Object Specific Endpoints", () => {
 			const currentTestBucket = env.MY_TEST_BUCKET_1; // Re-fetch bucket from env
 			// If currentTestBucket was null or undefined, this could indicate an issue with env availability
 			if (!currentTestBucket) {
-				console.error("MY_TEST_BUCKET_1 is not available in this test context prior to request.");
+				console.error(
+					"MY_TEST_BUCKET_1 is not available in this test context prior to request.",
+				);
 				// Optionally, force a failure or throw to make it clear
 				// throw new Error("MY_TEST_BUCKET_1 binding missing in test.");
 			}
@@ -128,7 +130,9 @@ describe("Object Specific Endpoints", () => {
 			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(500);
 			const bodyText = await response.text();
-			expect(bodyText).toContain("Bucket binding not found: NON_EXISTENT_BUCKET");
+			expect(bodyText).toContain(
+				"Bucket binding not found: NON_EXISTENT_BUCKET",
+			);
 		});
 	});
 
@@ -144,11 +148,17 @@ describe("Object Specific Endpoints", () => {
 			const response = await app.fetch(request, env, createExecutionContext());
 
 			expect(response.status).toBe(200);
-			expect(response.headers.get("content-type")).toBe(TEST_OBJECT_CONTENT_TYPE);
-			expect(response.headers.get("content-length")).toBe(TEST_OBJECT_CONTENT.length.toString());
+			expect(response.headers.get("content-type")).toBe(
+				TEST_OBJECT_CONTENT_TYPE,
+			);
+			expect(response.headers.get("content-length")).toBe(
+				TEST_OBJECT_CONTENT.length.toString(),
+			);
 			expect(response.headers.has("etag")).toBe(true);
 			// Default R2 GetObject includes Content-Disposition with sanitized filename and RFC 5987 filename*
-			expect(response.headers.get("content-disposition")).toBe(`attachment; filename="${TEST_OBJECT_KEY}"; filename*=UTF-8''${encodeURIComponent(TEST_OBJECT_KEY)}`);
+			expect(response.headers.get("content-disposition")).toBe(
+				`attachment; filename="${TEST_OBJECT_KEY}"; filename*=UTF-8''${encodeURIComponent(TEST_OBJECT_KEY)}`,
+			);
 
 			const body = await response.text();
 			expect(body).toBe(TEST_OBJECT_CONTENT);
@@ -173,7 +183,7 @@ describe("Object Specific Endpoints", () => {
 			);
 			const response = await app.fetch(request, env, createExecutionContext());
 			expect(response.status).toBe(500);
-			const body = (await response.text());
+			const body = await response.text();
 			expect(body).toContain("Bucket binding not found: NON_EXISTENT_BUCKET");
 		});
 
@@ -204,10 +214,12 @@ describe("Object Specific Endpoints", () => {
 		// The PutMetadata handler takes /:key, not /:key/metadata
 		const METADATA_URL = `/api/buckets/${BUCKET_NAME}/${base64Key}`;
 
-
 		it("should add new custom and update http metadata to an existing object", async () => {
 			const newCustomMetadata = { project: "r2-explorer", version: "1.0" };
-			const newHttpMetadata = { contentType: "application/octet-stream", cacheControl: "max-age=3600" };
+			const newHttpMetadata = {
+				contentType: "application/octet-stream",
+				cacheControl: "max-age=3600",
+			};
 
 			const request = createTestRequest(
 				METADATA_URL,
@@ -223,8 +235,12 @@ describe("Object Specific Endpoints", () => {
 			const headResponse = await MY_TEST_BUCKET_1.head(TEST_OBJECT_KEY);
 			expect(headResponse).not.toBeNull();
 			expect(headResponse?.customMetadata).toEqual(newCustomMetadata);
-			expect(headResponse?.httpMetadata?.contentType).toBe(newHttpMetadata.contentType);
-			expect(headResponse?.httpMetadata?.cacheControl).toBe(newHttpMetadata.cacheControl);
+			expect(headResponse?.httpMetadata?.contentType).toBe(
+				newHttpMetadata.contentType,
+			);
+			expect(headResponse?.httpMetadata?.cacheControl).toBe(
+				newHttpMetadata.cacheControl,
+			);
 		});
 
 		it("should update existing custom metadata", async () => {
@@ -234,11 +250,18 @@ describe("Object Specific Endpoints", () => {
 				httpMetadata: { contentType: TEST_OBJECT_CONTENT_TYPE },
 			});
 
-			const updatedCustomMetadata = { initial: "value", to_update: "new_value", added: "another" };
+			const updatedCustomMetadata = {
+				initial: "value",
+				to_update: "new_value",
+				added: "another",
+			};
 			const request = createTestRequest(
 				METADATA_URL,
 				"POST",
-				{ customMetadata: updatedCustomMetadata, httpMetadata: { contentType: TEST_OBJECT_CONTENT_TYPE } },
+				{
+					customMetadata: updatedCustomMetadata,
+					httpMetadata: { contentType: TEST_OBJECT_CONTENT_TYPE },
+				},
 				{ "Content-Type": "application/json" },
 			);
 			const response = await app.fetch(request, env, createExecutionContext());
@@ -256,7 +279,10 @@ describe("Object Specific Endpoints", () => {
 			const request = createTestRequest(
 				METADATA_URL,
 				"POST",
-				{ customMetadata: {}, httpMetadata: {contentType: TEST_OBJECT_CONTENT_TYPE} }, // Empty custom metadata
+				{
+					customMetadata: {},
+					httpMetadata: { contentType: TEST_OBJECT_CONTENT_TYPE },
+				}, // Empty custom metadata
 				{ "Content-Type": "application/json" },
 			);
 			const response = await app.fetch(request, env, createExecutionContext());
@@ -266,7 +292,6 @@ describe("Object Specific Endpoints", () => {
 			// R2 behavior: customMetadata becomes undefined, not an empty object, when cleared via put with {}
 			expect(headResponse?.customMetadata).toEqual({});
 		});
-
 
 		it("should return 404 when attempting to update metadata for a non-existent object", async () => {
 			const nonExistentBase64Key = btoa("ghost.txt");
@@ -300,7 +325,7 @@ describe("Object Specific Endpoints", () => {
 				{ "Content-Type": "application/json" },
 			);
 			const response = await app.fetch(request, env, createExecutionContext());
-			const body = (await response.text());
+			const body = await response.text();
 			expect(response.status).toBe(500);
 			expect(body).toContain("Bucket binding not found: NON_EXISTENT_BUCKET");
 		});

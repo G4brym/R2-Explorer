@@ -109,8 +109,7 @@ describe("Multipart Upload Endpoints", () => {
 		});
 
 		it("should return 400 for malformed customMetadata", async () => {
-			if (!MY_TEST_BUCKET_1)
-				throw new Error("MY_TEST_BUCKET_1 not available");
+			if (!MY_TEST_BUCKET_1) throw new Error("MY_TEST_BUCKET_1 not available");
 
 			const objectKey = "bad-metadata.dat";
 			const base64ObjectKey = btoa(objectKey);
@@ -130,8 +129,7 @@ describe("Multipart Upload Endpoints", () => {
 		});
 
 		it("should return 400 for malformed httpMetadata", async () => {
-			if (!MY_TEST_BUCKET_1)
-				throw new Error("MY_TEST_BUCKET_1 not available");
+			if (!MY_TEST_BUCKET_1) throw new Error("MY_TEST_BUCKET_1 not available");
 
 			const objectKey = "bad-metadata.dat";
 			const base64ObjectKey = btoa(objectKey);

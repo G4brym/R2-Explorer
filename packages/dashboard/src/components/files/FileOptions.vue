@@ -8,6 +8,7 @@
           <code v-else><q-spinner color="primary"/></code>
           files inside?</span>
         <span v-else class="q-ml-sm">Are you sure you want to delete the file <code>{{row.name}}</code>?</span>
+        <q-checkbox v-if="trashEnabled" v-model="deletePermanent" label="Delete permanently (skip trash)" color="red" />
       </q-card-section>
 
       <q-card-actions align="right">
@@ -84,6 +85,7 @@ export default defineComponent({
 		deleteModal: false,
 		renameModal: false,
 		updateMetadataModal: false,
+		deletePermanent: false,
 		deleteFolderInnerFilesCount: null,
 		newFolderName: "",
 		renameInput: "",
@@ -243,6 +245,8 @@ export default defineComponent({
 			});
 		},
 		deleteConfirm: async function () {
+			const permanent = this.deletePermanent;
+
 			if (this.row.type === "folder") {
 				// When deleting folders, first must copy the objects, because the popup close forces a reset on properties
 				const originalFolder = { ...this.row };
@@ -254,39 +258,83 @@ export default defineComponent({
 				const notif = this.q.notify({
 					group: false,
 					spinner: true,
-					message: "Deleting files...",
+					message: permanent
+						? "Deleting files forever..."
+						: "Moving files to trash...",
 					caption: "0%",
 					timeout: 0,
 				});
 
 				for (const [i, innerFile] of folderContents.entries()) {
 					if (innerFile.key) {
-						await apiHandler.deleteObject(innerFile.key, this.selectedBucket);
+						await apiHandler.deleteObject(
+							innerFile.key,
+							this.selectedBucket,
+							permanent,
+						);
 					}
 					notif({
 						caption: `${Number.parseInt((i * 100) / (folderContentsCount + 1))}%`, // +1 because still needs to delete the folder
 					});
 				}
 
-				await apiHandler.deleteObject(originalFolder.key, this.selectedBucket);
+				await apiHandler.deleteObject(
+					originalFolder.key,
+					this.selectedBucket,
+					permanent,
+				);
 
 				notif({
-					icon: "done", // we add an icon
-					spinner: false, // we reset the spinner setting so the icon can be displayed
+					icon: "done",
+					spinner: false,
 					caption: "100%",
-					message: "Folder deleted!",
-					timeout: 2500, // we will timeout it in 2.5s
+					message: permanent
+						? "Folder permanently deleted!"
+						: "Folder moved to trash!",
+					timeout: 2500,
 				});
 			} else {
 				this.deleteModal = false;
-				await apiHandler.deleteObject(this.row.key, this.selectedBucket);
-				this.q.notify({
-					group: false,
-					icon: "done", // we add an icon
-					spinner: false, // we reset the spinner setting so the icon can be displayed
-					message: "File deleted!",
-					timeout: 2500, // we will timeout it in 2.5s
-				});
+				const resp = await apiHandler.deleteObject(
+					this.row.key,
+					this.selectedBucket,
+					permanent,
+				);
+
+				if (!permanent && this.trashEnabled) {
+					const trashKey = resp.data.trashKey;
+					this.q.notify({
+						group: false,
+						icon: "delete",
+						spinner: false,
+						message: "File moved to trash",
+						timeout: 5000,
+						actions: [
+							{
+								label: "Undo",
+								color: "white",
+								handler: async () => {
+									await apiHandler.restoreTrash(this.selectedBucket, trashKey);
+									this.$bus.emit("fetchFiles");
+									this.q.notify({
+										group: false,
+										icon: "restore_from_trash",
+										message: "File restored!",
+										timeout: 2500,
+									});
+								},
+							},
+						],
+					});
+				} else {
+					this.q.notify({
+						group: false,
+						icon: "done",
+						spinner: false,
+						message: "File deleted!",
+						timeout: 2500,
+					});
+				}
 			}
 
 			this.$bus.emit("fetchFiles");
@@ -297,6 +345,7 @@ export default defineComponent({
 			this.deleteModal = false;
 			this.renameModal = false;
 			this.updateMetadataModal = false;
+			this.deletePermanent = false;
 			this.renameInput = "";
 			this.updateCustomMetadata = [];
 			this.updateHttpMetadata = [];
@@ -319,6 +368,9 @@ export default defineComponent({
 	computed: {
 		selectedBucket: function () {
 			return this.$route.params.bucket;
+		},
+		trashEnabled: function () {
+			return this.mainStore.config?.trash !== false;
 		},
 		selectedFolder: function () {
 			if (
