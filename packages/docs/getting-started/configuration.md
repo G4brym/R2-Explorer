@@ -12,6 +12,7 @@ Here is all the available options:
 | `emailRouting`     | `object`  or `undefined`  | Customize Email Explorer, read more [here](/guides/setup-email-explorer.html) | `https://demo.r2explorer.com`                             |
 | `cacheAssets`      | `boolean`  or `undefined` | Cache dashboard assets by 5 minutes, default: `true`                          | `true`                                                    |
 | `buckets`          | `object`  or `undefined`  | Configure bucket-specific settings like public URLs                           | `{ BUCKET: { publicUrl: "https://cdn.example.com" } }`    |
+| `trash`            | `object`, `false` or `undefined` | Enable trash / recycle bin, default: `{ retentionDays: 30 }`         | `{ retentionDays: 30 }` or `false`                        |
 
 `emailRouting` options:
 
@@ -24,6 +25,12 @@ Here is all the available options:
 | Name        | Type(s)                  | Description                              | Examples                  |
 |-------------|--------------------------|------------------------------------------|---------------------------|
 | `publicUrl` | `string` or `undefined`  | Public URL prefix for the bucket's files | `https://cdn.example.com` |
+
+`trash` options:
+
+| Name            | Type(s)                 | Description                                                | Examples |
+|-----------------|-------------------------|------------------------------------------------------------|----------|
+| `retentionDays` | `number` or `undefined` | Number of days to keep deleted items before auto-purging   | `30`     |
 
 ## Disabling readonly mode
 

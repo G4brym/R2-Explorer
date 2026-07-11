@@ -20,12 +20,20 @@ import { GetShareLink } from "./modules/buckets/getShareLink";
 import { HeadObject } from "./modules/buckets/headObject";
 import { ListObjects } from "./modules/buckets/listObjects";
 import { ListShares } from "./modules/buckets/listShares";
+import { ListTrash } from "./modules/buckets/listTrash";
 import { MoveObject } from "./modules/buckets/moveObject";
 import { CompleteUpload } from "./modules/buckets/multipart/completeUpload";
 import { CreateUpload } from "./modules/buckets/multipart/createUpload";
 import { PartUpload } from "./modules/buckets/multipart/partUpload";
+import { PurgeTrash } from "./modules/buckets/purgeTrash";
 import { PutMetadata } from "./modules/buckets/putMetadata";
 import { PutObject } from "./modules/buckets/putObject";
+import { RestoreTrash } from "./modules/buckets/restoreTrash";
+import {
+	getRetentionDays,
+	isTrashEnabled,
+	purgeExpiredTrash,
+} from "./modules/buckets/trash";
 import { dashboardIndex, dashboardRedirect } from "./modules/dashboard";
 import { receiveEmail } from "./modules/emails/receiveEmail";
 import { SendEmail } from "./modules/emails/sendEmail";
@@ -129,6 +137,12 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 	openapi.post("/api/buckets/:bucket/multipart/upload", PartUpload);
 	openapi.post("/api/buckets/:bucket/multipart/complete", CompleteUpload);
 	openapi.post("/api/buckets/:bucket/delete", DeleteObject);
+
+	// Trash routes
+	openapi.get("/api/buckets/:bucket/trash", ListTrash);
+	openapi.post("/api/buckets/:bucket/trash/restore", RestoreTrash);
+	openapi.post("/api/buckets/:bucket/trash/purge", PurgeTrash);
+
 	openapi.on("head", "/api/buckets/:bucket/:key", HeadObject);
 	openapi.get("/api/buckets/:bucket/:key/head", HeadObject); // There are some issues with calling the head method
 
@@ -164,6 +178,31 @@ export function R2Explorer(config?: R2ExplorerConfig) {
 		},
 		async fetch(request: Request, env: unknown, context: ExecutionContext) {
 			return app.fetch(request, env as AppEnv, context);
+		},
+		async scheduled(
+			event: { cron: string; scheduledTime: number },
+			env: AppEnv,
+			context: ExecutionContext,
+		) {
+			if (!isTrashEnabled(config)) {
+				return;
+			}
+
+			const retentionDays = getRetentionDays(config);
+
+			for (const [bindingName, binding] of Object.entries(env)) {
+				if (bindingName === "ASSETS") continue;
+				if (
+					binding &&
+					typeof binding === "object" &&
+					"list" in binding &&
+					"delete" in binding
+				) {
+					context.waitUntil(
+						purgeExpiredTrash(binding as R2Bucket, retentionDays),
+					);
+				}
+			}
 		},
 	};
 }

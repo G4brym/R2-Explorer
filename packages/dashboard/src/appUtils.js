@@ -125,9 +125,27 @@ export const apiHandler = {
 			key: encode(key),
 		});
 	},
-	deleteObject: (key, bucket) => {
+	deleteObject: (key, bucket, permanent = false) => {
 		return api.post(`/buckets/${bucket}/delete`, {
 			key: encode(key),
+			permanent: permanent,
+		});
+	},
+	listTrash: async (bucket, cursor = null) => {
+		return await api.get(`/buckets/${bucket}/trash`, {
+			params: {
+				cursor: cursor,
+			},
+		});
+	},
+	restoreTrash: (bucket, trashKey) => {
+		return api.post(`/buckets/${bucket}/trash/restore`, {
+			trashKey: encode(trashKey),
+		});
+	},
+	purgeTrash: (bucket, trashKey) => {
+		return api.post(`/buckets/${bucket}/trash/purge`, {
+			trashKey: trashKey ? encode(trashKey) : undefined,
 		});
 	},
 	downloadFile: (
@@ -288,9 +306,10 @@ export const apiHandler = {
 				})
 				.map((obj) => mapFile(obj, namePrefix))
 				.filter((obj) => {
-					// Remove hidden files
+					// Remove hidden files and internal explorer paths
 					return !(
-						mainStore.showHiddenFiles !== true && obj.name.startsWith(".")
+						(mainStore.showHiddenFiles !== true && obj.name.startsWith(".")) ||
+						obj.key.startsWith(".r2-explorer/")
 					);
 				});
 
@@ -303,7 +322,7 @@ export const apiHandler = {
 			const folders = response.data.delimitedPrefixes
 				.map((obj) => ({
 					name: obj.replace(namePrefix, ""),
-					hash: encode(obj.key),
+					hash: encode(obj),
 					key: obj,
 					lastModified: "--",
 					timestamp: 0,
@@ -314,9 +333,10 @@ export const apiHandler = {
 					color: "orange",
 				}))
 				.filter((obj) => {
-					// Remove hidden files
+					// Remove hidden files and internal explorer paths
 					return !(
-						mainStore.showHiddenFiles !== true && obj.name.startsWith(".")
+						(mainStore.showHiddenFiles !== true && obj.name.startsWith(".")) ||
+						obj.key.startsWith(".r2-explorer/")
 					);
 				});
 
@@ -358,9 +378,11 @@ export const apiHandler = {
 					})
 					.map((obj) => mapFile(obj, prefix))
 					.filter((obj) => {
-						// Remove hidden files
+						// Remove hidden files and internal explorer paths
 						return !(
-							mainStore.showHiddenFiles !== true && obj.name.startsWith(".")
+							(mainStore.showHiddenFiles !== true &&
+								obj.name.startsWith(".")) ||
+							obj.key.startsWith(".r2-explorer/")
 						);
 					});
 
@@ -373,7 +395,7 @@ export const apiHandler = {
 				const folders = response.data.delimitedPrefixes
 					.map((obj) => ({
 						name: obj.replace(prefix, ""),
-						hash: encode(obj.key),
+						hash: encode(obj),
 						key: obj,
 						lastModified: "--",
 						timestamp: 0,
@@ -384,9 +406,11 @@ export const apiHandler = {
 						color: "orange",
 					}))
 					.filter((obj) => {
-						// Remove hidden files
+						// Remove hidden files and internal explorer paths
 						return !(
-							mainStore.showHiddenFiles !== true && obj.name.startsWith(".")
+							(mainStore.showHiddenFiles !== true &&
+								obj.name.startsWith(".")) ||
+							obj.key.startsWith(".r2-explorer/")
 						);
 					});
 

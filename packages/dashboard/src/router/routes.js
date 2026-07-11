@@ -2,6 +2,7 @@ import MainLayout from "layouts/MainLayout.vue";
 import HomePage from "pages/HomePage.vue";
 import EmailFolderPage from "pages/email/EmailFolderPage.vue";
 import FilesFolderPage from "pages/files/FilesFolderPage.vue";
+import TrashPage from "pages/trash/TrashPage.vue";
 
 const routes = [
 	{
@@ -54,6 +55,12 @@ const routes = [
 				path: "/:bucket/email/:folder/:file",
 				name: "email-file",
 				component: () => import("pages/email/EmailFilePage.vue"),
+			},
+
+			{
+				path: "/:bucket/trash",
+				name: "trash-home",
+				component: TrashPage,
 			},
 
 			// backwards compatibility

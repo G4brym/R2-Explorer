@@ -10,6 +10,10 @@ export type BucketConfig = {
 	publicUrl?: string;
 };
 
+export type TrashConfig = {
+	retentionDays?: number;
+};
+
 export type R2ExplorerConfig = {
 	readonly?: boolean;
 	cors?: boolean;
@@ -23,6 +27,7 @@ export type R2ExplorerConfig = {
 	showHiddenFiles?: boolean;
 	basicAuth?: BasicAuth | BasicAuth[];
 	buckets?: Record<string, BucketConfig>;
+	trash?: TrashConfig | false;
 };
 
 export type ShareMetadata = {

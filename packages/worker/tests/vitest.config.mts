@@ -8,7 +8,7 @@ export default defineWorkersConfig({
 	test: {
 		poolOptions: {
 			workers: {
-        singleWorker: true,
+				singleWorker: true,
 				wrangler: { configPath: "../dev/wrangler.toml" },
 				miniflare: {
 					compatibilityDate: "2024-11-06", // Or your project's compatibility date
