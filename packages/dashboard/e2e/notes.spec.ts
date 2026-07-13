@@ -107,6 +107,28 @@ test.describe("Notes app", () => {
 		).toBeVisible();
 	});
 
+	test("mobile: list is full-width and editor takes over with a back button", async ({
+		page,
+	}) => {
+		await page.setViewportSize({ width: 390, height: 844 });
+		await page.goto(`/${BUCKET}/notes`);
+
+		// Editor pane hidden, list takes the full width
+		await expect(page.getByTestId("new-note-btn")).toBeVisible();
+		await expect(page.getByTestId("back-to-notes-btn")).toBeHidden();
+
+		await page.getByTestId("note-item").filter({ hasText: "welcome" }).click();
+
+		// Note open: editor visible, list hidden
+		await expect(page.getByTestId("note-textarea")).toBeVisible();
+		await expect(page.getByTestId("new-note-btn")).toBeHidden();
+
+		// Back button returns to the list
+		await page.getByTestId("back-to-notes-btn").click();
+		await expect(page).toHaveURL(new RegExp(`/${BUCKET}/notes$`));
+		await expect(page.getByTestId("new-note-btn")).toBeVisible();
+	});
+
 	test("deletes a note", async ({ page }) => {
 		await page.goto(`/${BUCKET}/notes/${encodeKey("welcome.md")}`);
 

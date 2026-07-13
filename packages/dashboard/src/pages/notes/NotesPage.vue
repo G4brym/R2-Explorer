@@ -1,5 +1,5 @@
 <template>
-  <q-page class="notes-page flex">
+  <q-page class="notes-page flex" :class="{ 'note-open': !!selectedName }">
     <div class="notes-list column">
       <div class="q-pa-sm">
         <q-btn
@@ -43,6 +43,14 @@
     <div class="notes-editor column col">
       <template v-if="selectedName">
         <div class="row items-center q-px-md q-py-sm editor-toolbar">
+          <q-btn
+            flat
+            round
+            icon="arrow_back"
+            class="lt-sm q-mr-sm"
+            data-testid="back-to-notes-btn"
+            @click="closeNote"
+          />
           <div class="text-h6 ellipsis col" data-testid="note-title">
             {{ noteTitle(selectedName) }}
           </div>
@@ -235,6 +243,15 @@ export default defineComponent({
 		confirmDiscard() {
 			return window.confirm("You have unsaved changes. Discard them?");
 		},
+		closeNote() {
+			if (this.isDirty && !this.confirmDiscard()) {
+				return;
+			}
+			this.$router.push({
+				name: "notes-home",
+				params: { bucket: this.selectedBucket },
+			});
+		},
 		async loadNote() {
 			if (!this.selectedName) {
 				this.content = "";
@@ -405,5 +422,22 @@ export default defineComponent({
 
 .note-preview :deep(img) {
   max-width: 100%;
+}
+
+/* Mobile: master-detail — full-width list, editor takes over when a note is open */
+@media (max-width: 599px) {
+  .notes-list {
+    width: 100%;
+    min-width: 0;
+    border-right: none;
+  }
+
+  .notes-page.note-open .notes-list {
+    display: none;
+  }
+
+  .notes-page:not(.note-open) .notes-editor {
+    display: none;
+  }
 }
 </style>
