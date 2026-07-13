@@ -7,3 +7,9 @@ Add a Notes app to the dashboard. Notes are markdown files stored directly in yo
 - Create, edit and delete markdown notes
 - Toggle between an edit view and a rendered markdown preview
 - Save with the Save button or Ctrl/Cmd+S
+
+The app can be disabled with the new `apps` server setting:
+
+```ts
+export default R2Explorer({ apps: { notes: { enabled: false } } });
+```

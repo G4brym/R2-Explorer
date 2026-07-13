@@ -20,6 +20,11 @@ export type R2ExplorerConfig = {
 				targetBucket: string;
 		  }
 		| false;
+	apps?: {
+		notes?: {
+			enabled?: boolean;
+		};
+	};
 	showHiddenFiles?: boolean;
 	basicAuth?: BasicAuth | BasicAuth[];
 	buckets?: Record<string, BucketConfig>;

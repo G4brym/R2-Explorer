@@ -10,6 +10,7 @@ Here is all the available options:
 | `cors`             | `boolean` or `undefined`  | Enables or disables CORS access to the internal API, default: `false`         | `true`                                                    |
 | `cfAccessTeamName` | `string`  or `undefined`  | When set enforces Cloudflare Access in all requests                           | `radar`  (taken from https://radar.cloudflareaccess.com/) |
 | `emailRouting`     | `object`  or `undefined`  | Customize Email Explorer, read more [here](/guides/setup-email-explorer.html) | `https://demo.r2explorer.com`                             |
+| `apps`             | `object`  or `undefined`  | Enable or disable dashboard apps, see below                                   | `{ notes: { enabled: false } }`                           |
 | `cacheAssets`      | `boolean`  or `undefined` | Cache dashboard assets by 5 minutes, default: `true`                          | `true`                                                    |
 | `buckets`          | `object`  or `undefined`  | Configure bucket-specific settings like public URLs                           | `{ BUCKET: { publicUrl: "https://cdn.example.com" } }`    |
 
@@ -18,6 +19,12 @@ Here is all the available options:
 | Name           | Type(s)                  | Description                              | Examples                                               |
 |----------------|--------------------------|------------------------------------------|--------------------------------------------------------|
 | `targetBucket` | `string`  or `undefined` | Bucket name that will receive the emails | `my-emails` (assuming my-emails is a real bucket name) |
+
+`apps` options:
+
+| Name    | Type(s)                  | Description                                                             | Examples             |
+|---------|--------------------------|-------------------------------------------------------------------------|----------------------|
+| `notes` | `object` or `undefined`  | Set `{ enabled: false }` to hide the Notes app, enabled by default      | `{ enabled: false }` |
 
 `buckets` options (per bucket):
 

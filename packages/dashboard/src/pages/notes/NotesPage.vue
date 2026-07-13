@@ -378,6 +378,13 @@ export default defineComponent({
 		},
 	},
 	created() {
+		if (this.mainStore.config?.apps?.notes?.enabled === false) {
+			this.$router.replace({
+				name: "files-home",
+				params: { bucket: this.selectedBucket },
+			});
+			return;
+		}
 		this.fetchNotes();
 		if (this.selectedName) {
 			this.loadNote();
