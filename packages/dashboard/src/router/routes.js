@@ -56,6 +56,17 @@ const routes = [
 				component: () => import("pages/email/EmailFilePage.vue"),
 			},
 
+			{
+				path: "/:bucket/notes",
+				name: "notes-home",
+				component: () => import("pages/notes/NotesPage.vue"),
+			},
+			{
+				path: "/:bucket/notes/:file",
+				name: "notes-file",
+				component: () => import("pages/notes/NotesPage.vue"),
+			},
+
 			// backwards compatibility
 			{
 				path: "/storage/:bucket",

@@ -44,6 +44,7 @@
       </q-btn>
 
       <q-btn class="q-mb-sm" @click="gotoFiles" color="blue" icon="folder_copy" label="Files" stack />
+      <q-btn class="q-mb-sm" @click="gotoNotes" color="blue" icon="sticky_note_2" label="Notes" stack />
       <q-btn v-if="mainStore.config && mainStore.config.emailRouting !== false" class="q-mb-sm" @click="gotoEmail" color="blue" icon="email" label="Email" stack />
 
       <q-btn class="q-mb-sm q-mt-auto q-mb-0" @click="infoPopup=true" color="secondary" icon="question_mark"
@@ -107,6 +108,9 @@ export default defineComponent({
 		},
 		gotoFiles: function () {
 			if (this.selectedApp !== "files") this.changeApp("files");
+		},
+		gotoNotes: function () {
+			if (this.selectedApp !== "notes") this.changeApp("notes");
 		},
 		changeApp: function (app) {
 			this.$router.push({
