@@ -55,15 +55,15 @@
 		"url": "https://github.com/G4brym/R2-Explorer/issues"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.10.15",
-		"@cloudflare/workers-types": "^4.20260702.1",
-		"@types/node": "^24.13.3",
-		"@vitest/coverage-istanbul": "^3.2.7",
+		"@cloudflare/vitest-pool-workers": "^0.22.0",
+		"@cloudflare/workers-types": "^5.20260828.1",
+		"@types/node": "^26.4.0",
+		"@vitest/coverage-istanbul": "^4.1.11",
 		"hono": "^4.13.5",
 		"publint": "^0.3.24",
 		"tsup": "^8.5.1",
-		"typescript": "^5.9.3",
-		"vitest": "^3.2.7",
+		"typescript": "^7.0.2",
+		"vitest": "^4.1.11",
 		"wrangler": "^4.127.1"
 	},
 	"dependencies": {
