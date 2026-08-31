@@ -231,8 +231,11 @@ export default defineComponent({
 			this.debounceTimer = setTimeout(() => {
 				this.debouncedContent = newVal;
 			}, 150);
-			if (this.editorMode !== "preview") {
-				this.debouncedContent = newVal;
+		},
+		editorMode(newVal) {
+			if (newVal === "preview") {
+				clearTimeout(this.debounceTimer);
+				this.debouncedContent = this.content;
 			}
 		},
 		isNotesEnabled(enabled) {
@@ -306,6 +309,16 @@ export default defineComponent({
 		},
 		async loadNote() {
 			if (!this.selectedName) {
+				if (this.$route.params.file) {
+					this.q.notify({
+						type: "negative",
+						message: "Invalid note URL",
+					});
+					this.$router.replace({
+						name: "notes-home",
+						params: { bucket: this.selectedBucket },
+					});
+				}
 				this.content = "";
 				this.savedContent = "";
 				this.debouncedContent = "";
@@ -334,13 +347,18 @@ export default defineComponent({
 			} catch (e) {
 				const status = e.response?.status ?? e.status;
 				const isNotFound = status === 404;
+				const isForbidden = status === 403;
+				let message = `Unable to open note: ${e.message}`;
+				if (isNotFound) {
+					message = `Note not found: ${this.noteTitle(this.selectedName)}`;
+				} else if (isForbidden) {
+					message = "Access denied: app is in read-only mode";
+				}
 				this.q.notify({
 					type: "negative",
-					message: isNotFound
-						? `Note not found: ${this.noteTitle(this.selectedName)}`
-						: `Unable to open note: ${e.message}`,
+					message,
 				});
-				if (isNotFound) {
+				if (isNotFound || isForbidden) {
 					this.$router.replace({
 						name: "notes-home",
 						params: { bucket: this.selectedBucket },
@@ -409,13 +427,13 @@ export default defineComponent({
 			if (name.length > 255) {
 				return "Name is too long (max 255 characters)";
 			}
-			const filename = name.endsWith(".md") ? name : `${name}.md`;
-			if (filename === ".md" || filename === "..md") {
-				return "Invalid name";
-			}
 			return null;
 		},
 		async createNote() {
+			if (this.mainStore.apiReadonly) {
+				this.createError = "Cannot create note: app is in read-only mode";
+				return;
+			}
 			const name = this.newNoteName.trim();
 			const validationError = this.validateNoteName(name);
 			if (validationError) {
@@ -478,26 +496,14 @@ export default defineComponent({
 				});
 		},
 	},
-	beforeRouteLeave(to, from, next) {
+	beforeRouteLeave() {
 		if (this.isDirty && !this.confirmDiscard()) {
-			if (typeof next === "function") {
-				return next(false);
-			}
 			return false;
-		}
-		if (typeof next === "function") {
-			return next();
 		}
 	},
-	beforeRouteUpdate(to, from, next) {
+	beforeRouteUpdate() {
 		if (this.isDirty && !this.confirmDiscard()) {
-			if (typeof next === "function") {
-				return next(false);
-			}
 			return false;
-		}
-		if (typeof next === "function") {
-			return next();
 		}
 	},
 	created() {

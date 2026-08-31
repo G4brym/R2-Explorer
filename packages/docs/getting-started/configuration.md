@@ -26,6 +26,10 @@ Here is all the available options:
 |---------|--------------------------|-------------------------------------------------------------------------|------------------------------------|
 | `notes` | `object` or `undefined`  | Set `{ notes: { enabled: false } }` to hide the Notes app, enabled by default | `{ notes: { enabled: false } }` |
 
+:::tip
+Disabling an app only hides it in the dashboard UI. Direct API access to its underlying R2 prefix (e.g. `.r2-explorer/notes/` for Notes) is still allowed if `readonly` is `false`.
+:::
+
 `buckets` options (per bucket):
 
 | Name        | Type(s)                  | Description                              | Examples                  |
