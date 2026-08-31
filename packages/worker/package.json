@@ -67,9 +67,9 @@
 		"wrangler": "^4.127.1"
 	},
 	"dependencies": {
-		"@hono/cloudflare-access": "^0.3.1",
-		"chanfana": "^2.8.3",
-		"postal-mime": "^2.7.6",
-		"zod": "^3.25.76"
+		"@hono/cloudflare-access": "^0.4.0",
+		"chanfana": "^3.4.0",
+		"postal-mime": "^3.0.0",
+		"zod": "^4.4.3"
 	}
 }
