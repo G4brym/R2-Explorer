@@ -176,6 +176,8 @@ export default defineComponent({
 		creating: false,
 		content: "",
 		savedContent: "",
+		debouncedContent: "",
+		debounceTimer: null,
 		editorMode: "edit",
 		createDialog: false,
 		newNoteName: "",
@@ -189,13 +191,32 @@ export default defineComponent({
 			if (!this.$route.params.file) {
 				return null;
 			}
-			return decode(this.$route.params.file);
+			try {
+				return decode(this.$route.params.file);
+			} catch {
+				return null;
+			}
 		},
 		isDirty() {
 			return this.content !== this.savedContent;
 		},
+		isNotesEnabled() {
+			return this.mainStore.config?.apps?.notes?.enabled !== false;
+		},
 		renderedContent() {
-			return DOMPurify.sanitize(marked.parse(this.content));
+			if (this.editorMode !== "preview") {
+				return "";
+			}
+			try {
+				const raw = marked.parse(this.debouncedContent, {
+					gfm: true,
+					breaks: false,
+				});
+				const html = typeof raw === "string" ? raw : String(raw);
+				return DOMPurify.sanitize(html);
+			} catch {
+				return DOMPurify.sanitize(this.debouncedContent);
+			}
 		},
 	},
 	watch: {
@@ -204,6 +225,23 @@ export default defineComponent({
 		},
 		selectedName() {
 			this.loadNote();
+		},
+		content(newVal) {
+			clearTimeout(this.debounceTimer);
+			this.debounceTimer = setTimeout(() => {
+				this.debouncedContent = newVal;
+			}, 150);
+			if (this.editorMode !== "preview") {
+				this.debouncedContent = newVal;
+			}
+		},
+		isNotesEnabled(enabled) {
+			if (!enabled) {
+				this.$router.replace({
+					name: "files-home",
+					params: { bucket: this.selectedBucket },
+				});
+			}
 		},
 	},
 	methods: {
@@ -214,6 +252,9 @@ export default defineComponent({
 			return `${NOTES_PREFIX}${name}`;
 		},
 		async fetchNotes() {
+			if (!this.isNotesEnabled) {
+				return;
+			}
 			this.loading = true;
 			try {
 				const files = await apiHandler.fetchFile(
@@ -224,6 +265,11 @@ export default defineComponent({
 				this.notes = files
 					.filter((obj) => obj.type === "file")
 					.sort((a, b) => b.timestamp - a.timestamp);
+			} catch (e) {
+				this.q.notify({
+					type: "negative",
+					message: `Unable to load notes: ${e.message}`,
+				});
 			} finally {
 				this.loading = false;
 			}
@@ -252,10 +298,17 @@ export default defineComponent({
 				params: { bucket: this.selectedBucket },
 			});
 		},
+		handleBeforeUnload(e) {
+			if (this.isDirty) {
+				e.preventDefault();
+				e.returnValue = "";
+			}
+		},
 		async loadNote() {
 			if (!this.selectedName) {
 				this.content = "";
 				this.savedContent = "";
+				this.debouncedContent = "";
 				return;
 			}
 
@@ -267,20 +320,45 @@ export default defineComponent({
 					this.noteKey(this.selectedName),
 					{ downloadType: "blob" },
 				);
-				const text = new TextDecoder().decode(response.data);
+				let text = "";
+				if (response.data instanceof ArrayBuffer) {
+					text = new TextDecoder().decode(response.data);
+				} else if (typeof response.data === "string") {
+					text = response.data;
+				} else if (response.data) {
+					text = new TextDecoder().decode(response.data);
+				}
 				this.content = text;
 				this.savedContent = text;
+				this.debouncedContent = text;
 			} catch (e) {
+				const status = e.response?.status ?? e.status;
+				const isNotFound = status === 404;
 				this.q.notify({
 					type: "negative",
-					message: `Unable to open note: ${e.message}`,
+					message: isNotFound
+						? `Note not found: ${this.noteTitle(this.selectedName)}`
+						: `Unable to open note: ${e.message}`,
 				});
+				if (isNotFound) {
+					this.$router.replace({
+						name: "notes-home",
+						params: { bucket: this.selectedBucket },
+					});
+				}
 			} finally {
 				this.loadingContent = false;
 			}
 		},
 		async saveNote() {
 			if (!this.selectedName || this.saving) {
+				return;
+			}
+			if (this.mainStore.apiReadonly) {
+				this.q.notify({
+					type: "negative",
+					message: "Cannot save: app is in read-only mode",
+				});
 				return;
 			}
 
@@ -312,14 +390,36 @@ export default defineComponent({
 			this.createError = "";
 			this.createDialog = true;
 		},
-		async createNote() {
-			const name = this.newNoteName.trim();
+		validateNoteName(name) {
 			if (!name) {
-				this.createError = "Name is required";
-				return;
+				return "Name is required";
 			}
 			if (name.includes("/")) {
-				this.createError = "Name cannot contain /";
+				return "Name cannot contain /";
+			}
+			if (name.includes("\\")) {
+				return "Name cannot contain \\";
+			}
+			if (name === "." || name === "..") {
+				return "Invalid name";
+			}
+			if (name.startsWith(".")) {
+				return "Name cannot start with .";
+			}
+			if (name.length > 255) {
+				return "Name is too long (max 255 characters)";
+			}
+			const filename = name.endsWith(".md") ? name : `${name}.md`;
+			if (filename === ".md" || filename === "..md") {
+				return "Invalid name";
+			}
+			return null;
+		},
+		async createNote() {
+			const name = this.newNoteName.trim();
+			const validationError = this.validateNoteName(name);
+			if (validationError) {
+				this.createError = validationError;
 				return;
 			}
 
@@ -362,6 +462,7 @@ export default defineComponent({
 						);
 						this.content = "";
 						this.savedContent = "";
+						this.debouncedContent = "";
 						await this.fetchNotes();
 						this.$router.push({
 							name: "notes-home",
@@ -377,8 +478,30 @@ export default defineComponent({
 				});
 		},
 	},
+	beforeRouteLeave(to, from, next) {
+		if (this.isDirty && !this.confirmDiscard()) {
+			if (typeof next === "function") {
+				return next(false);
+			}
+			return false;
+		}
+		if (typeof next === "function") {
+			return next();
+		}
+	},
+	beforeRouteUpdate(to, from, next) {
+		if (this.isDirty && !this.confirmDiscard()) {
+			if (typeof next === "function") {
+				return next(false);
+			}
+			return false;
+		}
+		if (typeof next === "function") {
+			return next();
+		}
+	},
 	created() {
-		if (this.mainStore.config?.apps?.notes?.enabled === false) {
+		if (!this.isNotesEnabled) {
 			this.$router.replace({
 				name: "files-home",
 				params: { bucket: this.selectedBucket },
@@ -389,6 +512,13 @@ export default defineComponent({
 		if (this.selectedName) {
 			this.loadNote();
 		}
+	},
+	mounted() {
+		window.addEventListener("beforeunload", this.handleBeforeUnload);
+	},
+	beforeUnmount() {
+		window.removeEventListener("beforeunload", this.handleBeforeUnload);
+		clearTimeout(this.debounceTimer);
 	},
 	setup() {
 		return {

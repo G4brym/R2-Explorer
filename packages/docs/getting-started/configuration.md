@@ -22,9 +22,9 @@ Here is all the available options:
 
 `apps` options:
 
-| Name    | Type(s)                  | Description                                                             | Examples             |
-|---------|--------------------------|-------------------------------------------------------------------------|----------------------|
-| `notes` | `object` or `undefined`  | Set `{ enabled: false }` to hide the Notes app, enabled by default      | `{ enabled: false }` |
+| Name    | Type(s)                  | Description                                                             | Examples                           |
+|---------|--------------------------|-------------------------------------------------------------------------|------------------------------------|
+| `notes` | `object` or `undefined`  | Set `{ notes: { enabled: false } }` to hide the Notes app, enabled by default | `{ notes: { enabled: false } }` |
 
 `buckets` options (per bucket):
 
