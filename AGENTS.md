@@ -127,7 +127,7 @@ assets = {
 ## Development Workflow
 
 ### Prerequisites
-- Node.js (v16+)
+- Node.js (v22+; 24.x recommended, workflows use `22.x` and `24.x` - wrangler 4.127+ requires Node 22+)
 - pnpm package manager
 - Cloudflare account with R2 enabled
 - Wrangler CLI (included as dev dependency)
@@ -167,14 +167,33 @@ pnpm package
 pnpm publish-npm
 ```
 
+### Git Workflow
+- **Never commit directly to `main`.** Always create a feature branch.
+- **Run `pnpm lint` before every commit.** Fix any lint errors before committing (`npx @biomejs/biome check --write`).
+
+### Changesets
+Every PR must include a changeset. Run `pnpm changeset` to create one:
+- User-facing changes: write a changelog entry describing what changed with examples.
+- Internal-only (refactoring, CI, docs, tooling): `pnpm changeset --empty`.
+
 ### Testing
 ```bash
-# Run worker tests
-cd packages/worker
+# Run all tests (worker + dashboard)
 pnpm test
+
+# Run worker tests only
+pnpm --filter r2-explorer test
+# or: cd packages/worker && pnpm test
+
+# Run dashboard component tests
+pnpm --filter r2-explorer-dashboard test
+
+# Run E2E tests (required for any UI changes)
+pnpm test:e2e
 ```
 
-Tests use Vitest with `@cloudflare/vitest-pool-workers` for Worker runtime testing.
+- **Any UI changes must be covered by E2E tests.** Playwright E2E tests live in `packages/dashboard/e2e/`.
+- Tests use Vitest with `@cloudflare/vitest-pool-workers` for Worker runtime testing.
 
 ## Key Technical Concepts
 
