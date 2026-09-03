@@ -145,9 +145,8 @@ export default defineComponent({
 			return this.$route.name?.split("-")[0] || "files";
 		},
 		showNotes: function () {
-			if (!this.mainStore.version) {
-				return false;
-			}
+			// Gate only on config like the Email button to avoid layout shift:
+			// initial config {} shows Notes immediately, then hides if disabled.
 			return this.mainStore.config?.apps?.notes?.enabled !== false;
 		},
 	},

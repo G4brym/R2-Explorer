@@ -148,6 +148,7 @@
           label="Create"
           color="primary"
           :loading="creating"
+          :disable="loading"
           data-testid="create-note-btn"
           @click="createNote"
         />
@@ -182,6 +183,7 @@ export default defineComponent({
 		createDialog: false,
 		newNoteName: "",
 		createError: "",
+		loadSeq: 0,
 	}),
 	computed: {
 		selectedBucket() {
@@ -221,6 +223,16 @@ export default defineComponent({
 	},
 	watch: {
 		selectedBucket() {
+			// Clear list optimistically to avoid flashing the previous bucket's notes.
+			this.notes = [];
+			// selectedName watcher won't fire when the filename is identical
+			// across buckets, so reload explicitly to avoid showing stale content.
+			if (this.selectedName) {
+				this.content = "";
+				this.savedContent = "";
+				this.debouncedContent = "";
+				this.loadNote();
+			}
 			this.fetchNotes();
 		},
 		selectedName() {
@@ -266,7 +278,7 @@ export default defineComponent({
 					"/",
 				);
 				this.notes = files
-					.filter((obj) => obj.type === "file")
+					.filter((obj) => obj.type === "file" && obj.name.endsWith(".md"))
 					.sort((a, b) => b.timestamp - a.timestamp);
 			} catch (e) {
 				this.q.notify({
@@ -325,14 +337,26 @@ export default defineComponent({
 				return;
 			}
 
+			const seq = ++this.loadSeq;
+			const targetBucket = this.selectedBucket;
+			const targetName = this.selectedName;
+
 			this.loadingContent = true;
 			this.editorMode = "edit";
 			try {
 				const response = await apiHandler.downloadFile(
-					this.selectedBucket,
-					this.noteKey(this.selectedName),
+					targetBucket,
+					this.noteKey(targetName),
 					{ downloadType: "blob" },
 				);
+				// Ignore slow responses when the user already navigated elsewhere.
+				if (
+					seq !== this.loadSeq ||
+					targetName !== this.selectedName ||
+					targetBucket !== this.selectedBucket
+				) {
+					return;
+				}
 				let text = "";
 				if (response.data instanceof ArrayBuffer) {
 					text = new TextDecoder().decode(response.data);
@@ -345,27 +369,44 @@ export default defineComponent({
 				this.savedContent = text;
 				this.debouncedContent = text;
 			} catch (e) {
+				// Ignore errors for superseded loads.
+				if (
+					seq !== this.loadSeq ||
+					targetName !== this.selectedName ||
+					targetBucket !== this.selectedBucket
+				) {
+					return;
+				}
 				const status = e.response?.status ?? e.status;
 				const isNotFound = status === 404;
-				const isForbidden = status === 403;
+				// Readonly middleware returns 401 and never blocks GETs, so a
+				// 401/403 here is an auth or permission failure, not readonly.
+				const isDenied = status === 401 || status === 403;
 				let message = `Unable to open note: ${e.message}`;
 				if (isNotFound) {
-					message = `Note not found: ${this.noteTitle(this.selectedName)}`;
-				} else if (isForbidden) {
-					message = "Access denied: app is in read-only mode";
+					message = `Note not found: ${this.noteTitle(targetName)}`;
+				} else if (isDenied) {
+					message = "Access denied";
 				}
 				this.q.notify({
 					type: "negative",
 					message,
 				});
-				if (isNotFound || isForbidden) {
+				// Clear editor on any failure to avoid showing the previous
+				// note's content under the new note's title.
+				this.content = "";
+				this.savedContent = "";
+				this.debouncedContent = "";
+				if (isNotFound || isDenied) {
 					this.$router.replace({
 						name: "notes-home",
-						params: { bucket: this.selectedBucket },
+						params: { bucket: targetBucket },
 					});
 				}
 			} finally {
-				this.loadingContent = false;
+				if (seq === this.loadSeq) {
+					this.loadingContent = false;
+				}
 			}
 		},
 		async saveNote() {
@@ -404,6 +445,9 @@ export default defineComponent({
 			);
 		},
 		openCreateDialog() {
+			if (this.isDirty && !this.confirmDiscard()) {
+				return;
+			}
 			this.newNoteName = "";
 			this.createError = "";
 			this.createDialog = true;
@@ -434,6 +478,9 @@ export default defineComponent({
 				this.createError = "Cannot create note: app is in read-only mode";
 				return;
 			}
+			if (this.isDirty && !this.confirmDiscard()) {
+				return;
+			}
 			const name = this.newNoteName.trim();
 			const validationError = this.validateNoteName(name);
 			if (validationError) {
@@ -449,6 +496,27 @@ export default defineComponent({
 
 			this.creating = true;
 			try {
+				// Client-side list may be stale or empty (fetch failed, another
+				// tab created the same name). Re-check on the server to avoid
+				// silently overwriting an existing note with empty content.
+				try {
+					const existing = await apiHandler.headFile(
+						this.selectedBucket,
+						this.noteKey(filename),
+					);
+					if (existing) {
+						this.createError = "A note with this name already exists";
+						return;
+					}
+				} catch (e) {
+					const status = e.response?.status ?? e.status;
+					// 404 means the note doesn't exist — proceed. Any other
+					// error means we can't verify, so abort to avoid data loss.
+					if (status !== 404) {
+						this.createError = `Unable to verify note name: ${e.message}`;
+						return;
+					}
+				}
 				await this.writeNote(filename, "");
 				this.createDialog = false;
 				await this.fetchNotes();
@@ -466,26 +534,40 @@ export default defineComponent({
 			}
 		},
 		deleteNote() {
+			if (this.mainStore.apiReadonly) {
+				this.q.notify({
+					type: "negative",
+					message: "Cannot delete: app is in read-only mode",
+				});
+				return;
+			}
+			// Capture target before the confirm dialog: a route/bucket change
+			// while the modal is open must not delete the wrong note.
+			const name = this.selectedName;
+			const bucket = this.selectedBucket;
+			if (!name) {
+				return;
+			}
 			this.q
 				.dialog({
 					title: "Delete note",
-					message: `Are you sure you want to delete "${this.noteTitle(this.selectedName)}"?`,
+					message: `Are you sure you want to delete "${this.noteTitle(name)}"?`,
 					cancel: true,
 				})
 				.onOk(async () => {
 					try {
-						await apiHandler.deleteObject(
-							this.noteKey(this.selectedName),
-							this.selectedBucket,
-						);
-						this.content = "";
-						this.savedContent = "";
-						this.debouncedContent = "";
+						await apiHandler.deleteObject(this.noteKey(name), bucket);
+						// Only clear the editor if still viewing the deleted note.
+						if (this.selectedBucket === bucket && this.selectedName === name) {
+							this.content = "";
+							this.savedContent = "";
+							this.debouncedContent = "";
+							this.$router.push({
+								name: "notes-home",
+								params: { bucket },
+							});
+						}
 						await this.fetchNotes();
-						this.$router.push({
-							name: "notes-home",
-							params: { bucket: this.selectedBucket },
-						});
 						this.q.notify({ type: "positive", message: "Note deleted" });
 					} catch (e) {
 						this.q.notify({
