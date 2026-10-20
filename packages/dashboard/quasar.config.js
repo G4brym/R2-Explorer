@@ -9,6 +9,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 const { configure } = require("quasar/wrappers");
+const path = require("node:path");
 
 module.exports = configure((/* ctx */) => ({
 	// eslint: {
@@ -49,7 +50,11 @@ module.exports = configure((/* ctx */) => ({
 	build: {
 		env: require("dotenv").config().parsed,
 		target: {
-			browser: ["es2019", "edge88", "firefox78", "chrome87", "safari13.1"],
+			// Minimum browsers for vue-pdf-embed's bundled pdf.js 6, which
+			// needs Promise.withResolvers (Chrome 119+) and Promise.try
+			// (Chrome 128+, Firefox 134+, Safari 18.2+) on its worker
+			// messaging hot path. See vite-preload-helper-shim.js.
+			browser: ["es2022", "edge128", "firefox134", "chrome128", "safari18.2"],
 			node: "node16",
 		},
 
@@ -71,6 +76,27 @@ module.exports = configure((/* ctx */) => ({
 
 		// extendViteConf (viteConf) {},
 		// viteVuePluginOptions: {},
+		extendViteConf(viteConf) {
+			// Shim for the `vite/preload-helper` virtual module, which Vite 2
+			// injects for dynamic `import()` calls (e.g. inside vue-pdf-embed's
+			// bundled pdf.js) but never provides itself. Without this alias the
+			// build fails in `vite:resolve` because pnpm hoisting exposes a
+			// vite 5 copy whose `exports` map rejects the subpath. See
+			// vite-preload-helper-shim.js. Remove once Vite >= 3 is used.
+			viteConf.resolve = viteConf.resolve || {};
+			const alias = viteConf.resolve.alias || [];
+			const entries = Array.isArray(alias)
+				? alias
+				: Object.entries(alias).map(([find, replacement]) => ({
+						find,
+						replacement,
+					}));
+			entries.push({
+				find: "vite/preload-helper",
+				replacement: path.join(__dirname, "vite-preload-helper-shim.js"),
+			});
+			viteConf.resolve.alias = entries;
+		},
 
 		// vitePlugins: [
 		//   [ 'package-name', { ..options.. } ]

@@ -21,7 +21,7 @@ export default {
 		this.data = origText.split("\n").map((val) => {
 			try {
 				return JSON.stringify(JSON.parse(val), null, 2);
-			} catch (e) {
+			} catch (_e) {
 				return val;
 			}
 		});

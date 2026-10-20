@@ -155,14 +155,14 @@ export default defineComponent({
 		selectedFolder: () => "inbox",
 	},
 	watch: {
-		selectedBucket(newVal) {
+		selectedBucket(_newVal) {
 			this.fetchFiles();
 		},
 	},
 	methods: {
 		rowClass: (prop) =>
 			prop.row.customMetadata.read === "true" ? "email-read" : "email-unread",
-		rowClick: function (evt, row, index) {
+		rowClick: function (_evt, row, _index) {
 			const file = row.key.replace(/^.*[\\/]/, "");
 			// const folder = row.key.replace(file, '')
 
@@ -229,7 +229,7 @@ export default defineComponent({
 			const fileData = await apiHandler
 				.downloadFile(this.selectedBucket, indexKey, {})
 				.then((obj) => obj.data)
-				.catch((obj) => null);
+				.catch((_obj) => null);
 
 			const updatedIndex = await this.createOrUpdateIndex(fileData);
 
@@ -238,7 +238,7 @@ export default defineComponent({
 			});
 			try {
 				await apiHandler.uploadObjects(blob, indexKey, this.selectedBucket);
-			} catch (e) {}
+			} catch (_e) {}
 
 			return updatedIndex;
 		},
@@ -286,7 +286,7 @@ export default defineComponent({
 					})
 					.map((obj) => {
 						const date = new Date(
-							Number.parseInt(obj.customMetadata.timestamp),
+							Number.parseInt(obj.customMetadata.timestamp, 10),
 						);
 
 						return {
@@ -297,7 +297,7 @@ export default defineComponent({
 							has_attachments: obj.customMetadata.has_attachments === "true",
 							read: obj.customMetadata.read,
 							lastModified: timeSince(date),
-							timestamp: Number.parseInt(obj.customMetadata.timestamp),
+							timestamp: Number.parseInt(obj.customMetadata.timestamp, 10),
 						};
 					});
 

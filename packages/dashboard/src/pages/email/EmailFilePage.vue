@@ -91,7 +91,6 @@
 </template>
 
 <script>
-import { api } from "boot/axios";
 import { useQuasar } from "quasar";
 import { useMainStore } from "stores/main-store";
 import { defineComponent } from "vue";

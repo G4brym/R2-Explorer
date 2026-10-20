@@ -1,4 +1,4 @@
-import { OpenAPIRoute, Str } from "chanfana";
+import { OpenAPIRoute } from "chanfana";
 import { z } from "zod";
 import type { AppContext } from "../../types";
 
@@ -12,15 +12,17 @@ export class SendEmail extends OpenAPIRoute {
 				content: {
 					"application/json": {
 						schema: z.object({
-							subject: Str({ example: "Look! No servers" }),
+							subject: z.string().openapi({ example: "Look! No servers" }),
 							from: z.object({
-								email: Str({ example: "sender@example.com" }),
-								name: Str({ example: "Workers - MailChannels integration" }),
+								email: z.string().openapi({ example: "sender@example.com" }),
+								name: z
+									.string()
+									.openapi({ example: "Workers - MailChannels integration" }),
 							}),
 							to: z
 								.object({
-									email: Str({ example: "test@example.com" }),
-									name: Str({ example: "Test Recipient" }),
+									email: z.string().openapi({ example: "test@example.com" }),
+									name: z.string().openapi({ example: "Test Recipient" }),
 								})
 								.array(),
 							content: z.object({}).catchall(z.string()),

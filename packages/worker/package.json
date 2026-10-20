@@ -15,7 +15,7 @@
 	],
 	"scripts": {
 		"build": "tsup src/index.ts --format cjs,esm --dts && cp -R ../dashboard/dist/spa/ dashboard/ && cp ../../README.md . && cp ../../LICENSE . && mkdir -p docs/getting-started docs/guides && cp ../docs/index.md docs/ && cp ../docs/getting-started/*.md docs/getting-started/ && cp ../docs/guides/*.md docs/guides/",
-		"lint": "npx @biomejs/biome check src/ tests/ || (npx @biomejs/biome check --write src/ tests/; exit 1)",
+		"lint": "pnpm exec biome check src/ tests/",
 		"test": "tsc && npx vitest run --config tests/vitest.config.mts",
 		"package": "npm run build && npm pack",
 		"publint": "publint",
@@ -68,8 +68,8 @@
 	},
 	"dependencies": {
 		"@hono/cloudflare-access": "^0.3.1",
-		"chanfana": "^2.8.3",
+		"chanfana": "^3.4.0",
 		"postal-mime": "^2.7.6",
-		"zod": "^3.25.76"
+		"zod": "^4.6.7"
 	}
 }

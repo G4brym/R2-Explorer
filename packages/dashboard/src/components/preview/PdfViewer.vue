@@ -1,47 +1,76 @@
 <template>
-  <div id="pdfvuer">
-    <pdf
-      :src="pdfdata"
-      v-for="i in numPages"
-      :key="i"
-      :id="i"
-      :page="i"
-      v-model:scale="scale"
-      style="width: 100%; margin: 20px auto"
-      :annotation="true"
-      :resize="true"
-    >
-      <template v-slot:loading> loading content here... </template>
-    </pdf>
+  <div ref="container">
+    <div v-if="loading" class="text-center q-my-lg">loading content here...</div>
+    <div v-if="loadError" class="pdf-error text-negative text-center q-my-lg">
+      Failed to load PDF preview.
+    </div>
+    <vue-pdf-embed
+      v-if="containerWidth > 0"
+      :source="pdfUrl"
+      :width="containerWidth"
+      text-layer
+      annotation-layer
+      @loaded="onLoaded"
+      @rendered="onRendered"
+      @loading-failed="onLoadingFailed"
+      @rendering-failed="onRenderingFailed"
+    />
   </div>
 </template>
 
 <script>
-import pdf from "components/preview/PdfVuer.vue";
+import VuePdfEmbed from "vue-pdf-embed";
+import "vue-pdf-embed/dist/styles/annotationLayer.css";
+import "vue-pdf-embed/dist/styles/textLayer.css";
 
 export default {
 	components: {
-		pdf,
+		VuePdfEmbed,
 	},
 	props: ["pdfUrl"],
 	data() {
 		return {
-			page: 1,
-			numPages: 0,
-			pdfdata: undefined,
-			errors: [],
-			scale: "page-width",
+			containerWidth: 0,
+			loading: true,
+			loadError: false,
+			resizeObserver: null,
 		};
 	},
 	mounted() {
-		this.getPdf();
+		this.updateWidth();
+		this.resizeObserver = new ResizeObserver(() => {
+			this.updateWidth();
+		});
+		this.resizeObserver.observe(this.$refs.container);
+	},
+	beforeUnmount() {
+		if (this.resizeObserver) {
+			this.resizeObserver.disconnect();
+			this.resizeObserver = null;
+		}
 	},
 	methods: {
-		getPdf() {
-			this.pdfdata = pdf.createLoadingTask(this.pdfUrl);
-			this.pdfdata.then((pdf) => {
-				this.numPages = pdf.numPages;
-			});
+		updateWidth() {
+			const width = this.$refs.container?.clientWidth ?? 0;
+			if (width > 0 && width !== this.containerWidth) {
+				this.containerWidth = width;
+			}
+		},
+		onLoaded() {
+			this.loading = false;
+		},
+		onRendered() {
+			this.loading = false;
+		},
+		onLoadingFailed(error) {
+			this.loading = false;
+			this.loadError = true;
+			this.$emit("error", error);
+		},
+		onRenderingFailed(error) {
+			this.loading = false;
+			this.loadError = true;
+			this.$emit("error", error);
 		},
 	},
 };

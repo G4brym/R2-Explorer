@@ -1,4 +1,3 @@
-import { Buffer } from "node:buffer"; // For btoa
 import { createExecutionContext, env } from "cloudflare:test";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createTestApp, createTestRequest } from "./setup";
@@ -109,8 +108,7 @@ describe("Multipart Upload Endpoints", () => {
 		});
 
 		it("should return 400 for malformed customMetadata", async () => {
-			if (!MY_TEST_BUCKET_1)
-				throw new Error("MY_TEST_BUCKET_1 not available");
+			if (!MY_TEST_BUCKET_1) throw new Error("MY_TEST_BUCKET_1 not available");
 
 			const objectKey = "bad-metadata.dat";
 			const base64ObjectKey = btoa(objectKey);
@@ -130,8 +128,7 @@ describe("Multipart Upload Endpoints", () => {
 		});
 
 		it("should return 400 for malformed httpMetadata", async () => {
-			if (!MY_TEST_BUCKET_1)
-				throw new Error("MY_TEST_BUCKET_1 not available");
+			if (!MY_TEST_BUCKET_1) throw new Error("MY_TEST_BUCKET_1 not available");
 
 			const objectKey = "bad-metadata.dat";
 			const base64ObjectKey = btoa(objectKey);

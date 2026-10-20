@@ -52,7 +52,7 @@ export class PutObject extends OpenAPIRoute {
 
 		const key = decodeURIComponent(escape(atob(data.query.key)));
 
-		let customMetadata = undefined;
+		let customMetadata;
 		if (data.query.customMetadata) {
 			try {
 				customMetadata = JSON.parse(
@@ -65,7 +65,7 @@ export class PutObject extends OpenAPIRoute {
 			}
 		}
 
-		let httpMetadata = undefined;
+		let httpMetadata;
 		if (data.query.httpMetadata) {
 			try {
 				httpMetadata = JSON.parse(

@@ -72,7 +72,7 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { ROOT_FOLDER, apiHandler, decode, encode } from "src/appUtils";
+import { apiHandler, decode, ROOT_FOLDER } from "src/appUtils";
 import { useMainStore } from "stores/main-store";
 import { defineComponent } from "vue";
 
@@ -107,7 +107,6 @@ export default defineComponent({
 		renameObject: async function (row) {
 			this.renameModal = true;
 			this.row = row;
-			// console.log(row)
 			this.renameInput = row.name;
 		},
 		updateMetadataObject: async function (row) {
@@ -171,7 +170,7 @@ export default defineComponent({
 						);
 					}
 					notif({
-						caption: `${Number.parseInt((i * 100) / folderContents.length)}%`,
+						caption: `${Number.parseInt((i * 100) / folderContents.length, 10)}%`,
 					});
 				}
 
@@ -264,7 +263,7 @@ export default defineComponent({
 						await apiHandler.deleteObject(innerFile.key, this.selectedBucket);
 					}
 					notif({
-						caption: `${Number.parseInt((i * 100) / (folderContentsCount + 1))}%`, // +1 because still needs to delete the folder
+						caption: `${Number.parseInt((i * 100) / (folderContentsCount + 1), 10)}%`, // +1 because still needs to delete the folder
 					});
 				}
 

@@ -24,7 +24,7 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { ROOT_FOLDER, apiHandler, decode, sleep } from "src/appUtils";
+import { apiHandler, decode, ROOT_FOLDER, sleep } from "src/appUtils";
 import { useMainStore } from "stores/main-store";
 
 export default {
@@ -59,7 +59,7 @@ export default {
 		openFoldersUploader() {
 			this.$refs.foldersUploader.click();
 		},
-		dragover(event) {
+		dragover(_event) {
 			if (this.mainStore.apiReadonly || this.isHover === true) {
 				return;
 			}
@@ -109,7 +109,6 @@ export default {
 			this.uploadFiles(folders);
 		},
 		async uploadFiles(folders) {
-			let totalFiles = 0;
 			let totalSize = 0;
 			const filenames = [];
 
@@ -124,8 +123,6 @@ export default {
 
 					await apiHandler.createFolder(folderKey, this.selectedBucket);
 				}
-
-				totalFiles += files.length;
 
 				for (const file of files) {
 					filenames.push(file.name);
@@ -178,13 +175,10 @@ export default {
 
 							let partNumber = 1;
 							const parts = [];
-							// console.log('total: ', file.size)
-							// console.log('chunk: ', chunkSize)
 
 							for (let start = 0; start < file.size; start += chunkSize) {
 								const end = Math.min(start + chunkSize, file.size);
 								const chunk = file.slice(start, end);
-								// console.log(`${start} -> ${end}`)
 
 								const { data } = await apiHandler.multipartUpload(
 									uploadId,
@@ -193,9 +187,8 @@ export default {
 									key,
 									chunk,
 									(progressEvent) => {
-										//console.log((start + progressEvent.loaded) * 100 / file.size)
 										notif({
-											caption: `${Number.parseInt(((uploadSize + start + progressEvent.loaded) * 100) / totalSize)}%`,
+											caption: `${Number.parseInt(((uploadSize + start + progressEvent.loaded) * 100) / totalSize, 10)}%`,
 										});
 										// self.$store.dispatch('setUploadProgress', {
 										//   filename: file.name,
@@ -221,9 +214,8 @@ export default {
 								key,
 								this.selectedBucket,
 								(progressEvent) => {
-									//console.log(progressEvent.loaded * 100 / file.size)
 									notif({
-										caption: `${Number.parseInt(((uploadSize + progressEvent.loaded) * 100) / totalSize)}%`,
+										caption: `${Number.parseInt(((uploadSize + progressEvent.loaded) * 100) / totalSize, 10)}%`,
 									});
 									// self.$store.dispatch('setUploadProgress', {
 									//   filename: file.name,
@@ -257,7 +249,7 @@ export default {
 
 			// Root files are handled outside
 			if (item.isFile && depth > 0) {
-				const filePromise = new Promise((resolve, reject) => {
+				const filePromise = new Promise((resolve, _reject) => {
 					item.file((file) => {
 						folders[path].push(file);
 
@@ -275,7 +267,7 @@ export default {
 				// Get folder contents
 				const dirReader = item.createReader();
 
-				const promise = new Promise((resolve, reject) => {
+				const promise = new Promise((resolve, _reject) => {
 					dirReader.readEntries(async (entries) => {
 						for (let i = 0; i < entries.length; i++) {
 							await this.traverseFileTree(
@@ -321,9 +313,6 @@ export default {
 			}
 
 			folders[""] = cleanedRootFiles;
-
-			// console.log(cleanedRootFiles)
-			// console.log(folders)
 
 			this.uploadFiles(folders);
 

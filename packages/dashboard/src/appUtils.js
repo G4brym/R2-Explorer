@@ -60,7 +60,7 @@ export async function retryWithBackoff(
 }
 
 export const timeSince = (date) => {
-	const seconds = Math.floor((new Date() - date) / 1000);
+	const seconds = Math.floor((Date.now() - date) / 1000);
 
 	let interval = seconds / 31536000;
 	let calc;
@@ -99,7 +99,7 @@ export const timeSince = (date) => {
 export const bytesToSize = (bytes) => {
 	const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
 	if (bytes === 0) return "0 Byte";
-	const i = Number.parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+	const i = Number.parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
 	return `${Math.round(bytes / 1024 ** i, 2)} ${sizes[i]}`;
 };
 
@@ -204,7 +204,7 @@ export const apiHandler = {
 			},
 		});
 	},
-	multipartComplete: (file, key, bucket, parts, uploadId) => {
+	multipartComplete: (_file, key, bucket, parts, uploadId) => {
 		return api.post(`/buckets/${bucket}/multipart/complete`, {
 			key: encode(key),
 			uploadId,
