@@ -124,7 +124,7 @@ import FileContextMenu from "pages/files/FileContextMenu.vue";
 import { useQuasar } from "quasar";
 import { useMainStore } from "stores/main-store";
 import { defineComponent } from "vue";
-import { ROOT_FOLDER, apiHandler, decode, encode } from "../../appUtils";
+import { apiHandler, decode, encode, ROOT_FOLDER } from "../../appUtils";
 
 export default defineComponent({
 	name: "FilesIndexPage",
@@ -174,7 +174,7 @@ export default defineComponent({
 				align: "left",
 				field: "lastModified",
 				sortable: true,
-				sort: (a, b, rowA, rowB) => {
+				sort: (_a, _b, rowA, rowB) => {
 					return rowA.timestamp - rowB.timestamp;
 				},
 			},
@@ -185,7 +185,7 @@ export default defineComponent({
 				align: "left",
 				field: "size",
 				sortable: true,
-				sort: (a, b, rowA, rowB) => {
+				sort: (_a, _b, rowA, rowB) => {
 					return rowA.sizeRaw - rowB.sizeRaw;
 				},
 			},
@@ -242,21 +242,21 @@ export default defineComponent({
 		},
 	},
 	watch: {
-		selectedBucket(newVal) {
+		selectedBucket(_newVal) {
 			this.searchQuery = "";
 			this.resetAndFetchFiles();
 		},
-		selectedFolder(newVal) {
+		selectedFolder(_newVal) {
 			this.searchQuery = "";
 			this.resetAndFetchFiles();
 		},
 	},
 	methods: {
-		openRowClick: function (evt, row, index) {
+		openRowClick: function (evt, row, _index) {
 			evt.preventDefault();
 			this.openObject(row);
 		},
-		openRowDlbClick: function (evt, row, index) {
+		openRowDlbClick: function (evt, row, _index) {
 			evt.preventDefault();
 			this.$bus.emit("openFileDetails", row);
 		},
@@ -266,14 +266,13 @@ export default defineComponent({
 				params: { bucket: this.selectedBucket, folder: encode(obj.path) },
 			});
 		},
-		rowClick: function (evt, row) {
+		rowClick: function (_evt, row) {
 			if (row.type === "folder") {
 				this.$router.push({
 					name: "files-folder",
 					params: { bucket: this.selectedBucket, folder: encode(row.key) },
 				});
 			} else {
-				// console.log(row)
 				this.$refs.preview.openFile(row);
 			}
 		},
@@ -284,7 +283,6 @@ export default defineComponent({
 					params: { bucket: this.selectedBucket, folder: encode(row.key) },
 				});
 			} else {
-				// console.log(row)
 				this.$refs.preview.openFile(row);
 			}
 		},
@@ -295,7 +293,6 @@ export default defineComponent({
 					params: { bucket: this.selectedBucket, folder: encode(row.key) },
 				});
 			} else {
-				// console.log(row)
 				this.$refs.preview.openFile(row);
 			}
 		},
@@ -352,7 +349,7 @@ export default defineComponent({
 			this.hasMore = result.truncated;
 			this.loadingMore = false;
 		},
-		handleScroll: function (event) {
+		handleScroll: function (_event) {
 			const container = this.$refs.pageContainer;
 			if (!container || this.loadingMore || !this.hasMore) {
 				return;

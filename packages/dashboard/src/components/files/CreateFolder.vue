@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { ROOT_FOLDER, apiHandler, decode } from "src/appUtils";
+import { apiHandler, decode, ROOT_FOLDER } from "src/appUtils";
 import { useMainStore } from "stores/main-store";
 import { defineComponent } from "vue";
 

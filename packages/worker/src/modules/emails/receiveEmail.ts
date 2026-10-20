@@ -21,7 +21,7 @@ async function streamToArrayBuffer(stream, streamSize) {
 export async function receiveEmail(
 	event: { raw: unknown; rawSize: unknown },
 	env: AppEnv,
-	ctx: ExecutionContext,
+	_ctx: ExecutionContext,
 	config: R2ExplorerConfig,
 ) {
 	let bucket;
@@ -37,8 +37,8 @@ export async function receiveEmail(
 
 	if (!bucket) {
 		// Bucket not set, default to first defined
-		for (const [key, value] of Object.entries(env)) {
-			// @ts-ignore
+		for (const [_key, value] of Object.entries(env)) {
+			// @ts-expect-error
 			if (value.get && value.put) {
 				bucket = value;
 				break;

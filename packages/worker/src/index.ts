@@ -1,8 +1,8 @@
 import { cloudflareAccess } from "@hono/cloudflare-access";
 import {
-	type OpenAPIObjectConfigV31,
 	extendZodWithOpenApi,
 	fromHono,
+	type OpenAPIObjectConfigV31,
 } from "chanfana";
 import { type ExecutionContext, Hono } from "hono";
 import { basicAuth } from "hono/basic-auth";

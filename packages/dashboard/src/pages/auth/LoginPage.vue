@@ -47,6 +47,7 @@
 <script>
 import { useAuthStore } from "stores/auth-store";
 import { defineComponent } from "vue";
+
 const authStore = useAuthStore();
 
 export default defineComponent({

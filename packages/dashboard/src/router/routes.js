@@ -1,7 +1,7 @@
 import MainLayout from "layouts/MainLayout.vue";
-import HomePage from "pages/HomePage.vue";
 import EmailFolderPage from "pages/email/EmailFolderPage.vue";
 import FilesFolderPage from "pages/files/FilesFolderPage.vue";
+import HomePage from "pages/HomePage.vue";
 
 const routes = [
 	{

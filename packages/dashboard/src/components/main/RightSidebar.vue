@@ -165,9 +165,8 @@ export default defineComponent({
 		],
 	}),
 	methods: {
-		openFileDetails: (row) => {
+		openFileDetails: (_row) => {
 			// this.$emit('updateDrawer', true)  // TODO: enable
-			// console.log(row)
 		},
 	},
 	computed: {

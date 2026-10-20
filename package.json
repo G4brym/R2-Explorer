@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"workers-ci": "export WORKERS_CI=1 && node packages/github-action/prepareDeploy.js",
-		"lint": "npx @biomejs/biome check packages/dashboard/src packages/worker/src || (npx @biomejs/biome check --write packages/dashboard/src packages/worker/src/; exit 1)",
+		"lint": "pnpm exec biome check packages/dashboard/src packages/worker/src",
 		"build-dashboard": "pnpm run --filter r2-explorer-dashboard build",
 		"build-worker": "pnpm run --filter r2-explorer build",
 		"test": "pnpm run --filter r2-explorer test && pnpm run --filter r2-explorer-dashboard test",
@@ -18,7 +18,7 @@
 		"release": "pnpm build && pnpm --filter r2-explorer publint && changeset publish"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
+		"@biomejs/biome": "2.5.15",
 		"@changesets/changelog-github": "^0.5.2",
 		"@changesets/cli": "^2.31.1",
 		"@playwright/test": "^1.62.1",

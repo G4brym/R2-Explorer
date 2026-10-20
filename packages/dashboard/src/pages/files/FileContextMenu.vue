@@ -42,7 +42,7 @@
 </template>
 <script>
 import { useQuasar } from "quasar";
-import { ROOT_FOLDER, apiHandler, decode, encode } from "src/appUtils";
+import { apiHandler, decode, encode, ROOT_FOLDER } from "src/appUtils";
 import { useMainStore } from "stores/main-store";
 
 export default {

@@ -1,30 +1,53 @@
-# Development instruction for R2 Explorer
+# Development guide for R2-Explorer
 
-## Build and publish Dashboard into Dev
+This repo is a pnpm monorepo (`pnpm-workspace.yaml`). Node.js v22+ required
+(workflows use `22.x`, publish uses `24.x`).
 
-```bash
-make build-dashboard
-wrangler pages publish --branch dev --project-name r2-explorer-dashboard dist/
-```
-
-## Build and publish Dashboard into Production
+## Setup
 
 ```bash
-cd packages/dashboard/
-npm run build
-wrangler pages publish --branch main --project-name r2-explorer-dashboard dist/
+pnpm install
+pnpm build
 ```
 
-## Manually publish worker
+## Build
 
 ```bash
-cd worker
-export RELEASE_VERSION=v1.0.0
-node packages/config/preparePublish.js
-npm run build
-npm publish --access public
+pnpm build             # dashboard + worker
+pnpm build-dashboard   # Vue SPA only
+pnpm build-worker      # worker bundle (includes dashboard assets)
+pnpm package           # npm tarball for the worker package
 ```
 
+## Lint & tests
+
+```bash
+pnpm lint              # Biome check on dashboard + worker sources
+pnpm test              # worker + dashboard unit tests
+pnpm test:e2e          # Playwright E2E (builds dashboard first)
+```
+
+Run a single package:
+
+```bash
+pnpm --filter r2-explorer test        # worker tests
+pnpm --filter r2-explorer-dashboard test  # dashboard tests
+```
+
+## Local dev
+
+```bash
+# Dashboard UI with hot reload
+cd packages/dashboard && pnpm dev
+
+# Worker against local R2 bindings (see template/wrangler.toml)
+cd template && pnpm exec wrangler dev
+```
+
+## Changesets
+
+Every PR needs a changeset (`pnpm changeset`; use `pnpm changeset --empty`
+for internal-only changes such as CI/docs/tooling).
 
 ## Generate PWA assets
 
@@ -45,11 +68,4 @@ convert logo.png -resize '32x32' favicon-32x32.png
 convert logo.png -resize '144x144' msapplication-icon-144x144.png
 convert logo.png -resize '150x150' -background transparent -compose Copy -gravity center -extent 270x270 mstile-150x150.png
 convert logo.png -resize '512x512' safari-pinned-tab.svg
-
-
-cd packages/dashboard-v2/public
-convert logo.png -resize '128x128' icons/favicon-128x128.png
-convert logo.png -resize '96x96' icons/favicon-96x96.png
-convert logo.png -resize '32x32' icons/favicon-32x32.png
-convert logo.png -resize '16x16' icons/favicon-16x16.png
 ```

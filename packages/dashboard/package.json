@@ -19,12 +19,11 @@
 		"axios": "^1.20.0",
 		"fflate": "^0.8.3",
 		"html-to-text": "^9.0.5",
-		"pdfjs-dist": "2.5.207",
-		"pdfvuer": "^2.0.1",
 		"pinia": "^2.3.1",
 		"postal-mime": "^2.7.6",
 		"quasar": "^2.17.5",
 		"vue": "^3.5.42",
+		"vue-pdf-embed": "^2.1.7",
 		"vue-router": "^4.6.4"
 	},
 	"devDependencies": {

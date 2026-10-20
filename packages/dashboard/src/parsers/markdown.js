@@ -6,34 +6,34 @@ const replaceRegex = (regex, replacement) => (str) =>
 // Regular expressions for Markdown (a bit strict, but they work)
 const codeBlockRegex = /((\n\t)(.*))+/g;
 const inlineCodeRegex = /(`)(.*?)\1/g;
-const imageRegex = /!\[([^\[]+)\]\(([^\)]+)\)/g;
-const linkRegex = /\[([^\[]+)\]\(([^\)]+)\)/g;
+const imageRegex = /!\[([^[]+)\]\(([^)]+)\)/g;
+const linkRegex = /\[([^[]+)\]\(([^)]+)\)/g;
 const headingRegex = /\n(#+\s*)(.*)/g;
 const boldItalicsRegex = /(\*{1,2})(.*?)\1/g;
-const strikethroughRegex = /(\~\~)(.*?)\1/g;
-const blockquoteRegex = /\n(&gt;|\>)(.*)/g;
-const horizontalRuleRegex = /\n((\-{3,})|(={3,}))/g;
-const unorderedListRegex = /(\n\s*(\-|\+)\s.*)+/g;
+const strikethroughRegex = /(~~)(.*?)\1/g;
+const blockquoteRegex = /\n(&gt;|>)(.*)/g;
+const horizontalRuleRegex = /\n((-{3,})|(={3,}))/g;
+const unorderedListRegex = /(\n\s*(-|\+)\s.*)+/g;
 const orderedListRegex = /(\n\s*([0-9]+\.)\s.*)+/g;
 const paragraphRegex =
 	/\n+(?!<pre>)(?!<h)(?!<ul>)(?!<blockquote)(?!<hr)(?!\t)([^\n]+)\n/g;
 // Replacer functions for Markdown
 const codeBlockReplacer = (fullMatch) => `\n<pre>${fullMatch}</pre>`;
-const inlineCodeReplacer = (fullMatch, tagStart, tagContents) =>
+const inlineCodeReplacer = (_fullMatch, _tagStart, tagContents) =>
 	`<code>${tagContents}</code>`;
-const imageReplacer = (fullMatch, tagTitle, tagURL) =>
+const imageReplacer = (_fullMatch, tagTitle, tagURL) =>
 	`<img src="${tagURL}" alt="${tagTitle}" />`;
-const linkReplacer = (fullMatch, tagTitle, tagURL) =>
+const linkReplacer = (_fullMatch, tagTitle, tagURL) =>
 	`<a href="${tagURL}">${tagTitle}</a>`;
-const headingReplacer = (fullMatch, tagStart, tagContents) =>
+const headingReplacer = (_fullMatch, tagStart, tagContents) =>
 	`\n<h${tagStart.trim().length}>${tagContents}</h${tagStart.trim().length}>`;
-const boldItalicsReplacer = (fullMatch, tagStart, tagContents) =>
+const boldItalicsReplacer = (_fullMatch, tagStart, tagContents) =>
 	`<${tagStart.trim().length === 1 ? "em" : "strong"}>${tagContents}</${tagStart.trim().length === 1 ? "em" : "strong"}>`;
-const strikethroughReplacer = (fullMatch, tagStart, tagContents) =>
+const strikethroughReplacer = (_fullMatch, _tagStart, tagContents) =>
 	`<del>${tagContents}</del>`;
-const blockquoteReplacer = (fullMatch, tagStart, tagContents) =>
+const blockquoteReplacer = (_fullMatch, _tagStart, tagContents) =>
 	`\n<blockquote>${tagContents}</blockquote>`;
-const horizontalRuleReplacer = (fullMatch) => "\n<hr />";
+const horizontalRuleReplacer = (_fullMatch) => "\n<hr />";
 const unorderedListReplacer = (fullMatch) => {
 	let items = "";
 	fullMatch
@@ -54,7 +54,7 @@ const orderedListReplacer = (fullMatch) => {
 		});
 	return `\n<ol>${items}</ol>`;
 };
-const paragraphReplacer = (fullMatch, tagContents) => `<p>${tagContents}</p>`;
+const paragraphReplacer = (_fullMatch, tagContents) => `<p>${tagContents}</p>`;
 // Rules for Markdown parsing (use in order of appearance for best results)
 const replaceCodeBlocks = replaceRegex(codeBlockRegex, codeBlockReplacer);
 const replaceInlineCodes = replaceRegex(inlineCodeRegex, inlineCodeReplacer);
@@ -80,10 +80,10 @@ const replaceParagraphs = replaceRegex(paragraphRegex, paragraphReplacer);
 // Fix for tab-indexed code blocks
 const codeBlockFixRegex = /\n(<pre>)((\n|.)*)(<\/pre>)/g;
 const codeBlockFixer = (
-	fullMatch,
+	_fullMatch,
 	tagStart,
 	tagContents,
-	lastMatch,
+	_lastMatch,
 	tagEnd,
 ) => {
 	let lines = "";

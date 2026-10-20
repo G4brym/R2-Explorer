@@ -34,7 +34,7 @@ export function createTestRequest(
 	headers?: HeadersInit,
 ): Request {
 	const url = new URL(`http://localhost${path}`); // Base URL doesn't matter much for worker tests
-	let bodyInit: BodyInit | undefined = undefined;
+	let bodyInit: BodyInit | undefined;
 	const reqHeaders = new Headers(headers);
 
 	if (body) {

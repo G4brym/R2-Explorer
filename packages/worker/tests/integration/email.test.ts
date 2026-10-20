@@ -1,5 +1,5 @@
 import { createExecutionContext, env } from "cloudflare:test";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { R2Explorer } from "../../src/index"; // Changed to named import
 import type { R2ExplorerEmail } from "../../src/modules/emails/receiveEmail"; // For typing
 import { createTestApp, createTestRequest } from "./setup";

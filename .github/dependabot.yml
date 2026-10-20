@@ -2,9 +2,11 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directories:
-      - "/pnpm-lock.yaml"
+      - "/"
       - "/packages/worker"
       - "/packages/worker/dev"
+      - "/packages/dashboard"
+      - "/packages/docs"
       - "/packages/github-action"
     schedule:
       interval: "weekly"
