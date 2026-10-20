@@ -30,6 +30,19 @@ function buildMarkerPdf(marker: string): Buffer {
   return Buffer.from(pdf, "utf-8");
 }
 
+/**
+ * Pad a PDF past ~1 MB with inert `%` comment lines inserted before `%%EOF`.
+ * Offsets before the insertion point (including `startxref`) stay valid, so
+ * the file remains a well-formed PDF.
+ */
+function padPdfPastOneMb(pdf: Buffer): Buffer {
+  const text = pdf.toString("utf-8");
+  const line = `%${"0123456789abcdef".repeat(12)}\n`;
+  const target = 1_100_000;
+  const lines = Math.max(0, Math.ceil((target - text.length) / line.length));
+  return Buffer.from(text.replace("%%EOF", `${line.repeat(lines)}%%EOF`), "utf-8");
+}
+
 test.describe("PDF preview", () => {
   test.beforeAll(async ({ request }) => {
     await uploadFile(
@@ -71,6 +84,48 @@ test.describe("PDF preview", () => {
 
     // No loading/rendering failure UI may be shown.
     await expect(dialog.locator(".pdf-error")).toHaveCount(0);
+  });
+
+  test("renders a ~1 MB PDF that the dashboard downloads as a blob", async ({
+    page,
+    request,
+  }) => {
+    const largeKey = "e2e-preview-large.pdf";
+    const largeMarker = "R2EXPLORER-PDF-LARGE";
+    await uploadFile(
+      request,
+      largeKey,
+      padPdfPastOneMb(buildMarkerPdf(largeMarker)),
+      "application/pdf",
+    );
+    try {
+      await page.goto(`/${BUCKET}/files`);
+      await expect(page.locator(`text=${largeKey}`)).toBeVisible({
+        timeout: 10_000,
+      });
+
+      await page.locator(`text=${largeKey}`).dblclick();
+
+      const dialog = page.locator(".q-dialog");
+
+      // The rendered page must show up as a non-zero-size canvas.
+      const canvas = dialog.locator("canvas").first();
+      await expect(canvas).toBeVisible({ timeout: 20_000 });
+      const box = await canvas.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.width).toBeGreaterThan(0);
+      expect(box!.height).toBeGreaterThan(0);
+
+      // The text layer must contain the marker text.
+      await expect(
+        dialog.locator(".textLayer", { hasText: largeMarker }),
+      ).toBeVisible({ timeout: 10_000 });
+
+      // No loading/rendering failure UI may be shown.
+      await expect(dialog.locator(".pdf-error")).toHaveCount(0);
+    } finally {
+      await deleteObject(request, largeKey);
+    }
   });
 
   test("scales the page down when the window narrows", async ({ page }) => {

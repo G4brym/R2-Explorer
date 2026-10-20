@@ -182,7 +182,7 @@ describe("Object Specific Endpoints", () => {
 		});
 
 		// Basic Range request test - R2 supports this automatically
-		it.skip("should handle a basic HTTP Range request", async () => {
+		it("should handle a basic HTTP Range request", async () => {
 			const base64Key = btoa(TEST_OBJECT_KEY);
 			const request = createTestRequest(
 				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
@@ -197,6 +197,270 @@ describe("Object Specific Endpoints", () => {
 			expect(response.headers.get("content-range")).toMatch(/^bytes 0-4\/\d+$/); // e.g. bytes 0-4/17
 			const body = await response.text();
 			expect(body).toBe(TEST_OBJECT_CONTENT.substring(0, 5)); // "Hello"
+		});
+
+		it("should send accept-ranges on a full GET", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(200);
+			expect(response.headers.get("accept-ranges")).toBe("bytes");
+			await response.text(); // Consume body
+		});
+
+		it("should send accept-ranges on a 206 response", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=0-4" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(206);
+			expect(response.headers.get("accept-ranges")).toBe("bytes");
+			expect(response.headers.get("cache-control")).toContain("no-transform");
+			expect(response.headers.get("content-encoding")).toBe("identity");
+			await response.text(); // Consume body
+		});
+
+		it("should handle an open-ended range", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=6-" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(206);
+			expect(response.headers.get("content-range")).toBe(
+				`bytes 6-${TEST_OBJECT_CONTENT.length - 1}/${TEST_OBJECT_CONTENT.length}`,
+			);
+			expect(response.headers.get("content-length")).toBe(
+				(TEST_OBJECT_CONTENT.length - 6).toString(),
+			);
+			const body = await response.text();
+			expect(body).toBe(TEST_OBJECT_CONTENT.substring(6));
+		});
+
+		it("should handle a suffix range", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=-6" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(206);
+			const total = TEST_OBJECT_CONTENT.length;
+			expect(response.headers.get("content-range")).toBe(
+				`bytes ${total - 6}-${total - 1}/${total}`,
+			);
+			expect(response.headers.get("content-length")).toBe("6");
+			const body = await response.text();
+			expect(body).toBe(TEST_OBJECT_CONTENT.slice(-6));
+		});
+
+		it("should serve the whole object when a suffix range exceeds the size", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=-100" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(206);
+			const total = TEST_OBJECT_CONTENT.length;
+			expect(response.headers.get("content-range")).toBe(
+				`bytes 0-${total - 1}/${total}`,
+			);
+			expect(response.headers.get("content-length")).toBe(total.toString());
+			const body = await response.text();
+			expect(body).toBe(TEST_OBJECT_CONTENT);
+		});
+
+		it("should clamp a range end beyond the object size", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=10-100" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(206);
+			const total = TEST_OBJECT_CONTENT.length;
+			expect(response.headers.get("content-range")).toBe(
+				`bytes 10-${total - 1}/${total}`,
+			);
+			expect(response.headers.get("content-length")).toBe(
+				(total - 10).toString(),
+			);
+			const body = await response.text();
+			expect(body).toBe(TEST_OBJECT_CONTENT.substring(10));
+		});
+
+		it("should clamp an end value beyond the safe integer range", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=10-99999999999999999999" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(206);
+			const total = TEST_OBJECT_CONTENT.length;
+			expect(response.headers.get("content-range")).toBe(
+				`bytes 10-${total - 1}/${total}`,
+			);
+			const body = await response.text();
+			expect(body).toBe(TEST_OBJECT_CONTENT.substring(10));
+		});
+
+		it("should serve the whole object for a suffix beyond the safe integer range", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=-99999999999999999999" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(206);
+			const total = TEST_OBJECT_CONTENT.length;
+			expect(response.headers.get("content-range")).toBe(
+				`bytes 0-${total - 1}/${total}`,
+			);
+			const body = await response.text();
+			expect(body).toBe(TEST_OBJECT_CONTENT);
+		});
+
+		it("should keep a stored content-encoding on a 206 response", async () => {
+			const gzipKey = "range-gzip.bin";
+			await MY_TEST_BUCKET_1.put(gzipKey, "0123456789", {
+				httpMetadata: { contentEncoding: "gzip" },
+			});
+			const base64Key = btoa(gzipKey);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=0-4" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(206);
+			expect(response.headers.get("content-encoding")).toBe("gzip");
+			await response.text();
+		});
+
+		it("should return 416 for an unsatisfiable range", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const total = TEST_OBJECT_CONTENT.length;
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: `bytes=${total}-` },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(416);
+			expect(response.headers.get("content-range")).toBe(`bytes */${total}`);
+			await response.text(); // Consume body
+		});
+
+		it("should return 416 for a zero-length suffix range", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=-0" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(416);
+			expect(response.headers.get("content-range")).toBe(
+				`bytes */${TEST_OBJECT_CONTENT.length}`,
+			);
+			await response.text(); // Consume body
+		});
+
+		it("should return 416 for a range request on an empty object", async () => {
+			await MY_TEST_BUCKET_1.put(TEST_OBJECT_KEY, "");
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=-5" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(416);
+			expect(response.headers.get("content-range")).toBe("bytes */0");
+			await response.text(); // Consume body
+		});
+
+		it("should return 404 for a range request on a missing object", async () => {
+			const base64Key = btoa("non-existent-object.txt");
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=0-4" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(404);
+			await response.text(); // Consume body
+		});
+
+		it("should ignore a malformed range header and serve the full object", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "not-a-range" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(200);
+			const body = await response.text();
+			expect(body).toBe(TEST_OBJECT_CONTENT);
+		});
+
+		it("should ignore a multi-range header and serve the full object", async () => {
+			const base64Key = btoa(TEST_OBJECT_KEY);
+			const request = createTestRequest(
+				`/api/buckets/${BUCKET_NAME}/${base64Key}`,
+				"GET",
+				undefined,
+				{ Range: "bytes=0-1,5-6" },
+			);
+			const response = await app.fetch(request, env, createExecutionContext());
+
+			expect(response.status).toBe(200);
+			expect(response.headers.has("content-range")).toBe(false);
+			const body = await response.text();
+			expect(body).toBe(TEST_OBJECT_CONTENT);
 		});
 	});
 
