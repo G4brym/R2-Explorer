@@ -1,8 +1,15 @@
-import { test, expect } from "@playwright/test";
-import { deleteObject, BUCKET } from "./helpers";
-import path from "node:path";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
+import path from "node:path";
+import { expect, test } from "@playwright/test";
+import { BUCKET, deleteObject } from "./helpers";
+
+const BASE = "http://localhost:8787";
+
+function enc(k: string): string {
+	return btoa(unescape(encodeURIComponent(k)));
+}
 
 test.describe("File upload", () => {
 	let tmpFile: string;
@@ -61,5 +68,107 @@ test.describe("File download", () => {
 		// Verify download was triggered
 		const download = await downloadPromise;
 		expect(download.suggestedFilename()).toBe("e2e-download-me.txt");
+	});
+});
+
+test.describe("Large file multipart upload", () => {
+	test("uploads a 100 MiB file through the UI using multipart", async ({
+		page,
+		request,
+	}) => {
+		test.setTimeout(420_000);
+		const key = "e2e-multipart-100mib.bin";
+		const size = 100 * 1024 * 1024;
+		const data = Buffer.alloc(size);
+		for (let i = 0; i < size; i += 4096) {
+			data.writeUInt32BE(i >>> 0, i);
+		}
+		const expectedHash = createHash("sha256").update(data).digest("hex");
+		const file = path.join(os.tmpdir(), key);
+		fs.writeFileSync(file, data);
+
+		const multipartUrls: string[] = [];
+		page.on("request", (req) => {
+			const url = req.url();
+			if (url.includes("/multipart/")) {
+				multipartUrls.push(url);
+			}
+		});
+
+		try {
+			await page.goto(`/${BUCKET}/files`);
+			await expect(page.locator(".q-table")).toBeVisible({ timeout: 10_000 });
+
+			await page
+				.locator('input[type="file"]:not([webkitdirectory])')
+				.setInputFiles(file);
+
+			await expect(page.locator(`text=${key}`)).toBeVisible({
+				timeout: 300_000,
+			});
+
+			expect(multipartUrls.some((u) => u.includes("multipart/create"))).toBe(
+				true,
+			);
+			const uploadCalls = multipartUrls.filter((u) =>
+				u.includes("multipart/upload"),
+			);
+			expect(uploadCalls.length).toBeGreaterThanOrEqual(2);
+			const partNumbers = new Set(
+				uploadCalls.map((u) => new URL(u).searchParams.get("partNumber")),
+			);
+			expect(partNumbers.size).toBeGreaterThanOrEqual(2);
+			expect(multipartUrls.some((u) => u.includes("multipart/complete"))).toBe(
+				true,
+			);
+
+			const getResp = await request.get(
+				`${BASE}/api/buckets/${BUCKET}/${enc(key)}`,
+			);
+			expect(getResp.status()).toBe(200);
+			const body = await getResp.body();
+			expect(body.length).toBe(size);
+			expect(createHash("sha256").update(body).digest("hex")).toBe(
+				expectedHash,
+			);
+		} finally {
+			await deleteObject(request, key);
+			if (fs.existsSync(file)) fs.unlinkSync(file);
+		}
+	});
+});
+
+test.describe("Upload content types", () => {
+	test("keeps application/pdf content type for a PDF uploaded through the UI", async ({
+		page,
+		request,
+	}) => {
+		const key = "e2e-upload-content-type.pdf";
+		const tmp = path.join(os.tmpdir(), key);
+		fs.writeFileSync(tmp, "%PDF-1.4\n%%EOF\n");
+
+		try {
+			await page.goto(`/${BUCKET}/files`);
+			await expect(page.locator(".q-table")).toBeVisible({ timeout: 10_000 });
+
+			await page
+				.locator('input[type="file"]:not([webkitdirectory])')
+				.setInputFiles(tmp);
+
+			await expect(page.locator(`text=${key}`)).toBeVisible({
+				timeout: 30_000,
+			});
+
+			const headResp = await request.fetch(
+				`${BASE}/api/buckets/${BUCKET}/${enc(key)}`,
+				{ method: "HEAD" },
+			);
+			expect(headResp.status()).toBe(200);
+			const contentType = headResp.headers()["content-type"] ?? "";
+			expect(contentType).toContain("application/pdf");
+		} finally {
+			await deleteObject(request, key);
+			if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
+		}
 	});
 });
